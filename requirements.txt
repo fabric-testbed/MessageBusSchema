@@ -1,0 +1,3 @@
+confluent-kafka
+confluent-kafka[avro]
+setuptools >= 21.0.0
