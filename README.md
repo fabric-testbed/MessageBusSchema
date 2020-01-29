@@ -7,7 +7,7 @@ Fabric communication across various actors in Control and Measurement Framework 
 
 Apache Kafka is a distributed system designed for streams. It is built to be fault-tolerant, high-throughput, horizontally scalable, and allows geographically distributed data streams and stream processing applications.
 
-Kafka enables event driven implementation of various actors/services. Events are both a Fact and a Trigger. Each fabric actor will be a producer for one topic following the Single Writer Principle and would subscribe to topics from other actors for communication. Messages are exchanged over Kafka using Apache Avro data serialization system. The following diagram gives an example of communication between Control Framework actors:
+Kafka enables event driven implementation of various actors/services. Events are both a Fact and a Trigger. Each fabric actor will be a producer for one topic following the Single Writer Principle and would subscribe to topics from other actors for communication. Messages are exchanged over Kafka using Apache Avro data serialization system. 
 
 ## Requirements
 - Python 3.7+
