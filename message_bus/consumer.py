@@ -13,8 +13,8 @@ from message_bus.message import IMessage
 
 
 class AvroConsumerApi:
-    def __init__(self, conf, record_schema, topics, batchSize = 5):
-        self.consumer = AvroConsumer(conf, reader_value_schema=record_schema)
+    def __init__(self, conf, key_schema, record_schema, topics, batchSize = 5):
+        self.consumer = AvroConsumer(conf, reader_key_schema=key_schema, reader_value_schema=record_schema)
         self.running = True
         self.topics = topics
         self.batchSize = batchSize
@@ -27,14 +27,18 @@ class AvroConsumerApi:
         print("Trigger shutdown")
         self.running = False
 
-    def process_message(self, topic: str, message: IMessage):
+    def process_message(self, topic: str, key: dict, value: dict):
         """
         Process the incoming message. Must be overridden in the derived class
-        :param message: incoming message
+        :param key: incoming message key
+        :param value: incoming message value
         :return:
         """
         print("Message received for topic " + topic)
-        message.print()
+        print("Key = {}".format(key))
+        print("Value = {}".format(value))
+        m = IMessage(value)
+        m.print()
 
     def consume_auto(self):
         """
@@ -59,7 +63,7 @@ class AvroConsumerApi:
                         print("Consumer error: {}".format(msg.error()))
                         continue
 
-                self.process_message(msg.topic(), IMessage(msg.value()))
+                self.process_message(msg.topic(), msg.key(), msg.value())
             except SerializerError as e:
                 # Report malformed record, discard results, continue polling
                 print("Message deserialization failed {}".format(e))
@@ -94,7 +98,7 @@ class AvroConsumerApi:
                         print("Consumer error: {}".format(msg.error()))
                         continue
 
-                self.process_message(msg.topic(), IMessage(msg.value()))
+                self.process_message(msg.topic(), msg.key(), msg.value())
                 msg_count += 1
                 if msg_count % self.batch_size == 0:
                     self.consumer.commit(asynchronous=False)
@@ -128,10 +132,11 @@ if __name__ == '__main__':
             'schema.registry.url': "http://localhost:8081"}
 
     # load AVRO schema
-    schema = avro.loads(open('schema/message.avsc', "r").read())
+    key_schema = avro.loads(open('schema/key.avsc', "r").read())
+    val_schema = avro.loads(open('schema/message.avsc', "r").read())
 
     # create a producer
-    producer = AvroProducerApi(conf, schema)
+    producer = AvroProducerApi(conf, key_schema, val_schema)
 
     # push messages to topics
     for x in range(0,5):
@@ -145,7 +150,7 @@ if __name__ == '__main__':
     conf['auto.offset.reset'] = "earliest"
 
     # create a consumer
-    consumer = AvroConsumerApi(conf, schema, topics)
+    consumer = AvroConsumerApi(conf, key_schema, val_schema, topics)
 
     # start a thread to consume messages
     consume_thread = Thread(target = consumer.consume_auto, daemon=True)

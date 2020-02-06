@@ -16,17 +16,19 @@ class AvroProducerApi:
         This class implements the Interface for Kafka producer carrying Avro messages.
         It is expected that the users would extend this class and override on_delivery function.
     """
-    def __init__(self, conf, record_schema):
+    def __init__(self, conf, key_schema, record_schema):
         """
             Initialize the Producer API
             :param conf: configuration e.g:
                         {'bootstrap.servers': localhost:9092,
                         'schema.registry.url': http://localhost:8083}
-            :param record_schema: loaded AVRO schema
+            :param key_schema: loaded AVRO schema for the key
+            :param record_schema: loaded AVRO schema for the value
         """
-        self.producer = AvroProducer(conf, default_value_schema=record_schema)
+        self.producer = AvroProducer(conf, default_key_schema=key_schema, default_value_schema=record_schema)
 
     def delivery_report(self, err, msg, obj):
+
         """
             Handle delivery reports served from producer.poll.
             This callback takes an extra argument, obj.
@@ -50,7 +52,7 @@ class AvroProducerApi:
         try:
             # The message passed to the delivery callback will already be serialized.
             # To aid in debugging we provide the original object to the delivery callback.
-            self.producer.produce(topic=topic, value=record.to_dict(),
+            self.producer.produce(topic=topic, key=record.get_slice_id(), value=record.to_dict(),
                              callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
             # Serve on_delivery callbacks from previous asynchronous produce()
             self.producer.poll(0)
@@ -67,7 +69,7 @@ class AvroProducerApi:
         print("Producing records to topic {}.".format(topic))
         try:
             # Pass the message synchronously
-            self.producer.produce(topic=topic, value=record.to_dict())
+            self.producer.produce(topic=topic, key=record.get_slice_id(), value=record.to_dict())
             self.producer.flush()
         except ValueError:
             print("Invalid input, discarding record...")
@@ -88,10 +90,11 @@ if __name__ == '__main__':
             'schema.registry.url': "http://localhost:8081"}
 
     # load AVRO schema
-    schema = avro.loads(open('schema/message.avsc', "r").read())
+    key_schema = avro.loads(open('schema/key.avsc', "r").read())
+    val_schema = avro.loads(open('schema/message.avsc', "r").read())
 
     # create a producer
-    producer = AvroProducerApi(conf, schema)
+    producer = AvroProducerApi(conf, key_schema, val_schema)
 
     # produce message to topics
     message = IMessage("slice1")

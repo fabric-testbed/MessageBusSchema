@@ -38,4 +38,13 @@ class IMessage(object):
         }
 
     def print(self):
+        """
+        Prints the record
+        """
         print("slice_id:" + self.slice_id)
+
+    def get_slice_id(self):
+        """
+        Returns the slice id
+        """
+        return self.slice_id
