@@ -1,22 +1,44 @@
 #!/usr/bin/env python3
-# #######################################################################
-# Copyright (c) 2020 RENCI. All rights reserved
-# This material is the confidential property of RENCI or its
-# licensors and may be used, reproduced, stored or transmitted only in
-# accordance with a valid RENCI license or sublicense agreement.
-# #######################################################################
+# MIT License
+#
+# Copyright (c) 2020 FABRIC Testbed
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+#
+# Author: Komal Thareja (kthare10@renci.org)
+import traceback
 
 from confluent_kafka.avro import AvroProducer
 
-from message_bus.message import IMessage
+from message_bus.admin import AdminApi
+from message_bus.base import Base
+from message_bus.messages.QueryAvro import QueryAvro
+from message_bus.messages.message import IMessageAvro
 
 
-class AvroProducerApi:
+class AvroProducerApi(Base):
     """
         This class implements the Interface for Kafka producer carrying Avro messages.
         It is expected that the users would extend this class and override on_delivery function.
     """
-    def __init__(self, conf, key_schema, record_schema):
+    def __init__(self, conf, key_schema, record_schema, logger=None):
         """
             Initialize the Producer API
             :param conf: configuration e.g:
@@ -25,7 +47,11 @@ class AvroProducerApi:
             :param key_schema: loaded AVRO schema for the key
             :param record_schema: loaded AVRO schema for the value
         """
+        super().__init__(logger)
         self.producer = AvroProducer(conf, default_key_schema=key_schema, default_value_schema=record_schema)
+
+    def set_logger(self, logger):
+        self.logger = logger
 
     def delivery_report(self, err, msg, obj):
 
@@ -35,48 +61,57 @@ class AvroProducerApi:
             This allows the original contents to be included for debugging purposes.
         """
         if err is not None:
-            print('Message {} delivery failed for user {} with error {}'.format(
+            self.log_error('Message {} delivery failed for user {} with error {}'.format(
                 obj.id, obj.name, err))
         else:
-            print('Message {} successfully produced to {} [{}] at offset {}'.format(
+            self.log_debug('Message {} successfully produced to {} [{}] at offset {}'.format(
                 obj.id, msg.topic(), msg.partition(), msg.offset()))
 
-    def produce_async(self, topic, record: IMessage):
+    def produce_async(self, topic, record: IMessageAvro) -> bool:
         """
             Produce records for a specific topic
             :param topic: topic to which messages are written to
             :param record: record/message to be written
             :return:
         """
-        print("Producing records to topic {}.".format(topic))
+        self.log_debug("Producing records to topic {}.".format(topic))
         try:
             # The message passed to the delivery callback will already be serialized.
             # To aid in debugging we provide the original object to the delivery callback.
-            self.producer.produce(topic=topic, key=record.get_slice_id(), value=record.to_dict(),
+            self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
                              callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
             # Serve on_delivery callbacks from previous asynchronous produce()
             self.producer.poll(0)
-        except ValueError:
-            print("Invalid input, discarding record...")
+            return True
+        except ValueError as e:
+            traceback.pint_exc()
+            self.log_error("Invalid input, discarding record...{}".format(e))
+        return False
 
-    def produce_sync(self, topic, record: IMessage):
+    def produce_sync(self, topic, record: IMessageAvro) -> bool:
         """
             Produce records for a specific topic
             :param topic: topic to which messages are written to
             :param record: record/message to be written
             :return:
         """
-        print("Producing records to topic {}.".format(topic))
+        self.log_debug("Producing key {} to topic {}.".format(record.get_id(), topic))
+        self.log_debug("Producing record {} to topic {}.".format(record.to_dict(), topic))
+
         try:
             # Pass the message synchronously
-            self.producer.produce(topic=topic, key=record.get_slice_id(), value=record.to_dict())
+            self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict())
             self.producer.flush()
-        except ValueError:
-            print("Invalid input, discarding record...")
+            return True
+        except ValueError as e:
+            traceback.print_exc()
+            self.log_error("Invalid input, discarding record...")
+            self.log_error(str(e))
+            print(e)
+        return False
 
 
 if __name__ == '__main__':
-    from message_bus.admin import AdminApi
     from confluent_kafka import avro
 
     # Create Admin API object
@@ -97,9 +132,14 @@ if __name__ == '__main__':
     producer = AvroProducerApi(conf, key_schema, val_schema)
 
     # produce message to topics
-    message = IMessage("slice1")
+    message = QueryAvro()
+    message.message_id = "msg1"
+    message.properties = {"abc": "def"}
     producer.produce_sync("topic1", message)
-    message = IMessage("slice2")
+
+    message = QueryAvro("slice2")
+    message.message_id = "msg2"
+    message.properties = {"abc": "def"}
     producer.produce_sync("topic1", message)
 
     # delete topics

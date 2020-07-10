@@ -14,6 +14,11 @@ Kafka enables event driven implementation of various actors/services. Events are
 - confluent-kafka
 - confluent-kafka[avro]
 
+## Installation
+```
+$ pip3 install .
+```
+
 ## Usage
 This package implements the interface for producer/consumer APIs to push/read messages to/from Kafka via Avro serialization. 
 
