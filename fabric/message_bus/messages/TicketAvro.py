@@ -49,7 +49,8 @@ class TicketAvro(IMessageAvro):
             raise Exception("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']
-        self.reservation = ReservationAvro().from_dict(value['reservation'])
+        self.reservation = ReservationAvro()
+        self.reservation.from_dict(value['reservation'])
         if 'auth' in value['auth'] and value['auth'] != "null":
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])

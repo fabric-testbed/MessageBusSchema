@@ -61,19 +61,19 @@ class IMessageAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
-        return None
+        raise NotImplementedError
 
     def from_dict(self, value: dict):
-        return
+        raise NotImplementedError
 
     def get_message_id(self) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_message_name(self) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_callback_topic(self) -> str:
-        raise NotImplemented
+        raise NotImplementedError
 
     def get_id(self) -> str:
-        raise NotImplemented
+        raise NotImplementedError

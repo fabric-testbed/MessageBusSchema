@@ -30,6 +30,7 @@ from confluent_kafka.avro import AvroProducer
 from fabric.message_bus.admin import AdminApi
 from fabric.message_bus.base import Base
 from fabric.message_bus.messages.QueryAvro import QueryAvro
+from fabric.message_bus.messages.QueryResultAvro import QueryResultAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
@@ -84,7 +85,7 @@ class AvroProducerApi(Base):
             self.producer.poll(0)
             return True
         except ValueError as e:
-            traceback.pint_exc()
+            traceback.print_exc()
             self.log_error("Invalid input, discarding record...{}".format(e))
         return False
 
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     message.properties = {"abc": "def"}
     producer.produce_sync("topic1", message)
 
-    message = QueryAvro("slice2")
+    message = QueryResultAvro()
     message.message_id = "msg2"
     message.properties = {"abc": "def"}
     producer.produce_sync("topic1", message)

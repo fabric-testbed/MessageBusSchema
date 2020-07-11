@@ -212,7 +212,7 @@ class AdminApi(Base):
                 else:
                     errstr = ""
 
-                self.log_debug("    partition {} leader: {}, replicas: {}, isrs: {}".format(
+                self.log_debug("    partition {} leader: {}, replicas: {}, isrs: {}, errstr: {}".format(
                     p.id, p.leader, p.replicas, p.isrs, errstr))
 
     def list_topics(self) -> list:

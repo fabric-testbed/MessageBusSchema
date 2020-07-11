@@ -50,7 +50,7 @@ class AvroConsumerApi(Base):
         self.consumer = AvroConsumer(conf, reader_key_schema=key_schema, reader_value_schema=record_schema)
         self.running = True
         self.topics = topics
-        self.batchSize = batchSize
+        self.batch_size = batchSize
 
     def shutdown(self):
         """
