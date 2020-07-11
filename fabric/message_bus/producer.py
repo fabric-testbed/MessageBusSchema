@@ -27,10 +27,10 @@ import traceback
 
 from confluent_kafka.avro import AvroProducer
 
-from fabric.message_bus import AdminApi
+from fabric.message_bus.admin import AdminApi
 from fabric.message_bus.base import Base
-from fabric.message_bus.messages import QueryAvro
-from fabric.message_bus.messages import IMessageAvro
+from fabric.message_bus.messages.QueryAvro import QueryAvro
+from fabric.message_bus.messages.message import IMessageAvro
 
 
 class AvroProducerApi(Base):

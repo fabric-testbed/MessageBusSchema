@@ -23,9 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric.message_bus.messages import ResourceSetAvro
+from fabric.message_bus.messages.ResourceSetAvro import ResourceSetAvro
 from fabric.message_bus.messages.SliceAvro import SliceAvro
-from fabric.message_bus.messages import TermAvro
+from fabric.message_bus.messages.TermAvro import TermAvro
 
 
 class ReservationAvro:

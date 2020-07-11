@@ -23,7 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric.message_bus.messages import ResourceDataAvro
+from fabric.message_bus.messages.ResourceDataAvro import ResourceDataAvro
 
 
 class ResourceSetAvro:

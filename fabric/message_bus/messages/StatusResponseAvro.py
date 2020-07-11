@@ -25,8 +25,8 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from uuid import uuid4
 
-from fabric.message_bus.messages import ResultAvro
-from fabric.message_bus.messages import IMessageAvro
+from fabric.message_bus.messages.ResultAvro import ResultAvro
+from fabric.message_bus.messages.message import IMessageAvro
 
 
 class StatusResponseAvro(IMessageAvro):

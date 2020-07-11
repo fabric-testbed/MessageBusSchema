@@ -26,7 +26,7 @@
 
 from __future__ import annotations
 
-from fabric.message_bus.messages import ReservationPredecessorMng
+from fabric.message_bus.messages.ReservationPredecessorMng import ReservationPredecessorMng
 from fabric.message_bus.messages.TicketReservationMng import TicketReservationMng
 
 

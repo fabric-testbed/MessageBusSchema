@@ -23,7 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric.message_bus.messages import AuthAvro
+from fabric.message_bus.messages.AuthAvro import AuthAvro
 
 
 class SliceAvro:

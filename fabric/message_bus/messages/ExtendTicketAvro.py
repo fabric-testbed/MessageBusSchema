@@ -25,10 +25,9 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from uuid import uuid4
 
-from fabric.message_bus.messages import AuthAvro
-from fabric.message_bus.messages import ReservationAvro
-from fabric.message_bus.messages import IMessageAvro
-
+from fabric.message_bus.messages.AuthAvro import AuthAvro
+from fabric.message_bus.messages.ReservationAvro import ReservationAvro
+from fabric.message_bus.messages.message import IMessageAvro
 
 class ExtendTicketAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
