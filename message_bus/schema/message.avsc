@@ -1,8 +1,0 @@
-{
-    "namespace": "fabric.cf.serialization.avro",
-    "type": "record",
-    "name": "IMessage",
-    "fields": [
-        {"name": "slice_id", "type": "string"}
-    ]
-}
