@@ -2,6 +2,8 @@
 
 from setuptools import setup, find_packages
 
+from fabric import SchemaDir, MessageSchemaFile, KeySchemaFile
+
 NAME = "fabric-message-bus"
 VERSION = "1.0.0"
 # To install the library, run the following
@@ -27,12 +29,13 @@ setup(
     keywords=["Kafka", "Fabric Message Bus"],
     install_requires=REQUIRES,
     packages=find_packages(),
-    include_package_data=False,
+    include_package_data=True,
+    data_files=[(SchemaDir, [KeySchemaFile, MessageSchemaFile])],
     long_description=long_description,
     classifiers=[
                   "Programming Language :: Python :: 3",
                   "License :: OSI Approved :: MIT License",
                   "Operating System :: OS Independent",
               ],
-    python_requires='>=3.6'
+    python_requires='>=3.7'
 )
