@@ -24,5 +24,5 @@
 # Author Komal Thareja (kthare10@renci.org)
 
 SchemaDir = '/etc/fabric/message_bus/schema/'
-KeySchemaFile = 'message_bus/messages/schema/key.avsc'
-MessageSchemaFile = 'message_bus/messages/schema/message.avsc'
+KeySchemaFile = 'fabric/message_bus/schema/key.avsc'
+MessageSchemaFile = 'fabric/message_bus/schema/message.avsc'
