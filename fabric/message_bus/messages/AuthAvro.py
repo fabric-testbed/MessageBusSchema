@@ -58,3 +58,8 @@ class AuthAvro:
 
     def __str__(self):
         return "name: {} guid: {} id_token: {}".format(self.name, self.guid, self.id_token)
+
+    def __eq__(self, other):
+        if not isinstance(other, AuthAvro):
+            return False
+        return self.name == other.name and self.guid == other.guid and self.id_token == other.id_token

@@ -72,3 +72,9 @@ class ReservationAvro:
                                                                                             self.term,
                                                                                             self.sequence,
                                                                                             self.resource_set)
+
+    def __eq__(self, other):
+        if not isinstance(other, ReservationAvro):
+            return False
+        return self.reservation_id == other.reservation_id and self.slice == other.slice and \
+               self.term == other.term and self.resource_set == other.resource_set

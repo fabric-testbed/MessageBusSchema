@@ -64,3 +64,11 @@ class ResourceDataAvro:
     def __str__(self):
         return "request_properties: {} config_properties: {} resource_properties: {}"\
             .format(self.request_properties, self.config_properties, self.resource_properties)
+
+    def __eq__(self, other):
+        if not isinstance(other, ResourceDataAvro):
+            return False
+
+        return self.request_properties == other.request_properties and \
+               self.config_properties == other.config_properties and \
+               self.resource_properties == other.resource_properties

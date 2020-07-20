@@ -755,5 +755,37 @@
 				"default": null
 			}
 		]
+	},
+    {
+	    "namespace": "fabric.cf.model",
+		"name": "UpdateReservations",
+		"type": "record",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "callback_topic",
+				"type": "string"
+			},
+			{
+				"name": "message_id",
+				"type": "string"
+			},
+			{
+				"name": "guid",
+				"type": "string"
+			},
+			{
+				"name": "reservation_obj",
+				"type": ["null", "fabric.cf.model.ReservationMngRecord"],
+				"default": null
+			},
+			{
+				"name": "auth",
+				"type": ["null", "fabric.cf.model.AuthRecord"],
+				"default": null
+			}
+		]
 	}
 ]

@@ -63,3 +63,10 @@ class ResourceSetAvro:
     def __str__(self):
         return "units: {} type: {} resource_data: {} concrete: {}"\
             .format(self.units, self.type, self.resource_data, self.concrete)
+
+    def __eq__(self, other):
+        if not isinstance(other, ResourceSetAvro):
+            return False
+
+        return self.units == other.units and self.type == other.type and \
+               self.resource_data == other.resource_data and self.concrete == other.concrete

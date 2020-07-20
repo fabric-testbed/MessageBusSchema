@@ -24,35 +24,31 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 
-
-class UpdateDataAvro:
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["failed", "message"]
-
+class ReservationStateAvro:
     def __init__(self):
-        self.failed = None
-        self.message = None
+        self.state = None
+        self.pending_state = None
 
-    def from_dict(self, value: dict):
-        self.failed = value['failed']
-        self.message = value['message']
+    def get_state(self) -> int:
+        return self.state
+
+    def set_state(self, value: int):
+        self.state = value
+
+    def get_pending_state(self) -> int:
+        return self.pending_state
+
+    def set_pending_state(self, value: int):
+        self.pending_state = value
+
+    def from_dict(self, values: dict):
+        self.state = values.get('state', None)
+        self.state = values.get('pending_state', None)
 
     def to_dict(self) -> dict:
-        """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
-        """
-        result = {
-            "failed": self.failed,
-            "message": self.message
-        }
-        return result
+        return {
+            'state':self.state,
+            'pending_state': self.pending_state }
 
     def __str__(self):
-        return "failed: {} message: {} ".format(self.failed, self.message)
-
-    def __eq__(self, other):
-        if not isinstance(other, UpdateDataAvro):
-            return False
-
-        return self.failed == other.failed and self.message == other.message
+        return "state: {} pending_state: {}".format(self.state, self.pending_state)

@@ -25,10 +25,10 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from uuid import uuid4
 
-from fabric.message_bus.messages.LeaseReservationMng import LeaseReservationMng
+from fabric.message_bus.messages.LeaseReservationAvro import LeaseReservationAvro
 from fabric.message_bus.messages.ReservationMng import ReservationMng
 from fabric.message_bus.messages.ResultAvro import ResultAvro
-from fabric.message_bus.messages.TicketReservationMng import TicketReservationMng
+from fabric.message_bus.messages.TicketReservationAvro import TicketReservationAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
@@ -53,10 +53,10 @@ class ClaimResourcesResponseAvro(IMessageAvro):
         self.status.from_dict(value['status'])
         temp_res = value.get('reservation', None)
         if temp_res is not None:
-            if temp_res.get('name') == LeaseReservationMng.__class__.__name__:
-                self.reservation = LeaseReservationMng()
-            elif temp_res.get('name') == TicketReservationMng.__class__.__name__:
-                self.reservation = TicketReservationMng()
+            if temp_res.get('name') == LeaseReservationAvro.__class__.__name__:
+                self.reservation = LeaseReservationAvro()
+            elif temp_res.get('name') == TicketReservationAvro.__class__.__name__:
+                self.reservation = TicketReservationAvro()
             else:
                 self.reservation = ReservationMng()
             self.reservation.from_dict(temp_res)

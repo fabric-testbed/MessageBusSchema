@@ -26,38 +26,40 @@
 from uuid import uuid4
 
 from fabric.message_bus.messages.AuthAvro import AuthAvro
-from fabric.message_bus.messages.SliceAvro import SliceAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UpdateSliceRequestAvro(IMessageAvro):
+class CloseReservationsAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "reservation_id", "reservation_state", "callback_topic", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.UpdateSlice
+        self.name = IMessageAvro.CloseReservations
         self.message_id = None
         self.guid = None
-        self.slice_obj = None
-        self.callback_topic = None
         self.auth = None
+        self.slice_id = None
+        self.reservation_id = None
+        self.reservation_state = None
+        self.callback_topic = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.UpdateSlice:
+        if value['name'] != IMessageAvro.CloseReservations:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
+        self.guid = value['guid']
         self.callback_topic = value['callback_topic']
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
+
+        self.slice_id = value.get("slice_id", None)
+        self.reservation_id = value.get("reservation_id", None)
+        self.reservation_state = value.get("reservation_state", None)
+
+        if value.get('auth', None) is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
-        temp_slice = value.get('slice_obj', None)
-        self.slice_obj = SliceAvro()
-        self.slice_obj.from_dict(temp_slice)
-        self.guid = value.get('guid', None)
 
     def to_dict(self) -> dict:
         """
@@ -67,12 +69,18 @@ class UpdateSliceRequestAvro(IMessageAvro):
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "slice_obj": self.slice_obj.to_dict(),
-            "guid": self.guid
+            "guid": self.guid,
+            "callback_topic": self.callback_topic
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
+
+        if self.slice_id is not None:
+            result['slice_id'] = self.slice_id
+        if self.reservation_id is not None:
+            result['reservation_id'] = self.reservation_id
+        if self.reservation_state is not None:
+            result['reservation_state'] = self.reservation_state
         return result
 
     def get_message_id(self) -> str:
@@ -84,16 +92,22 @@ class UpdateSliceRequestAvro(IMessageAvro):
     def get_message_name(self) -> str:
         return self.name
 
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {}".format(self.name,
-                                                                                                   self.message_id,
-                                                                                                   self.callback_topic,
-                                                                                                   self.guid,
-                                                                                                   self.slice_obj,
-                                                                                                   self.auth)
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
 
     def get_id(self) -> str:
         return self.id.__str__()
 
-    def get_slice_obj(self) -> SliceAvro:
-        return self.slice_obj
+    def get_slice_id(self) -> str:
+        return self.slice_id
+
+    def get_reservation_state(self) -> int:
+        return self.reservation_state
+
+    def get_reservation_id(self) -> str:
+        return self.reservation_id
+
+    def __str__(self):
+        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} reservation_id: {} reservation_state: {} " \
+               "callback_topic: {}".format(self.name, self.message_id, self.guid, self.auth, self.slice_id,
+                                           self.reservation_id, self.reservation_state, self.callback_topic)

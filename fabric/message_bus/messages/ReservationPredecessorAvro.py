@@ -25,57 +25,37 @@
 # Author: Komal Thareja (kthare10@renci.org)
 
 
-class ResultAvro:
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["code", "message", "details"]
-
+class ReservationPredecessorAvro:
     def __init__(self):
-        self.code = 0
-        self.message = ""
-        self.details = ""
+        self.reservation_id = None
+        self.filter = None
 
     def from_dict(self, value: dict):
-        self.code = value.get("code", None)
-        self.message = value.get("message", None)
-        self.details = value.get("details", None)
+        self.reservation_id = value.get('reservation_id', None)
+        self.filter = value.get('filter', None)
 
     def to_dict(self) -> dict:
-        """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
-        """
-        result = {
-            "code": self.code
-        }
-        if self.message is not None:
-            result["message"] = self.message
-        if self.details is not None:
-            result["details"] = self.details
+        result = {'reservation_id': self.reservation_id,
+                  'filter': self.filter}
         return result
 
     def __str__(self):
-        return "code: {} message: {} details: {}".format(self.code, self.message, self.details)
+        return "reservation_id: {} filter: {}".format(self.reservation_id, self.filter)
 
-    def get_code(self) -> int:
-        return self.code
+    def get_reservation_id(self) -> str:
+        return self.reservation_id
 
-    def set_code(self, code: int):
-        self.code = code
+    def set_reservation_id(self, value: str):
+        self.reservation_id = value
 
-    def get_message(self) -> str:
-        return self.message
+    def get_filter_properties(self) -> dict:
+        return self.filter
 
-    def set_message(self, msg: str):
-        self.message = msg
-
-    def get_details(self) -> str:
-        return self.details
-
-    def set_details(self, value: str):
-        self.details = value
+    def set_filter_properties(self, value: dict):
+        self.filter = value
 
     def __eq__(self, other):
-        if not isinstance(other, ResultAvro):
+        if not isinstance(other, ReservationPredecessorAvro):
             return False
 
-        return self.code == other.code and self.message == other.message and self.details == other.details
+        return self.reservation_id == other.reservation_id and self.filter == other.filter

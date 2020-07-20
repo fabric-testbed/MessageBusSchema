@@ -26,39 +26,40 @@
 from uuid import uuid4
 
 from fabric.message_bus.messages.AuthAvro import AuthAvro
+from fabric.message_bus.messages.ReservationMng import ReservationMng
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ClaimResourcesAvro(IMessageAvro):
+class UpdateReservationAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "slice_id", "auth", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "reservation_obj", "callback_topic", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ClaimResources
+        self.name = IMessageAvro.UpdateReservation
         self.message_id = None
         self.guid = None
-        self.broker_id = None
-        self.reservation_id = None
-        self.slice_id = None
         self.auth = None
+        self.reservation_obj = None
         self.callback_topic = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.ClaimResources:
+        if value['name'] != IMessageAvro.UpdateReservation:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
         self.guid = value['guid']
-        self.broker_id = value['broker_id']
-        self.reservation_id = value['reservation_id']
-        self.slice_id = value.get('slice_id', None)
+        self.callback_topic = value['callback_topic']
+
+        if value.get("reservation_obj", None) is not None:
+            res_value = value.get("reservation_obj", None)
+            self.reservation_obj = ReservationMng()
+            self.reservation_obj.from_dict(res_value)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
-        self.callback_topic = value['callback_topic']
 
     def to_dict(self) -> dict:
         """
@@ -69,14 +70,14 @@ class ClaimResourcesAvro(IMessageAvro):
             "name": self.name,
             "message_id": self.message_id,
             "guid": self.guid,
-            "broker_id": self.broker_id,
-            "reservation_id": self.reservation_id,
             "callback_topic": self.callback_topic
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
-        if self.slice_id is not None:
-            result["slice_id"] = self.slice_id
+
+        if self.reservation_obj is not None:
+            result['reservation_obj'] = self.reservation_obj.to_dict()
+
         return result
 
     def get_message_id(self) -> str:
@@ -91,9 +92,16 @@ class ClaimResourcesAvro(IMessageAvro):
     def get_callback_topic(self) -> str:
         return self.callback_topic
 
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} broker_id: {} reservation_id: {} slice_id: {} auth: {} callback_topic: {}".format(
-            self.name, self.message_id, self.guid, self.broker_id, self.reservation_id, self.slice_id, self.auth, self.callback_topic)
-
     def get_id(self) -> str:
         return self.id.__str__()
+
+    def get_reservation(self) -> ReservationMng:
+        return self.reservation_obj
+
+    def __str__(self):
+        return "name: {} message_id: {} guid: {} auth: {} reservation_obj: {} callback_topic: {}".format(self.name,
+                                                                                                     self.message_id,
+                                                                                                     self.guid,
+                                                                                                     self.auth,
+                                                                                                     self.reservation_obj,
+                                                                                                     self.callback_topic)

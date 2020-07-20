@@ -210,3 +210,13 @@ class SliceAvro:
 
     def set_slice_id(self, slice_id: str):
         self.guid = slice_id
+
+    def __eq__(self, other):
+        if not isinstance(other, SliceAvro):
+            return False
+
+        return self.slice_name == other.slice_name and self.guid == other.guid and self.owner == other.owner and \
+            self.description == other.description and self.local_properties == other.local_properties and \
+            self.config_properties == other.config_properties and self.request_properties == other.request_properties and \
+            self.resource_properties == other.resource_properties and self.resource_type == other.resource_type and \
+            self.client_slice == other.client_slice and self.broker_client_slice == other.broker_client_slice

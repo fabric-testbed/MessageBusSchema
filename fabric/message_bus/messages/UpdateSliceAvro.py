@@ -25,47 +25,39 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from uuid import uuid4
 
-from fabric.message_bus.messages.LeaseReservationMng import LeaseReservationMng
-from fabric.message_bus.messages.ReservationMng import ReservationMng
-from fabric.message_bus.messages.ResultAvro import ResultAvro
-from fabric.message_bus.messages.TicketReservationMng import TicketReservationMng
+from fabric.message_bus.messages.AuthAvro import AuthAvro
+from fabric.message_bus.messages.SliceAvro import SliceAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class GetReservationsResponseAvro(IMessageAvro):
+class UpdateSliceAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "status", "reservations", "slices", "id"]
+    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.GetReservationsResponse
+        self.name = IMessageAvro.UpdateSlice
         self.message_id = None
-        self.status = None
-        self.reservations = None
-        self.slices = None
+        self.guid = None
+        self.slice_obj = None
+        self.callback_topic = None
+        self.auth = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.GetReservationsResponse:
+        if value['name'] != IMessageAvro.UpdateSlice:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
-        self.status = ResultAvro()
-        self.status.from_dict(value['status'])
-        reservations_list = value.get('reservations', None)
-        if reservations_list is not None:
-            for s in reservations_list:
-                res_obj = None
-                if s.get('name') == LeaseReservationMng.__class__.__name__:
-                    res_obj = LeaseReservationMng()
-                elif s.get('name') == TicketReservationMng.__class__.__name__:
-                    res_obj = TicketReservationMng()
-                else:
-                    res_obj = ReservationMng()
-                res_obj.from_dict(s)
-                if self.reservations is None:
-                    self.reservations = []
-                self.reservations.append(res_obj)
+        self.callback_topic = value['callback_topic']
+        auth_temp = value.get('auth', None)
+        if auth_temp is not None:
+            self.auth = AuthAvro()
+            self.auth.from_dict(value['auth'])
+        temp_slice = value.get('slice_obj', None)
+        self.slice_obj = SliceAvro()
+        self.slice_obj.from_dict(temp_slice)
+        self.guid = value.get('guid', None)
 
     def to_dict(self) -> dict:
         """
@@ -75,13 +67,12 @@ class GetReservationsResponseAvro(IMessageAvro):
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "status": self.status.to_dict()
+            "callback_topic": self.callback_topic,
+            "slice_obj": self.slice_obj.to_dict(),
+            "guid": self.guid
         }
-        if self.reservations is not None:
-            temp = []
-            for s in self.reservations:
-                temp.append(s.to_dict())
-            result["reservations"] = temp
+        if self.auth is not None:
+            result['auth'] = self.auth.to_dict()
         return result
 
     def get_message_id(self) -> str:
@@ -94,7 +85,15 @@ class GetReservationsResponseAvro(IMessageAvro):
         return self.name
 
     def __str__(self):
-        return "name: {} message_id: {} status: {} reservations: {}".format(self.name, self.message_id, self.status, self.reservations)
+        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {}".format(self.name,
+                                                                                                   self.message_id,
+                                                                                                   self.callback_topic,
+                                                                                                   self.guid,
+                                                                                                   self.slice_obj,
+                                                                                                   self.auth)
 
     def get_id(self) -> str:
         return self.id.__str__()
+
+    def get_slice_obj(self) -> SliceAvro:
+        return self.slice_obj

@@ -212,3 +212,13 @@ class ReservationMng:
 
     def set_notices(self, value: str):
         self.notices = value
+
+    def __eq__(self, other):
+        if not isinstance(other, ReservationMng):
+            return False
+
+        return self.name == other.name and self.reservation_id == other.reservation_id and \
+            self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
+            self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
+            self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
+            self.request == other.request and self.resource == other.resource and self.notices == other.notices

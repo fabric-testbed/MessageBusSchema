@@ -23,33 +23,29 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+from fabric.message_bus.messages.ReservationStateAvro import ReservationStateAvro
 
 
-class ReservationPredecessorMng:
+class LeaseReservationStateAvro(ReservationStateAvro):
     def __init__(self):
-        self.reservation_id = None
-        self.filter = None
+        super().__init__()
+        self.joining = None
 
-    def from_dict(self, value: dict):
-        self.reservation_id = value.get('reservation_id', None)
-        self.filter = value.get('filter', None)
+    def get_joining(self) -> int:
+        return self.joining
+
+    def set_joining(self, value: int):
+        self.joining = value
+
+    def from_dict(self, values: dict):
+        self.state = values.get('state', None)
+        self.state = values.get('pending_state', None)
 
     def to_dict(self) -> dict:
-        result = {'reservation_id': self.reservation_id,
-                  'filter': self.filter}
-        return result
+        return {
+            'state':self.state,
+            'pending_state': self.pending_state,
+            'joining': self.joining}
 
     def __str__(self):
-        return "reservation_id: {} filter: {}".format(self.reservation_id, self.filter)
-
-    def get_reservation_id(self) -> str:
-        return self.reservation_id
-
-    def set_reservation_id(self, value: str):
-        self.reservation_id = value
-
-    def get_filter_properties(self) -> dict:
-        return self.filter
-
-    def set_filter_properties(self, value: dict):
-        self.filter = value
+        return "state: {} pending_state: {} joining: {}".format(self.state, self.pending_state, self.joining)

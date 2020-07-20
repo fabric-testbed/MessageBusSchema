@@ -23,59 +23,48 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-
-from __future__ import annotations
-
-from fabric.message_bus.messages.ReservationPredecessorMng import ReservationPredecessorMng
-from fabric.message_bus.messages.TicketReservationMng import TicketReservationMng
+from fabric.message_bus.messages.ReservationMng import ReservationMng
 
 
-class LeaseReservationMng(TicketReservationMng):
+class TicketReservationAvro(ReservationMng):
     def __init__(self):
         super().__init__()
-        self.authority = None
-        self.join_state = None
-        self.leased_units = None
-        self.redeem_processors = []
+        self.broker = None
+        self.ticket = None
+        self.renewable = None
+        self.renew_time = None
         self.name = self.__class__.__name__
 
     def from_dict(self, value: dict):
         super().from_dict(value)
-        self.authority = value.get('authority', None)
-        self.join_state = value.get('join_state', None)
-        self.leased_units = value.get('leased_units', None)
-        temp_redeem = value.get('redeem_processors', None)
-        if temp_redeem is not None:
-            for p in temp_redeem:
-                predecessor = ReservationPredecessorMng()
-                predecessor.from_dict(p)
-                self.redeem_processors.append(predecessor)
+        self.broker = value.get('broker', None)
+        self.ticket = value.get('ticket', None)
+        self.renewable = value.get('renewable', None)
+        self.renew_time = value.get('renew_time', None)
 
     def to_dict(self) -> dict:
         result = super().to_dict()
         if result is None:
             result = {}
-        result['authority'] = self.authority
-        if self.join_state is not None:
-            result['join_state'] = self.join_state
 
-        if self.leased_units is not None:
-            result['leased_units'] = self.leased_units
+        if self.broker is not None:
+            result['broker'] = self.broker
 
-        if self.redeem_processors is not None and len(self.redeem_processors) > 0:
-            temp = []
-            for p in self.redeem_processors:
-                temp.append(p.to_dict())
-            result['redeem_processors'] = temp
+        if self.ticket is not None:
+            result['ticket'] = self.ticket
+
+        if self.renewable is not None:
+            result['renewable'] = self.renewable
+
+        if self.renew_time is not None:
+            result['renew_time'] = self.renew_time
 
         return result
 
     def __str__(self):
-        return "{} authority: {} join_state: {} leased_units: {} redeem_processors: {}".format(super().__str__(),
-                                                                                               self.authority,
-                                                                                               self.join_state,
-                                                                                               self.leased_units,
-                                                                                               self.redeem_processors)
+        prev_result = super().__str__()
+        return "{} broker: {} ticket: {} renewable: {} renew_time: {}".format(prev_result, self.broker, self.ticket,
+                                                                              self.renewable, self.renew_time)
 
     def print(self):
         print("")
@@ -100,20 +89,6 @@ class LeaseReservationMng(TicketReservationMng):
         if self.renew_time is not None:
             print("Renew Time: {}".format(self.renew_time))
 
-        print("Authority: {}".format(self.authority))
-
-        if self.join_state is not None:
-            print("Join State: {}".format(self.join_state))
-
-        if self.leased_units is not None:
-            print("Leased Units: {}".format(self.leased_units))
-
-        if self.redeem_processors is not None:
-            index = 0
-            for rp in self.redeem_processors:
-                print("Redeem Predecessor# {}: {}".format(index, rp))
-                index += 1
-
         if self.local is not None:
             print("Local Properties: {}".format(self.local))
         if self.config is not None:
@@ -124,23 +99,38 @@ class LeaseReservationMng(TicketReservationMng):
             print("Resource Properties: {}".format(self.resource))
         print("")
 
-    def get_authority(self) -> str:
-        return self.authority
+    def get_broker(self) -> str:
+        return self.broker
 
-    def set_authority(self, value: str):
-        self.authority = value
+    def set_broker(self, value: str):
+        self.broker = value
 
-    def get_join_state(self) -> int:
-        return self.join_state
+    def get_ticket_properties(self) -> dict:
+        return self.ticket
 
-    def set_join_state(self, value: int):
-        self.join_state = value
+    def set_ticket_properties(self, value: dict):
+        self.ticket = value
 
-    def get_leased_units(self) -> int:
-        return self.leased_units
+    def is_renewable(self) -> bool:
+        return self.renewable
 
-    def set_leased_units(self, value: int):
-        self.leased_units = value
+    def set_renewable(self, value: bool):
+        self.renewable = value
 
-    def get_redeem_predecessors(self) -> list:
-        return self.redeem_processors
+    def get_renew_time(self) -> int:
+        return self.renew_time
+
+    def set_renew_time(self, value: int):
+        self.renew_time = value
+
+    def __eq__(self, other):
+        if not isinstance(other, TicketReservationAvro):
+            return False
+
+        return self.name == other.name and self.reservation_id == other.reservation_id and \
+            self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
+            self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
+            self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
+            self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
+            self.broker == other.broker and self.ticket == other.ticket and self.renewable == other.renewable and \
+            self.renewable == other.renew_time

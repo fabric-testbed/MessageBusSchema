@@ -55,6 +55,11 @@ class IMessageAvro:
     StatusResponse = "StatusResponse"
     AddSlice = "AddSlice"
     UpdateSlice = "UpdateSlice"
+    RemoveReservation = "RemoveReservation"
+    CloseReservations = "CloseReservations"
+    UpdateReservation = "UpdateReservation"
+    GetReservationsStateRequest = "GetReservationsStateRequest"
+    GetReservationsStateResponse = "GetReservationsStateResponse"
 
     def to_dict(self) -> dict:
         """

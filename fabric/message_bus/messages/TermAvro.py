@@ -67,3 +67,10 @@ class TermAvro:
     def __str__(self):
         return "start_time: {} end_time: {} ticket_time: {} new_start_time: {}"\
             .format(self.start_time, self.end_time, self.ticket_time, self.new_start_time)
+
+    def __eq__(self, other):
+        if not isinstance(other, TermAvro):
+            return False
+
+        return self.start_time == other.start_time and self.ticket_time == other.ticket_time and \
+               self.end_time == other.end_time and self.new_start_time == other.new_start_time
