@@ -35,7 +35,7 @@ class RelinquishAvro(IMessageAvro):
     __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.Redeem
+        self.name = IMessageAvro.Relinquish
         self.message_id = None
         self.reservation = None
         self.callback_topic = None
@@ -45,7 +45,7 @@ class RelinquishAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.Redeem:
+        if value['name'] != IMessageAvro.Relinquish:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']

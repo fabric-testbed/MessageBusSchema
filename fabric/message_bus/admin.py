@@ -32,9 +32,9 @@ from fabric.message_bus.base import Base
 
 
 class AdminApi(Base):
-    def __init__(self, broker_address: str, logger=None):
+    def __init__(self, conf, logger=None):
         super().__init__(logger)
-        self.admin_client = AdminClient({'bootstrap.servers': broker_address})
+        self.admin_client = AdminClient(conf)
 
     def create_topics(self, topics, num_partitions: int = 3, replication_factor: int = 1):
         """

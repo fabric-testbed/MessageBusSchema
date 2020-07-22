@@ -120,28 +120,29 @@ class SliceAvro:
                                                 self.request_properties, self.resource_properties, self.resource_type,
                                                 self.client_slice, self.broker_client_slice)
 
-    def print(self):
+    def print(self, all: bool = False):
         print("")
         print("Slice Name: {} Slice Guid: {}".format(self.slice_name, self.guid))
-        if self.owner is not None:
-            print("Slice owner: {}".format(self.owner))
-        if self.description is not None:
-            print("Description: {}".format(self.description))
-        if self.resource_type is not None:
-            print("resource_type: {}".format(self.resource_type))
-        if self.client_slice is not None:
-            print("client_slice: {}".format(self.client_slice))
-        if self.broker_client_slice is not None:
-            print("broker_client_slice: {}".format(self.broker_client_slice))
+        if all:
+            if self.owner is not None:
+                print("Slice owner: {}".format(self.owner))
+            if self.description is not None:
+                print("Description: {}".format(self.description))
+            if self.resource_type is not None:
+                print("resource_type: {}".format(self.resource_type))
+            if self.client_slice is not None:
+                print("client_slice: {}".format(self.client_slice))
+            if self.broker_client_slice is not None:
+                print("broker_client_slice: {}".format(self.broker_client_slice))
 
-        if self.local_properties is not None:
-            print("local_properties: {}".format(self.local_properties))
-        if self.config_properties is not None:
-            print("config_properties: {}".format(self.config_properties))
-        if self.request_properties is not None:
-            print("request_properties: {}".format(self.request_properties))
-        if self.resource_properties is not None:
-            print("resource_properties: {}".format(self.resource_properties))
+            if self.local_properties is not None:
+                print("local_properties: {}".format(self.local_properties))
+            if self.config_properties is not None:
+                print("config_properties: {}".format(self.config_properties))
+            if self.request_properties is not None:
+                print("request_properties: {}".format(self.request_properties))
+            if self.resource_properties is not None:
+                print("resource_properties: {}".format(self.resource_properties))
 
         print("")
 

@@ -716,7 +716,8 @@
 			},
 			{
 				"name": "result",
-				"type": "string"
+				"type": ["null", "string"],
+				"default": null
 			},
 			{
 				"name": "status",

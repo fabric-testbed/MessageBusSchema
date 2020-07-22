@@ -58,9 +58,10 @@ class StatusResponseAvro(IMessageAvro):
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "status": self.status.to_dict(),
-            "result": self.result
+            "status": self.status.to_dict()
         }
+        if self.result is not None:
+            result["result"] = self.result
         return result
 
     def get_message_id(self) -> str:

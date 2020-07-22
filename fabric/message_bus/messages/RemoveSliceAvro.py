@@ -94,3 +94,6 @@ class RemoveSliceAvro(IMessageAvro):
 
     def get_slice_id(self) -> str:
         return self.slice_id
+
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
