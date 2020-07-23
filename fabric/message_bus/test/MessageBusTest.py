@@ -64,23 +64,21 @@ class MessageBusTest(unittest.TestCase):
         from threading import Thread
         import time
 
+        conf = {'bootstrap.servers': "localhost:9092"}
         # Create Admin API object
-        api = AdminApi("localhost:9092")
+        api = AdminApi(conf)
 
         for a in api.list_topics():
             print("Topic {}".format(a))
 
-        tt = ["fabric-broker-topic", "fabric-vm-am-topic"]
-        api.delete_topics(tt)
+        #tt = ["fabric-broker-topic", "fabric-vm-am-topic"]
+        #api.delete_topics(tt)
 
-        topics = ['topic1', 'topic2']
+        topics = ['fabric-mb-public-test1', 'fabric-mb-public-test2']
 
         # create topics
         api.delete_topics(topics)
         api.create_topics(topics, num_partitions=1, replication_factor=1)
-
-        conf = {'bootstrap.servers': "localhost:9092",
-                'schema.registry.url': "http://localhost:8081"}
 
         # load AVRO schema
         file = open('../schema/key.avsc', "r")
@@ -91,6 +89,8 @@ class MessageBusTest(unittest.TestCase):
         val_bytes = file.read()
         file.close()
         val_schema = avro.loads(val_bytes)
+
+        conf['schema.registry.url']="http://localhost:8081"
 
         # create a producer
         producer = AvroProducerApi(conf, key_schema, val_schema)
@@ -133,7 +133,7 @@ class MessageBusTest(unittest.TestCase):
         failed_rpc.error_details = "test error message"
         failed_rpc.auth = auth
         #print(failed_rpc.to_dict())
-        producer.produce_sync("topic2", failed_rpc)
+        producer.produce_sync("fabric-mb-public-test2", failed_rpc)
 
         claim_req = ClaimResourcesAvro()
         claim_req.guid = "dummy-guid"
@@ -144,7 +144,7 @@ class MessageBusTest(unittest.TestCase):
         claim_req.callback_topic = "test"
 
         #print(claim_req.to_dict())
-        producer.produce_sync("topic2", claim_req)
+        producer.produce_sync("fabric-mb-public-test2", claim_req)
 
         reservation = ReservationAvro()
         reservation.reservation_id = "res123"
@@ -175,7 +175,7 @@ class MessageBusTest(unittest.TestCase):
         claim.callback_topic = "test"
         claim.reservation = reservation
         #print(claim.to_dict())
-        producer.produce_sync("topic2", claim)
+        producer.produce_sync("fabric-mb-public-test2", claim)
 
         # Redeem
         redeem = RedeemAvro()
@@ -183,7 +183,7 @@ class MessageBusTest(unittest.TestCase):
         redeem.callback_topic = "test"
         redeem.reservation = reservation
         #print(redeem.to_dict())
-        producer.produce_sync("topic2", redeem)
+        producer.produce_sync("fabric-mb-public-test2", redeem)
 
         update_ticket = UpdateTicketAvro()
         update_ticket.auth = auth
@@ -194,7 +194,7 @@ class MessageBusTest(unittest.TestCase):
         update_ticket.update_data.failed = False
 
         #print(update_ticket.to_dict())
-        producer.produce_sync("topic2", update_ticket)
+        producer.produce_sync("fabric-mb-public-test2", update_ticket)
 
         get_slice = GetSlicesRequestAvro()
         get_slice.auth = auth
@@ -204,7 +204,7 @@ class MessageBusTest(unittest.TestCase):
 
         #print(get_slice.to_dict())
 
-        producer.produce_sync("topic2", get_slice)
+        producer.produce_sync("fabric-mb-public-test2", get_slice)
 
         result = ResultAvro()
         result.code = 0
@@ -229,16 +229,16 @@ class MessageBusTest(unittest.TestCase):
 
         #print(slice_res.to_dict())
 
-        producer.produce_sync("topic2", slice_res)
+        producer.produce_sync("fabric-mb-public-test2", slice_res)
 
         res_req = GetReservationsRequestAvro()
         res_req.message_id = "abc123"
         res_req.callback_topic = "test"
         res_req.guid = "guid"
 
-        #print(res_req.to_dict())
+        print(res_req.to_dict())
 
-        producer.produce_sync("topic2", res_req)
+        producer.produce_sync("fabric-mb-public-test2", res_req)
 
         res = ReservationMng()
         res.reservation_id = "abcd123"
@@ -260,7 +260,7 @@ class MessageBusTest(unittest.TestCase):
 
         #print(res_res.to_dict())
 
-        producer.produce_sync("topic2", res_res)
+        producer.produce_sync("fabric-mb-public-test2", res_res)
 
         remove_slice = RemoveSliceAvro()
         remove_slice.message_id = "msg1"
@@ -270,14 +270,14 @@ class MessageBusTest(unittest.TestCase):
         remove_slice.auth = auth
         #print(remove_slice.to_dict())
 
-        producer.produce_sync("topic2", remove_slice)
+        producer.produce_sync("fabric-mb-public-test2", remove_slice)
 
         status_resp = StatusResponseAvro()
         status_resp.message_id = "msg1"
         status_resp.result = "abc"
         status_resp.status = result
 
-        producer.produce_sync("topic2", status_resp)
+        producer.produce_sync("fabric-mb-public-test2", status_resp)
 
         add_slice = AddSliceAvro()
         add_slice.message_id = "msg1"
@@ -287,7 +287,7 @@ class MessageBusTest(unittest.TestCase):
         add_slice.auth = auth
         # print(add_slice.to_dict())
 
-        producer.produce_sync("topic2", add_slice)
+        producer.produce_sync("fabric-mb-public-test2", add_slice)
 
         update_slice = UpdateSliceAvro()
         update_slice.message_id = "msg1"
@@ -297,7 +297,7 @@ class MessageBusTest(unittest.TestCase):
         update_slice.auth = auth
         # print(update_slice.to_dict())
 
-        producer.produce_sync("topic2", update_slice)
+        producer.produce_sync("fabric-mb-public-test2", update_slice)
 
         remove_res = RemoveReservationAvro()
         remove_res.message_id = "msg1"
@@ -307,7 +307,7 @@ class MessageBusTest(unittest.TestCase):
         remove_res.auth = auth
         # print(remove_res.to_dict())
 
-        producer.produce_sync("topic2", remove_res)
+        producer.produce_sync("fabric-mb-public-test2", remove_res)
 
         close_res = CloseReservationsAvro()
         close_res.message_id = "msg1"
@@ -317,7 +317,7 @@ class MessageBusTest(unittest.TestCase):
         close_res.auth = auth
         # print(close_res.to_dict())
 
-        producer.produce_sync("topic2", close_res)
+        producer.produce_sync("fabric-mb-public-test2", close_res)
 
         update_res = UpdateReservationAvro()
         update_res.message_id = "msg1"
@@ -327,7 +327,7 @@ class MessageBusTest(unittest.TestCase):
         update_res.auth = auth
         print(update_res.to_dict())
 
-        producer.produce_sync("topic2", update_res)
+        producer.produce_sync("fabric-mb-public-test2", update_res)
 
         # Fallback to earliest to ensure all messages are consumed
         conf['group.id'] = "example_avro"
