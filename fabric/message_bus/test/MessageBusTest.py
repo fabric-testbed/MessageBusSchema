@@ -64,15 +64,19 @@ class MessageBusTest(unittest.TestCase):
         from threading import Thread
         import time
 
-        conf = {'bootstrap.servers': "localhost:9092"}
+        conf = {'metadata.broker.list': 'localhost:19092',
+                'security.protocol': 'SSL',
+                'group.id': 'ssl-host',
+                'ssl.ca.location': '../../../secrets/snakeoil-ca-1.crt',
+                'ssl.key.location': '../../../secrets/kafkacat.client.key',
+                'ssl.key.password': 'confluent',
+                'ssl.certificate.location': '../../../secrets/kafkacat-ca1-signed.pem'
+        }
         # Create Admin API object
         api = AdminApi(conf)
 
         for a in api.list_topics():
             print("Topic {}".format(a))
-
-        #tt = ["fabric-broker-topic", "fabric-vm-am-topic"]
-        #api.delete_topics(tt)
 
         topics = ['fabric-mb-public-test1', 'fabric-mb-public-test2']
 
@@ -113,7 +117,7 @@ class MessageBusTest(unittest.TestCase):
         query.properties = {"abc": "def"}
         query.auth = auth
         #print(query.to_dict())
-        producer.produce_sync("topic1", query)
+        producer.produce_sync("fabric-mb-public-test1", query)
 
         # QueryResult
         query_result = QueryResultAvro()
@@ -122,7 +126,7 @@ class MessageBusTest(unittest.TestCase):
         query_result.properties = {"abc": "def"}
         query_result.auth = auth
         #print(query_result.to_dict())
-        producer.produce_sync("topic2", query_result)
+        producer.produce_sync("fabric-mb-public-test2", query_result)
 
         # FailedRPC
         failed_rpc = FailedRPCAvro()
@@ -330,7 +334,6 @@ class MessageBusTest(unittest.TestCase):
         producer.produce_sync("fabric-mb-public-test2", update_res)
 
         # Fallback to earliest to ensure all messages are consumed
-        conf['group.id'] = "example_avro"
         conf['auto.offset.reset'] = "earliest"
 
         print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
