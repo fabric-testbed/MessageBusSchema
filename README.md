@@ -42,6 +42,19 @@ AdminApi class provides support to carry out basic admin functions like create/d
 
 
 ## How to bring up a test Kafka cluster to test
+### Generate Credentials
+You must generate CA certificates (or use yours if you already have one) and then generate a keystore and truststore for brokers and clients.
+```
+cd $(pwd)/secrets
+./create-certs.sh
+(Type yes for all "Trust this certificate? [no]:" prompts.)
+cd -
+```
+Set the environment variable for the secrets directory. This is used in later commands. Make sure that you are in the MessageBus directory.
+```
+export KAFKA_SSL_SECRETS_DIR=$(pwd)/secrets
+```
+### Bring up the containers
 You can use the docker-compose.yaml file to bring up a simple Kafka cluster containing
 - broker
 - zookeeper 
@@ -55,8 +68,8 @@ docker-compose up -d
 This should bring up following containers:
 ```
 docker ps
-CONTAINER ID        IMAGE                                   COMMAND                  CREATED             STATUS              PORTS                                              NAMES
-8b9ebe91b61f        confluentinc/cp-schema-registry:5.4.0   "/etc/confluent/dock…"   6 hours ago         Up 6 hours          0.0.0.0:8081->8081/tcp                             schema-registry
-aad65962159f        confluentinc/cp-kafka:5.4.0             "/etc/confluent/dock…"   6 hours ago         Up 6 hours          0.0.0.0:9092->9092/tcp, 0.0.0.0:29092->29092/tcp   broker
-4263ac0944ac        confluentinc/cp-zookeeper:5.4.0         "/etc/confluent/dock…"   6 hours ago         Up 6 hours          2888/tcp, 0.0.0.0:2181->2181/tcp, 3888/tcp         zookeeper
+CONTAINER ID        IMAGE                                    COMMAND                  CREATED             STATUS              PORTS                                                                                        NAMES
+189ba0e70b97        confluentinc/cp-schema-registry:latest   "/etc/confluent/dock…"   58 seconds ago      Up 58 seconds       0.0.0.0:8081->8081/tcp                                                                       schemaregistry
+49616f1c9b0a        confluentinc/cp-kafka:latest             "/etc/confluent/dock…"   59 seconds ago      Up 58 seconds       0.0.0.0:9092->9092/tcp, 0.0.0.0:19092->19092/tcp                                             broker1
+c9d19c82558d        confluentinc/cp-zookeeper:latest         "/etc/confluent/dock…"   59 seconds ago      Up 59 seconds       2888/tcp, 0.0.0.0:2181->2181/tcp, 3888/tcp                                                   zookeeper
 ```
