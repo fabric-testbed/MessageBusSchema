@@ -29,8 +29,8 @@ from confluent_kafka.avro import AvroProducer
 
 from fabric.message_bus.admin import AdminApi
 from fabric.message_bus.base import Base
-from fabric.message_bus.messages.QueryAvro import QueryAvro
-from fabric.message_bus.messages.QueryResultAvro import QueryResultAvro
+from fabric.message_bus.messages.query_avro import QueryAvro
+from fabric.message_bus.messages.query_result_avro import QueryResultAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 

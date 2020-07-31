@@ -38,6 +38,25 @@
 		]
 	},
 	{
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "ReservationStateRecord",
+		"fields": [{
+				"name": "state",
+				"type": "int"
+			},
+			{
+				"name": "pending_state",
+				"type": "int"
+			},
+			{
+				"name": "joining",
+				"type": ["null", "int"],
+				"default": null
+			}
+		]
+	},
+	{
 	    "namespace": "fabric.cf.model",
         "name": "SliceRecord",
         "type": "record",
@@ -544,29 +563,6 @@
 		]
 	},
 	{
-		"namespace": "fabric.cf.model",
-		"name": "ClaimResourcesResponse",
-		"type": "record",
-		"fields": [{
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"name": "message_id",
-				"type": "string"
-			},
-			{
-				"name": "status",
-				"type": "fabric.cf.model.ResultRecord"
-			},
-			{
-				"name": "reservation",
-				"type": ["null", "fabric.cf.model.ReservationMngRecord"],
-				"default": null
-			}
-		]
-	},
-	{
 	    "namespace": "fabric.cf.model",
 		"name": "GetSlicesRequest",
 		"type": "record",
@@ -600,7 +596,7 @@
 	},
 	{
 	    "namespace": "fabric.cf.model",
-		"name": "GetSlicesReservationsResponse",
+		"name": "ResultSliceReservation",
 		"type": "record",
 		"fields": [{
 				"name": "name",
@@ -627,6 +623,14 @@
 				"type": ["null", {
 				    "type":"array",
 				    "items" : "fabric.cf.model.ReservationMngRecord"
+				}],
+				"default": null
+			},
+			{
+				"name": "reservation_states",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.ReservationStateRecord"
 				}],
 				"default": null
 			}
@@ -677,6 +681,41 @@
 	},
 	{
 	    "namespace": "fabric.cf.model",
+		"name": "GetReservationsStateRequest",
+		"type": "record",
+		"fields": [
+		    {
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "callback_topic",
+				"type": "string"
+			},
+			{
+				"name": "message_id",
+				"type": "string"
+			},
+			{
+				"name": "guid",
+				"type": "string"
+			},
+			{
+				"name": "reservation_ids",
+				"type": {
+				    "type":"array",
+				    "items" : "string"
+				}
+			},
+			{
+				"name": "auth",
+				"type": ["null", "fabric.cf.model.AuthRecord"],
+				"default": null
+			}
+		]
+	},
+	{
+	    "namespace": "fabric.cf.model",
 		"name": "OperationBySliceId",
 		"type": "record",
 		"fields": [{
@@ -704,7 +743,30 @@
 	},
 	{
 	    "namespace": "fabric.cf.model",
-		"name": "StatusResponse",
+		"name": "ResultString",
+		"type": "record",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "message_id",
+				"type": "string"
+			},
+			{
+				"name": "result_str",
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "status",
+				"type": "fabric.cf.model.ResultRecord"
+			}
+		]
+	},
+	{
+	    "namespace": "fabric.cf.model",
+		"name": "ResultStrings",
 		"type": "record",
 		"fields": [{
 				"name": "name",
@@ -716,8 +778,10 @@
 			},
 			{
 				"name": "result",
-				"type": ["null", "string"],
-				"default": null
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "string"
+				}]
 			},
 			{
 				"name": "status",

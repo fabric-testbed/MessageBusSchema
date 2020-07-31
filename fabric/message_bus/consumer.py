@@ -28,47 +28,36 @@
 from confluent_kafka.avro import AvroConsumer, SerializerError
 from confluent_kafka.cimpl import KafkaError
 
-from fabric.message_bus.admin import AdminApi
 from fabric.message_bus.base import Base
-from fabric.message_bus.messages.AddSliceAvro import AddSliceAvro
-from fabric.message_bus.messages.AuthAvro import AuthAvro
-from fabric.message_bus.messages.ClaimAvro import ClaimAvro
-from fabric.message_bus.messages.ClaimResourcesAvro import ClaimResourcesAvro
-from fabric.message_bus.messages.ClaimResourcesResponseAvro import ClaimResourcesResponseAvro
-from fabric.message_bus.messages.CloseAvro import CloseAvro
-from fabric.message_bus.messages.CloseReservationsAvro import CloseReservationsAvro
-from fabric.message_bus.messages.ExtendLeaseAvro import ExtendLeaseAvro
-from fabric.message_bus.messages.ExtendTicketAvro import ExtendTicketAvro
-from fabric.message_bus.messages.FailedRPCAvro import FailedRPCAvro
-from fabric.message_bus.messages.GetReservationsRequestAvro import GetReservationsRequestAvro
-from fabric.message_bus.messages.GetReservationsResponseAvro import GetReservationsResponseAvro
-from fabric.message_bus.messages.GetReservationsStateRequestAvro import GetReservationsStateRequestAvro
-from fabric.message_bus.messages.GetReservationsStateResponseAvro import GetReservationsStateResponseAvro
-from fabric.message_bus.messages.GetSlicesRequestAvro import GetSlicesRequestAvro
-from fabric.message_bus.messages.GetSlicesResponseAvro import GetSlicesResponseAvro
-from fabric.message_bus.messages.ModifyLeaseAvro import ModifyLeaseAvro
-from fabric.message_bus.messages.QueryAvro import QueryAvro
-from fabric.message_bus.messages.QueryResultAvro import QueryResultAvro
-from fabric.message_bus.messages.RedeemAvro import RedeemAvro
-from fabric.message_bus.messages.RelinquishAvro import RelinquishAvro
-from fabric.message_bus.messages.RemoveReservationAvro import RemoveReservationAvro
-from fabric.message_bus.messages.RemoveSliceAvro import RemoveSliceAvro
-from fabric.message_bus.messages.ReservationAvro import ReservationAvro
-from fabric.message_bus.messages.ReservationMng import ReservationMng
-from fabric.message_bus.messages.ResourceDataAvro import ResourceDataAvro
-from fabric.message_bus.messages.ResourceSetAvro import ResourceSetAvro
-from fabric.message_bus.messages.ResultAvro import ResultAvro
-from fabric.message_bus.messages.SliceAvro import SliceAvro
-from fabric.message_bus.messages.StatusResponseAvro import StatusResponseAvro
-from fabric.message_bus.messages.TermAvro import TermAvro
-from fabric.message_bus.messages.TicketAvro import TicketAvro
-from fabric.message_bus.messages.UpdateDataAvro import UpdateDataAvro
-from fabric.message_bus.messages.UpdateLeaseAvro import UpdateLeaseAvro
-from fabric.message_bus.messages.UpdateReservationAvro import UpdateReservationAvro
-from fabric.message_bus.messages.UpdateSliceAvro import UpdateSliceAvro
-from fabric.message_bus.messages.UpdateTicketAvro import UpdateTicketAvro
+from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
+from fabric.message_bus.messages.claim_avro import ClaimAvro
+from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
+from fabric.message_bus.messages.close_avro import CloseAvro
+from fabric.message_bus.messages.close_reservations_avro import CloseReservationsAvro
+from fabric.message_bus.messages.extend_lease_avro import ExtendLeaseAvro
+from fabric.message_bus.messages.extend_ticket_avro import ExtendTicketAvro
+from fabric.message_bus.messages.failed_rpc_avro import FailedRPCAvro
+from fabric.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
+from fabric.message_bus.messages.result_reservation_avro import ResultReservationAvro
+from fabric.message_bus.messages.get_reservations_state_request_avro import GetReservationsStateRequestAvro
+from fabric.message_bus.messages.result_reservation_state_avro import ResultReservationStateAvro
+from fabric.message_bus.messages.get_slices_request_avro import GetSlicesRequestAvro
+from fabric.message_bus.messages.result_slice_avro import ResultSliceAvro
+from fabric.message_bus.messages.modify_lease_avro import ModifyLeaseAvro
+from fabric.message_bus.messages.query_avro import QueryAvro
+from fabric.message_bus.messages.query_result_avro import QueryResultAvro
+from fabric.message_bus.messages.redeem_avro import RedeemAvro
+from fabric.message_bus.messages.relinquish_avro import RelinquishAvro
+from fabric.message_bus.messages.remove_reservation_avro import RemoveReservationAvro
+from fabric.message_bus.messages.remove_slice_avro import RemoveSliceAvro
+from fabric.message_bus.messages.result_string_avro import ResultStringAvro
+from fabric.message_bus.messages.result_strings_avro import ResultStringsAvro
+from fabric.message_bus.messages.ticket_avro import TicketAvro
+from fabric.message_bus.messages.update_lease_avro import UpdateLeaseAvro
+from fabric.message_bus.messages.update_reservation_avro import UpdateReservationAvro
+from fabric.message_bus.messages.update_slice_avro import UpdateSliceAvro
+from fabric.message_bus.messages.update_ticket_avro import UpdateTicketAvro
 from fabric.message_bus.messages.message import IMessageAvro
-from fabric.message_bus.producer import AvroProducerApi
 
 
 class AvroConsumerApi(Base):
@@ -137,29 +126,12 @@ class AvroConsumerApi(Base):
         elif value['name'] == IMessageAvro.UpdateLease:
             message = UpdateLeaseAvro()
             message.from_dict(value)
+        # Management Messages
         elif value['name'] == IMessageAvro.ClaimResources:
             message = ClaimResourcesAvro()
             message.from_dict(value)
-        elif value['name'] == IMessageAvro.ClaimResourcesResponse:
-            message = ClaimResourcesResponseAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.GetSlicesRequest:
-            message = GetSlicesRequestAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.GetSlicesResponse:
-            message = GetSlicesResponseAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.GetReservationsRequest:
-            message = GetReservationsRequestAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.GetReservationsResponse:
-            message = GetReservationsResponseAvro()
-            message.from_dict(value)
         elif value['name'] == IMessageAvro.RemoveSlice:
             message = RemoveSliceAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.StatusResponse:
-            message = StatusResponseAvro()
             message.from_dict(value)
         elif value['name'] == IMessageAvro.AddSlice:
             message = AddSliceAvro()
@@ -176,11 +148,32 @@ class AvroConsumerApi(Base):
         elif value['name'] == IMessageAvro.UpdateReservation:
             message = UpdateReservationAvro()
             message.from_dict(value)
+        # Get Messages
+        elif value['name'] == IMessageAvro.GetSlicesRequest:
+            message = GetSlicesRequestAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.GetReservationsRequest:
+            message = GetReservationsRequestAvro()
+            message.from_dict(value)
         elif value['name'] == IMessageAvro.GetReservationsStateRequest:
             message = GetReservationsStateRequestAvro()
             message.from_dict(value)
-        elif value['name'] == IMessageAvro.GetReservationsStateResponse:
-            message = GetReservationsStateResponseAvro()
+
+        # Responses
+        elif value['name'] == IMessageAvro.ResultSlice:
+            message = ResultSliceAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ResultReservation:
+            message = ResultReservationAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ResultReservationState:
+            message = ResultReservationStateAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ResultStrings:
+            message = ResultStringsAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ResultString:
+            message = ResultStringAvro()
             message.from_dict(value)
         else:
             self.log_error("Unsupported message: {}".format(value))

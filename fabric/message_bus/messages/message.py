@@ -34,7 +34,7 @@ class IMessageAvro:
     Claim = "Claim"
     Close = "Close"
     ExtendLease = "ExtendLease"
-    ExtendTicket = "ExtendLease"
+    ExtendTicket = "ExtendTicket"
     FailedRPC = "FailedRPC"
     ModifyLease = "ModifyLease"
     Query = "Query"
@@ -44,22 +44,26 @@ class IMessageAvro:
     UpdateLease = "UpdateLease"
     UpdateTicket = "UpdateTicket"
     Ticket = "Ticket"
+
     # Management APIs
     ClaimResources = "ClaimResources"
-    ClaimResourcesResponse = "ClaimResourcesResponse"
-    GetSlicesRequest = "GetSlicesRequest"
-    GetSlicesResponse = "GetSlicesResponse"
-    GetReservationsRequest = "GetReservationsRequest"
-    GetReservationsResponse = "GetReservationsResponse"
     RemoveSlice = "RemoveSlice"
-    StatusResponse = "StatusResponse"
     AddSlice = "AddSlice"
     UpdateSlice = "UpdateSlice"
     RemoveReservation = "RemoveReservation"
     CloseReservations = "CloseReservations"
     UpdateReservation = "UpdateReservation"
+
     GetReservationsStateRequest = "GetReservationsStateRequest"
-    GetReservationsStateResponse = "GetReservationsStateResponse"
+    GetSlicesRequest = "GetSlicesRequest"
+    GetReservationsRequest = "GetReservationsRequest"
+
+    ResultSlice = "ResultSlice"
+    ResultReservation = "ResultReservation"
+    ResultReservationState = "ResultReservationState"
+    ResultStrings = "ResultStrings"
+    ResultString = "ResultString"
+
 
     def to_dict(self) -> dict:
         """
