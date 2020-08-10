@@ -35,6 +35,9 @@ class ReservationPredecessorAvro:
         self.filter = value.get('filter', None)
 
     def to_dict(self) -> dict:
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {'reservation_id': self.reservation_id,
                   'filter': self.filter}
         return result
@@ -59,3 +62,9 @@ class ReservationPredecessorAvro:
             return False
 
         return self.reservation_id == other.reservation_id and self.filter == other.filter
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.reservation_id is None or self.filter is None:
+            ret_val = False
+        return ret_val

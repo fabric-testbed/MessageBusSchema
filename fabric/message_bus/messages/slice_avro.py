@@ -51,35 +51,24 @@ class SliceAvro:
             self.owner = AuthAvro()
             self.owner.from_dict(value['owner'])
 
-        if value.get('description', None) is not None:
-            self.description = value['description']
+        self.description = value.get('description', None)
+        self.local_properties = value.get('local_properties', None)
+        self.config_properties = value.get('config_properties', None)
+        self.request_properties = value.get('request_properties', None)
 
-        if value.get('local_properties', None) is not None:
-            self.local_properties = value['local_properties']
-
-        if value.get('config_properties', None) is not None:
-            self.config_properties = value['config_properties']
-
-        if value.get('request_properties', None) is not None:
-            self.request_properties = value['request_properties']
-
-        if value.get('resource_properties', None) is not None:
-            self.resource_properties = value['resource_properties']
-
-        if value.get('resource_type', None) is not None:
-            self.resource_type = value['resource_type']
-
-        if value.get('client_slice', None) is not None:
-            self.client_slice = value['client_slice']
-
-        if value.get('broker_client_slice', None) is not None:
-            self.broker_client_slice = value['broker_client_slice']
+        self.resource_properties = value.get('resource_properties', None)
+        self.resource_type = value.get('resource_type', None)
+        self.client_slice = value.get('client_slice', None)
+        self.broker_client_slice = value.get('broker_client_slice', None)
 
     def to_dict(self) -> dict:
         """
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "slice_name": self.slice_name,
             "guid": self.guid
@@ -221,3 +210,10 @@ class SliceAvro:
             self.config_properties == other.config_properties and self.request_properties == other.request_properties and \
             self.resource_properties == other.resource_properties and self.resource_type == other.resource_type and \
             self.client_slice == other.client_slice and self.broker_client_slice == other.broker_client_slice
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.slice_name is None or self.owner is None or self.description is None or \
+                self.broker_client_slice is None or self.guid is None:
+            ret_val = False
+        return ret_val

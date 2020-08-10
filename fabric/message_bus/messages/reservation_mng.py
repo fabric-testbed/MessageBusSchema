@@ -61,6 +61,9 @@ class ReservationMng:
         self.notices = value.get('notices', None)
 
     def to_dict(self) -> dict:
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {'name': self.name,
                   'reservation_id': self.reservation_id,
                   'rtype': self.rtype,
@@ -222,3 +225,9 @@ class ReservationMng:
             self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
             self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
             self.request == other.request and self.resource == other.resource and self.notices == other.notices
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.reservation_id is None or self.rtype is None or self.notices is None:
+            ret_val = False
+        return ret_val

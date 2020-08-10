@@ -31,7 +31,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class GetReservationsRequestAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "reservation_id", "reservation_state", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "reservation_id", "reservation_state", "type", "callback_topic", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetReservationsRequest
@@ -41,6 +41,7 @@ class GetReservationsRequestAvro(IMessageAvro):
         self.slice_id = None
         self.reservation_id = None
         self.reservation_state = None
+        self.type = None
         self.callback_topic = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
@@ -56,6 +57,7 @@ class GetReservationsRequestAvro(IMessageAvro):
         self.slice_id = value.get("slice_id", None)
         self.reservation_id = value.get("reservation_id", None)
         self.reservation_state = value.get("reservation_state", None)
+        self.type = value.get("type", None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -66,6 +68,8 @@ class GetReservationsRequestAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -81,6 +85,8 @@ class GetReservationsRequestAvro(IMessageAvro):
             result['reservation_id'] = self.reservation_id
         if self.reservation_state is not None:
             result['reservation_state'] = self.reservation_state
+        if self.type is not None:
+            result['type'] = self.type
         return result
 
     def get_message_id(self) -> str:
@@ -107,7 +113,18 @@ class GetReservationsRequestAvro(IMessageAvro):
     def get_reservation_id(self) -> str:
         return self.reservation_id
 
+    def get_reservation_type(self) -> str:
+        return self.type
+
     def __str__(self):
         return "name: {} message_id: {} guid: {} auth: {} slice_id: {} reservation_id: {} reservation_state: {} " \
-               "callback_topic: {}".format(self.name, self.message_id, self.guid, self.auth, self.slice_id,
-                                           self.reservation_id, self.reservation_state, self.callback_topic)
+               "type: {} callback_topic: {}".format(self.name, self.message_id, self.guid, self.auth, self.slice_id,
+                                           self.reservation_id, self.type, self.reservation_state, self.callback_topic)
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+
+        if self.guid is None or self.auth is None or self.callback_topic is None:
+            ret_val = False
+
+        return ret_val

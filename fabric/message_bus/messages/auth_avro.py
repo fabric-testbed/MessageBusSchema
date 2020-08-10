@@ -46,6 +46,9 @@ class AuthAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name
         }
@@ -63,3 +66,8 @@ class AuthAvro:
         if not isinstance(other, AuthAvro):
             return False
         return self.name == other.name and self.guid == other.guid and self.id_token == other.id_token
+
+    def validate(self) -> bool:
+        if self.name is None:
+            return False
+        return True

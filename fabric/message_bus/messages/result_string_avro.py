@@ -33,7 +33,7 @@ from fabric.message_bus.messages.result_avro import ResultAvro
 
 class ResultStringAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "result_str", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "result_str", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.ResultString
@@ -57,6 +57,9 @@ class ResultStringAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -90,3 +93,15 @@ class ResultStringAvro(IMessageAvro):
 
     def get_result(self) -> str:
         return self.result_str
+
+    def set_result(self, result: str):
+        self.result_str = result
+
+    def get_callback_topic(self) -> str:
+        return None
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+        if self.status is None:
+            ret_val = False
+        return ret_val

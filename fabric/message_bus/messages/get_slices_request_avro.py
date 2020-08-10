@@ -28,9 +28,10 @@ from uuid import uuid4
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
+
 class GetSlicesRequestAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "type", "callback_topic", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetSlicesRequest
@@ -39,6 +40,7 @@ class GetSlicesRequestAvro(IMessageAvro):
         self.auth = None
         self.slice_id = None
         self.callback_topic = None
+        self.type = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -46,22 +48,24 @@ class GetSlicesRequestAvro(IMessageAvro):
     def from_dict(self, value: dict):
         if value['name'] != IMessageAvro.GetSlicesRequest:
             raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-
-        if value.get("slice_id", None) is not None:
-            self.slice_id = value["slice_id"]
+        self.message_id = value.get('message_id', None)
+        self.guid = value.get('guid', None)
+        self.slice_id = value.get('slice_id', None)
+        self.callback_topic = value.get('callback_topic', None)
+        self.type = value.get('type', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
-        self.callback_topic = value['callback_topic']
 
     def to_dict(self) -> dict:
         """
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -73,6 +77,10 @@ class GetSlicesRequestAvro(IMessageAvro):
 
         if self.slice_id is not None:
             result['slice_id'] = self.slice_id
+
+        if self.type is not None:
+            result['type'] = self.type
+
         return result
 
     def get_message_id(self) -> str:
@@ -87,12 +95,23 @@ class GetSlicesRequestAvro(IMessageAvro):
     def get_callback_topic(self) -> str:
         return self.callback_topic
 
+    def get_slice_type(self) -> str:
+        return self.type
+
     def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} callback_topic: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.slice_id, self.callback_topic)
+        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} type: {} callback_topic: {}".format(
+            self.name, self.message_id, self.guid, self.auth, self.slice_id, self.type, self.callback_topic)
 
     def get_id(self) -> str:
         return self.id.__str__()
 
     def get_slice_id(self) -> str:
         return self.slice_id
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+
+        if self.guid is None or self.auth is None or self.callback_topic is None:
+            ret_val = False
+
+        return ret_val

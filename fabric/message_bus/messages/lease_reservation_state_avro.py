@@ -41,14 +41,20 @@ class LeaseReservationStateAvro(ReservationStateAvro):
     def from_dict(self, values: dict):
         self.name = values.get('name', None)
         self.state = values.get('state', None)
-        self.state = values.get('pending_state', None)
+        self.pending_state = values.get('pending_state', None)
+        self.joining = values.get('joining', None)
 
     def to_dict(self) -> dict:
-        return {
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
+        result = {
             'name':self.name,
             'state':self.state,
-            'pending_state': self.pending_state,
-            'joining': self.joining}
+            'pending_state': self.pending_state}
+        if self.joining is not None:
+            result['joining'] = self.joining
+        return result
 
     def __str__(self):
         return "state: {} pending_state: {} joining: {}".format(self.state, self.pending_state, self.joining)

@@ -59,6 +59,9 @@ class QueryResultAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -84,3 +87,12 @@ class QueryResultAvro(IMessageAvro):
 
     def get_id(self) -> str:
         return self.id.__str__()
+
+    def get_callback_topic(self) -> str:
+        return None
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+        if self.auth is None or self.properties is None:
+            ret_val = False
+        return ret_val

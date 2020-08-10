@@ -46,9 +46,12 @@ class ReservationStateAvro:
     def from_dict(self, values: dict):
         self.name = values.get('name', None)
         self.state = values.get('state', None)
-        self.state = values.get('pending_state', None)
+        self.pending_state = values.get('pending_state', None)
 
     def to_dict(self) -> dict:
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         return {
             'name':self.name,
             'state':self.state,
@@ -62,3 +65,9 @@ class ReservationStateAvro:
             return False
 
         return self.state == other.state and self.pending_state == other.pending_state
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.state is None or self.pending_state is None:
+            ret_val = False
+        return ret_val

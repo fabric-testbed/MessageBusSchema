@@ -29,6 +29,7 @@ from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.reservation_avro import ReservationAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
+
 class ExtendLeaseAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
@@ -62,6 +63,9 @@ class ExtendLeaseAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -86,3 +90,12 @@ class ExtendLeaseAvro(IMessageAvro):
 
     def get_id(self) -> str:
         return self.id.__str__()
+
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+        if self.callback_topic is None or self.reservation is None:
+            ret_val = False
+        return ret_val

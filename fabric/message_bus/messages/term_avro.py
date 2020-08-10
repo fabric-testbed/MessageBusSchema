@@ -36,23 +36,19 @@ class TermAvro:
         self.new_start_time = None
 
     def from_dict(self, value: dict):
-        if 'start_time' in value and value['start_time'] != "null":
-            self.start_time = value['start_time']
-
-        if 'end_time' in value and value['end_time'] != "null":
-            self.end_time = value['end_time']
-
-        if 'ticket_time' in value and value['ticket_time'] != "null":
-            self.ticket_time = value['ticket_time']
-
-        if 'new_start_time' in value and value['new_start_time'] != "null":
-            self.new_start_time = value['new_start_time']
+        self.start_time = value.get('start_time', None)
+        self.end_time = value.get('end_time', None)
+        self.ticket_time = value.get('ticket_time', None)
+        self.new_start_time = value.get('new_start_time', None)
 
     def to_dict(self) -> dict:
         """
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "start_time": self.start_time,
             "end_time": self.end_time
@@ -61,7 +57,7 @@ class TermAvro:
             result["ticket_time"] = self.ticket_time
 
         if self.new_start_time is not None:
-            result["new_start_time"] =  self.new_start_time
+            result["new_start_time"] = self.new_start_time
         return result
 
     def __str__(self):
@@ -74,3 +70,10 @@ class TermAvro:
 
         return self.start_time == other.start_time and self.ticket_time == other.ticket_time and \
                self.end_time == other.end_time and self.new_start_time == other.new_start_time
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.start_time is None or self.end_time is None or self.new_start_time is None:
+
+            ret_val = False
+        return ret_val

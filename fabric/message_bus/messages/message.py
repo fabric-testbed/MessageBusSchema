@@ -53,16 +53,28 @@ class IMessageAvro:
     RemoveReservation = "RemoveReservation"
     CloseReservations = "CloseReservations"
     UpdateReservation = "UpdateReservation"
+    AddReservation = "AddReservation"
+    AddReservations = "AddReservations"
+    DemandReservation = "DemandReservation"
+    ExtendReservation = "ExtendReservation"
 
     GetReservationsStateRequest = "GetReservationsStateRequest"
     GetSlicesRequest = "GetSlicesRequest"
     GetReservationsRequest = "GetReservationsRequest"
+    GetReservationUnitsRequest = "GetReservationUnitsRequest"
+    GetUnitRequest = "GetUnitRequest"
+    GetPoolInfoRequest = "GetPoolInfoRequest"
+    GetActorsRequest = "GetActorsRequest"
 
     ResultSlice = "ResultSlice"
     ResultReservation = "ResultReservation"
     ResultReservationState = "ResultReservationState"
     ResultStrings = "ResultStrings"
     ResultString = "ResultString"
+    ResultUnits = "ResultUnits"
+    ResultProxy = "ResultProxy"
+    ResultPool = "ResultPool"
+    ResultActor = "ResultActor"
 
 
     def to_dict(self) -> dict:
@@ -86,3 +98,9 @@ class IMessageAvro:
 
     def get_id(self) -> str:
         raise NotImplementedError
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.get_message_name() is None or self.get_message_id() is None or self.get_id() is None:
+            ret_val = False
+        return ret_val

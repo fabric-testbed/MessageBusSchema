@@ -61,6 +61,9 @@ class RemoveReservationAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -95,3 +98,9 @@ class RemoveReservationAvro(IMessageAvro):
     def __str__(self):
         return "name: {} message_id: {} guid: {} auth: {} reservation_id: {} callback_topic: {}".format(
             self.name, self.message_id, self.guid, self.auth, self.reservation_id, self.callback_topic)
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+        if self.callback_topic is None or self.reservation_id is None or self.auth is None or self.guid is None:
+            ret_val = False
+        return ret_val

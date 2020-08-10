@@ -55,6 +55,9 @@ class ReservationAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "reservation_id": self.reservation_id,
             "slice": self.slice.to_dict(),
@@ -78,3 +81,9 @@ class ReservationAvro:
             return False
         return self.reservation_id == other.reservation_id and self.slice == other.slice and \
                self.term == other.term and self.resource_set == other.resource_set
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.reservation_id is None or self.slice is None or self.term is None:
+            ret_val = False
+        return ret_val

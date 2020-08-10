@@ -52,6 +52,9 @@ class LeaseReservationAvro(TicketReservationAvro):
                 self.redeem_processors.append(predecessor)
 
     def to_dict(self) -> dict:
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = super().to_dict()
         if result is None:
             result = {}
@@ -158,3 +161,11 @@ class LeaseReservationAvro(TicketReservationAvro):
                 self.renewable == other.renew_time and \
                 self.authority == other.authority and self.join_state == other.join_state and \
                 self.leased_units == other.leased_units and self.redeem_processors == other.redeem_processors
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+
+        if self.authority is None:
+            ret_val = False
+
+        return ret_val

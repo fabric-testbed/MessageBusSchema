@@ -35,20 +35,18 @@ class ResourceDataAvro:
         self.resource_properties = None
 
     def from_dict(self, value: dict):
-        if 'request_properties' in value and value['request_properties'] != "null":
-            self.request_properties = value['request_properties']
-
-        if 'config_properties' in value and value['config_properties'] != "null":
-            self.config_properties = value['config_properties']
-
-        if 'resource_properties' in value and value['resource_properties'] != "null":
-            self.resource_properties = value['resource_properties']
+        self.request_properties = value.get('request_properties', None)
+        self.config_properties = value.get('config_properties', None)
+        self.resource_properties = value.get('resource_properties', None)
 
     def to_dict(self) -> dict:
         """
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {}
         if self.config_properties is not None and len(self.config_properties) > 0:
             result['config_properties'] = self.config_properties
@@ -72,3 +70,7 @@ class ResourceDataAvro:
         return self.request_properties == other.request_properties and \
                self.config_properties == other.config_properties and \
                self.resource_properties == other.resource_properties
+
+    def validate(self) -> bool:
+        ret_val = True
+        return ret_val

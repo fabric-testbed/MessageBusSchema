@@ -43,6 +43,9 @@ class TicketReservationAvro(ReservationMng):
         self.renew_time = value.get('renew_time', None)
 
     def to_dict(self) -> dict:
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = super().to_dict()
         if result is None:
             result = {}
@@ -134,3 +137,11 @@ class TicketReservationAvro(ReservationMng):
             self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
             self.broker == other.broker and self.ticket == other.ticket and self.renewable == other.renewable and \
             self.renewable == other.renew_time
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+
+        if self.broker is None:
+            ret_val = False
+
+        return ret_val

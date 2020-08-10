@@ -50,6 +50,9 @@ class ResourceSetAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "units": self.units,
             "type": self.type
@@ -70,3 +73,9 @@ class ResourceSetAvro:
 
         return self.units == other.units and self.type == other.type and \
                self.resource_data == other.resource_data and self.concrete == other.concrete
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.units is None or self.type is None:
+            ret_val = False
+        return ret_val

@@ -44,6 +44,9 @@ class ResultAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "code": self.code
         }
@@ -79,3 +82,9 @@ class ResultAvro:
             return False
 
         return self.code == other.code and self.message == other.message and self.details == other.details
+
+    def validate(self) -> bool:
+        ret_val = True
+        if self.code is None:
+            ret_val = False
+        return ret_val

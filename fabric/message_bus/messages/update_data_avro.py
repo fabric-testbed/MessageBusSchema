@@ -42,6 +42,9 @@ class UpdateDataAvro:
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "failed": self.failed,
             "message": self.message
@@ -56,3 +59,11 @@ class UpdateDataAvro:
             return False
 
         return self.failed == other.failed and self.message == other.message
+
+    def validate(self) -> bool:
+        ret_val = True
+
+        if self.failed is None or self.message is None:
+            ret_val = False
+
+        return ret_val

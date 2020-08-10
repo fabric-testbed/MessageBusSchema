@@ -61,6 +61,9 @@ class TicketAvro(IMessageAvro):
             The Avro Python library does not support code generation.
             For this reason we must provide a dict representation of our class for serialization.
         """
+        if not self.validate():
+            raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
@@ -85,3 +88,12 @@ class TicketAvro(IMessageAvro):
 
     def get_message_name(self) -> str:
         return self.name
+
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
+
+    def validate(self) -> bool:
+        ret_val = super().validate()
+        if self.auth is None or self.callback_topic is None or self.reservation is None:
+            ret_val = False
+        return ret_val
