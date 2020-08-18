@@ -32,6 +32,7 @@ class IMessageAvro:
         New Avro schema must be defined as per the inherited class and should be used for the producer/consumer
     """
     Claim = "Claim"
+    Reclaim = "Reclaim"
     Close = "Close"
     ExtendLease = "ExtendLease"
     ExtendTicket = "ExtendTicket"
@@ -47,6 +48,7 @@ class IMessageAvro:
 
     # Management APIs
     ClaimResources = "ClaimResources"
+    ReclaimResources = "ReclaimResources"
     RemoveSlice = "RemoveSlice"
     AddSlice = "AddSlice"
     UpdateSlice = "UpdateSlice"

@@ -29,12 +29,12 @@ from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ClaimResourcesAvro(IMessageAvro):
+class ReclaimResourcesAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "slice_id", "auth", "callback_topic", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ClaimResources
+        self.name = IMessageAvro.ReclaimResources
         self.message_id = None
         self.guid = None
         self.broker_id = None
@@ -47,7 +47,7 @@ class ClaimResourcesAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.ClaimResources:
+        if value['name'] != IMessageAvro.ReclaimResources:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
         self.guid = value['guid']
