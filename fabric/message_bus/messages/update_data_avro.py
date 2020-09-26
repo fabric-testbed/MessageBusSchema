@@ -30,12 +30,12 @@ class UpdateDataAvro:
     __slots__ = ["failed", "message"]
 
     def __init__(self):
-        self.failed = None
-        self.message = None
+        self.failed = False
+        self.message = ""
 
     def from_dict(self, value: dict):
-        self.failed = value['failed']
-        self.message = value['message']
+        self.failed = value.get('failed', None)
+        self.message = value.get('message', None)
 
     def to_dict(self) -> dict:
         """

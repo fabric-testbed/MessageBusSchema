@@ -45,6 +45,8 @@ from fabric.message_bus.messages.get_pool_info_avro import GetPoolInfoAvro
 from fabric.message_bus.messages.get_reservation_units_avro import GetReservationUnitsAvro
 from fabric.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
 from fabric.message_bus.messages.get_unit_avro import GetUnitAvro
+from fabric.message_bus.messages.reclaim_avro import ReclaimAvro
+from fabric.message_bus.messages.reclaim_resources_avro import ReclaimResourcesAvro
 from fabric.message_bus.messages.result_actor_avro import ResultActorAvro
 from fabric.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
 from fabric.message_bus.messages.result_proxy_avro import ResultProxyAvro
@@ -118,6 +120,9 @@ class AvroConsumerApi(Base):
         elif value['name'] == IMessageAvro.Claim:
             message = ClaimAvro()
             message.from_dict(value)
+        elif value['name'] == IMessageAvro.Reclaim:
+            message = ReclaimAvro()
+            message.from_dict(value)
         elif value['name'] == IMessageAvro.ExtendTicket:
             message = ExtendTicketAvro()
             message.from_dict(value)
@@ -142,6 +147,9 @@ class AvroConsumerApi(Base):
         # Management Messages
         elif value['name'] == IMessageAvro.ClaimResources:
             message = ClaimResourcesAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ReclaimResources:
+            message = ReclaimResourcesAvro()
             message.from_dict(value)
         elif value['name'] == IMessageAvro.RemoveSlice:
             message = RemoveSliceAvro()

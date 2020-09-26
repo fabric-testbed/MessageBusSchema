@@ -229,5 +229,6 @@ class ReservationMng:
     def validate(self) -> bool:
         ret_val = True
         if self.reservation_id is None or self.rtype is None or self.notices is None:
+            print("reservation_id: {} rtype: {} notices: {}".format(self.reservation_id, self.rtype, self.notices))
             ret_val = False
         return ret_val
