@@ -235,7 +235,7 @@ class AvroConsumerApi(Base):
             self.log_error("Unsupported message: {}".format(value))
             return
 
-        self.handle_message(message)
+        self.handle_message(message=message)
 
     def handle_message(self, message: IMessageAvro):
         print(message)
