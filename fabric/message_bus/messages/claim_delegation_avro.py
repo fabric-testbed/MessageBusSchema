@@ -26,42 +26,37 @@
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
+from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ReclaimResourcesAvro(IMessageAvro):
+class ClaimDelegationAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "delegation_id", "slice_id", "auth",
-                 "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "callback_topic", "delegation", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ReclaimResources
+        self.name = IMessageAvro.ClaimDelegation
         self.message_id = None
-        self.guid = None
-        self.broker_id = None
-        self.reservation_id = None
-        self.delegation_id = None
-        self.slice_id = None
-        self.auth = None
+        self.delegation = None
         self.callback_topic = None
+        self.auth = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.ReclaimResources:
+        if value['name'] != IMessageAvro.ClaimDelegation:
             raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-        self.broker_id = value['broker_id']
-        self.reservation_id = value.get('reservation_id', None)
-        self.delegation_id = value.get('delegation_id', None)
-        self.slice_id = value.get('slice_id', None)
-
-        if value.get('auth', None) is not None:
+        self.message_id = value.get('message_id', None)
+        self.callback_topic = value.get('callback_topic', None)
+        auth_temp = value.get('auth', None)
+        if auth_temp is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
-        self.callback_topic = value['callback_topic']
+        del_dict = value.get('delegation', None)
+        if del_dict is not None:
+            self.delegation = DelegationAvro()
+            self.delegation.from_dict(del_dict)
 
     def to_dict(self) -> dict:
         """
@@ -70,23 +65,15 @@ class ReclaimResourcesAvro(IMessageAvro):
         """
         if not self.validate():
             raise Exception("Invalid arguments")
+
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "guid": self.guid,
-            "broker_id": self.broker_id,
-            "callback_topic": self.callback_topic
+            "callback_topic": self.callback_topic,
+            "delegation": self.delegation.to_dict()
         }
-        if self.delegation_id is not None:
-            result['delegation_id'] = self.delegation_id
-
-        if self.reservation_id is not None:
-            result['reservation_id'] = self.reservation_id
-
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
-        if self.slice_id is not None:
-            result["slice_id"] = self.slice_id
         return result
 
     def get_message_id(self) -> str:
@@ -98,25 +85,17 @@ class ReclaimResourcesAvro(IMessageAvro):
     def get_message_name(self) -> str:
         return self.name
 
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
-
     def __str__(self):
-        return "name: {} message_id: {} guid: {} broker_id: {} reservation_id: {} delegation_id: {} slice_id: {} " \
-               "auth: {} callback_topic: {}".format(self.name, self.message_id, self.guid, self.broker_id,
-                                                    self.reservation_id, self.delegation_id, self.slice_id,
-                                                    self.auth, self.callback_topic)
+        return "name: {} message_id: {} callback_topic: {} delegation: {}".format(self.name, self.message_id, self.callback_topic, self.delegation)
 
     def get_id(self) -> str:
         return self.id.__str__()
 
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
+
     def validate(self) -> bool:
         ret_val = super().validate()
-
-        if self.guid is None or self.auth is None or self.broker_id is None or self.callback_topic is None:
+        if self.callback_topic is None or self.delegation is None:
             ret_val = False
-
-        if self.reservation_id is None and self.delegation_id is None:
-            ret_val = False
-
         return ret_val

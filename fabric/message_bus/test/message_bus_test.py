@@ -34,9 +34,11 @@ from fabric.message_bus.messages.add_reservations_avro import AddReservationsAvr
 from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.claim_avro import ClaimAvro
+from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationAvro
 from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
 from fabric.message_bus.messages.close_avro import CloseAvro
 from fabric.message_bus.messages.close_reservations_avro import CloseReservationsAvro
+from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.demand_reservation_avro import DemandReservationAvro
 from fabric.message_bus.messages.extend_lease_avro import ExtendLeaseAvro
 from fabric.message_bus.messages.extend_reservation_avro import ExtendReservationAvro
@@ -78,6 +80,7 @@ from fabric.message_bus.messages.ticket_avro import TicketAvro
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 from fabric.message_bus.messages.unit_avro import UnitAvro
 from fabric.message_bus.messages.update_data_avro import UpdateDataAvro
+from fabric.message_bus.messages.update_delegation_avro import UpdateDelegationAvro
 from fabric.message_bus.messages.update_lease_avro import UpdateLeaseAvro
 from fabric.message_bus.messages.update_reservation_avro import UpdateReservationAvro
 from fabric.message_bus.messages.update_slice_avro import UpdateSliceAvro
@@ -172,13 +175,14 @@ class MessageBusTest(unittest.TestCase):
         claim_req.auth = auth
         claim_req.broker_id = "brokerid"
         claim_req.reservation_id = "rsv_id"
+        claim_req.delegation_id = "dlg_id"
         claim_req.message_id = "test_claim_1"
         claim_req.callback_topic = "test"
         claim_req.slice_id = "slice_1"
 
         #print(claim_req.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claim_req)
-
+        
         reservation = ReservationAvro()
         reservation.reservation_id = "res123"
         reservation.sequence = 1
@@ -212,6 +216,24 @@ class MessageBusTest(unittest.TestCase):
         #print(claim.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claim)
 
+        delegation = DelegationAvro()
+        delegation.delegation_id = "dlg123"
+        delegation.sequence = 1
+        delegation.slice = SliceAvro()
+        delegation.slice.guid = "slice-12"
+        delegation.slice.slice_name = "test_slice"
+        delegation.slice.description = "test description"
+        delegation.slice.owner = auth
+        delegation.graph = b'\x80\x04\x95\xb9\x02\x00\x00\x00\x00\x00\x00\x8c\x16actor.core.core.Ticket\x94\x8c\x06Ticket\x94\x93\x94)\x81\x94}\x94(\x8c\tauthority\x94\x8c,actor.core.proxies.kafka.KafkaAuthorityProxy\x94\x8c\x13KafkaAuthorityProxy\x94\x93\x94)\x81\x94}\x94(\x8c\nproxy_type\x94\x8c\x05kafka\x94\x8c\x08callback\x94\x89\x8c\nactor_name\x94\x8c\x0cfabric-vm-am\x94\x8c\nactor_guid\x94\x8c\x12actor.core.util.ID\x94\x8c\x02ID\x94\x93\x94)\x81\x94}\x94\x8c\x02id\x94\x8c\x11fabric-vm-am-guid\x94sb\x8c\x04auth\x94\x8c\x18actor.security.AuthToken\x94\x8c\tAuthToken\x94\x93\x94)\x81\x94}\x94(\x8c\x04name\x94h\x0f\x8c\x04guid\x94h\x14ub\x8c\x0bkafka_topic\x94\x8c\x12fabric-vm-am-topic\x94\x8c\x04type\x94K\x03\x8c\x10bootstrap_server\x94\x8c\x0elocalhost:9092\x94\x8c\x0fschema_registry\x94\x8c\x15http://localhost:8081\x94\x8c\x0fkey_schema_file\x94\x8cK/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/key.avsc\x94\x8c\x11value_schema_file\x94\x8cO/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/message.avsc\x94ub\x8c\x0fresource_ticket\x94N\x8c\told_units\x94K\x0fub.'
+
+        claimd = ClaimDelegationAvro()
+        claimd.auth = auth
+        claimd.message_id = "msg4"
+        claimd.callback_topic = "test"
+        claimd.delegation = delegation
+        #print(claim.to_dict())
+        producer.produce_sync("fabric-mb-public-test2", claimd)
+
         # Redeem
         redeem = RedeemAvro()
         redeem.message_id = "msg4"
@@ -232,6 +254,18 @@ class MessageBusTest(unittest.TestCase):
 
         #print(update_ticket.to_dict())
         producer.produce_sync("fabric-mb-public-test2", update_ticket)
+
+        update_d = UpdateDelegationAvro()
+        update_d.auth = auth
+        update_d.message_id = "msg11"
+        update_d.callback_topic = "test"
+        update_d.delegation = delegation
+        update_d.update_data = UpdateDataAvro()
+        update_d.update_data.failed = False
+        update_d.update_data.message = ""
+
+        #print(update_ticket.to_dict())
+        producer.produce_sync("fabric-mb-public-test2", update_d)
 
         get_slice = GetSlicesRequestAvro()
         get_slice.auth = auth
@@ -618,6 +652,9 @@ class MessageBusTest(unittest.TestCase):
                 if message.get_message_name() == IMessageAvro.Claim:
                    self.parent.validate_claim(message, claim)
 
+                elif message.get_message_name() == IMessageAvro.ClaimDelegation:
+                   self.parent.validate_claim_delegation(message, claimd)
+
                 elif message.get_message_name() == IMessageAvro.Close:
                     self.parent.validate_close(message, close)
 
@@ -778,6 +815,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.broker_id, outgoing.broker_id)
         self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
+        self.assertEqual(incoming.delegation_id, outgoing.delegation_id)
         self.assertEqual(incoming.slice_id, outgoing.slice_id)
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
@@ -786,6 +824,13 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.reservation, outgoing.reservation)
+        self.assertEqual(incoming.auth, outgoing.auth)
+        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+
+    def validate_claim_delegation(self, incoming: ClaimDelegationAvro, outgoing: ClaimDelegationAvro):
+        self.assertEqual(incoming.name, outgoing.name)
+        self.assertEqual(incoming.message_id, outgoing.message_id)
+        self.assertEqual(incoming.delegation, outgoing.delegation)
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 

@@ -241,6 +241,11 @@
 				"type": ["null", "string"],
 				"default": null
 			},
+            {
+				"name": "graph_id",
+				"type": ["null", "string"],
+				"default": null
+			},
 			{
 				"name": "client_slice",
 				"type": ["null", "boolean"],
@@ -505,6 +510,32 @@
             }
         ]
     },
+    {
+        "namespace": "fabric.cf.model",
+        "name": "DelegationRecord",
+        "type": "record",
+        "fields": [
+            {
+                "name": "delegation_id",
+                "type": "string"
+            },
+            {
+                "name": "sequence",
+                "type": ["null", "int"],
+                "default": null
+            },
+            {
+				"name": "slice",
+				"type": ["null", "fabric.cf.model.SliceRecord"],
+				"default": null
+			},
+			{
+				"name": "graph",
+				"type": ["null", "string"],
+				"default": null
+			}
+        ]
+    },
 	{
 		"namespace": "fabric.cf.model",
 		"type": "record",
@@ -642,6 +673,11 @@
 				"default": null
 			},
 			{
+				"name": "delegation",
+				"type": ["null", "fabric.cf.model.DelegationRecord"],
+				"default": null
+			},
+			{
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
 				"default": null
@@ -674,7 +710,13 @@
 			},
 			{
 				"name": "reservation_id",
-				"type": "string"
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "delegation_id",
+				"type": ["null", "string"],
+				"default": null
 			},
 			{
 				"name": "slice_id",
@@ -749,6 +791,14 @@
 				"type": ["null", {
 				    "type":"array",
 				    "items" : "fabric.cf.model.PoolRecord"
+				}],
+				"default": null
+			},
+			{
+				"name": "delegations",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.DelegationRecord"
 				}],
 				"default": null
 			},

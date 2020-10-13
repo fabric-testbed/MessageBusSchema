@@ -96,6 +96,7 @@ class AvroProducerApi(Base):
             :param record: record/message to be written
             :return:
         """
+        self.log_debug("Record type={}".format(type(record)))
         self.log_debug("Producing key {} to topic {}.".format(record.get_id(), topic))
         self.log_debug("Producing record {} to topic {}.".format(record.to_dict(), topic))
 

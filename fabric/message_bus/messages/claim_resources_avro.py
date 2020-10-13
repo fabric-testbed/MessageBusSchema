@@ -31,7 +31,8 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class ClaimResourcesAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "slice_id", "auth", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "delegation_id", "slice_id", "auth",
+                 "callback_topic", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.ClaimResources
@@ -39,6 +40,7 @@ class ClaimResourcesAvro(IMessageAvro):
         self.guid = None
         self.broker_id = None
         self.reservation_id = None
+        self.delegation_id = None
         self.slice_id = None
         self.auth = None
         self.callback_topic = None
@@ -52,7 +54,8 @@ class ClaimResourcesAvro(IMessageAvro):
         self.message_id = value['message_id']
         self.guid = value['guid']
         self.broker_id = value['broker_id']
-        self.reservation_id = value['reservation_id']
+        self.reservation_id = value.get('reservation_id', None)
+        self.delegation_id = value.get('delegation_id', None)
         self.slice_id = value.get('slice_id', None)
 
         if value.get('auth', None) is not None:
@@ -72,9 +75,14 @@ class ClaimResourcesAvro(IMessageAvro):
             "message_id": self.message_id,
             "guid": self.guid,
             "broker_id": self.broker_id,
-            "reservation_id": self.reservation_id,
             "callback_topic": self.callback_topic
         }
+        if self.delegation_id is not None:
+            result['delegation_id'] = self.delegation_id
+
+        if self.reservation_id is not None:
+            result['reservation_id'] = self.reservation_id
+
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
         if self.slice_id is not None:
@@ -94,8 +102,10 @@ class ClaimResourcesAvro(IMessageAvro):
         return self.callback_topic
 
     def __str__(self):
-        return "name: {} message_id: {} guid: {} broker_id: {} reservation_id: {} slice_id: {} auth: {} callback_topic: {}".format(
-            self.name, self.message_id, self.guid, self.broker_id, self.reservation_id, self.slice_id, self.auth, self.callback_topic)
+        return "name: {} message_id: {} guid: {} broker_id: {} reservation_id: {} delegation_id: {} slice_id: {} " \
+               "auth: {} callback_topic: {}".format(self.name, self.message_id, self.guid, self.broker_id,
+                                                    self.reservation_id, self.delegation_id, self.slice_id,
+                                                    self.auth, self.callback_topic)
 
     def get_id(self) -> str:
         return self.id.__str__()
@@ -103,7 +113,10 @@ class ClaimResourcesAvro(IMessageAvro):
     def validate(self) -> bool:
         ret_val = super().validate()
 
-        if self.guid is None or self.auth is None or self.broker_id is None or self.reservation_id is None or self.callback_topic is None:
+        if self.guid is None or self.auth is None or self.broker_id is None or self.callback_topic is None:
+            ret_val = False
+
+        if self.reservation_id is None and self.delegation_id is None:
             ret_val = False
 
         return ret_val
