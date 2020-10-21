@@ -215,14 +215,15 @@ class AdminApi(Base):
                 self.log_debug("    partition {} leader: {}, replicas: {}, isrs: {}, errstr: {}".format(
                     p.id, p.leader, p.replicas, p.isrs, errstr))
 
-    def list_topics(self) -> list:
+    def list_topics(self, timeout: int = 10) -> list:
         """
             list topics and cluster metadata
             :param type: list topics or brokers or all; allowed values (all|topics|brokers)
+            :param timeout: timeout in ms
             :return:
         """
         result = []
-        md = self.admin_client.list_topics(timeout=10)
+        md = self.admin_client.list_topics(timeout=timeout)
 
         for t in iter(md.topics.values()):
             result.append(str(t))
