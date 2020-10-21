@@ -29,7 +29,8 @@ from fabric.message_bus.messages.auth_avro import AuthAvro
 class SliceAvro:
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["slice_name", "guid", "owner", "description", "local_properties", "config_properties",
-                 "request_properties", "resource_properties", "resource_type", "client_slice", "broker_client_slice"]
+                 "request_properties", "resource_properties", "resource_type", "client_slice", "broker_client_slice",
+                 "graph_id"]
 
     def __init__(self):
         self.slice_name = None
@@ -43,6 +44,7 @@ class SliceAvro:
         self.resource_type = None
         self.client_slice = False
         self.broker_client_slice = False
+        self.graph_id = None
 
     def from_dict(self, value: dict):
         self.slice_name = value['slice_name']
@@ -60,6 +62,7 @@ class SliceAvro:
         self.resource_type = value.get('resource_type', None)
         self.client_slice = value.get('client_slice', None)
         self.broker_client_slice = value.get('broker_client_slice', None)
+        self.graph_id = value.get('graph_id', None)
 
     def to_dict(self) -> dict:
         """
@@ -99,19 +102,24 @@ class SliceAvro:
 
         if self.broker_client_slice is not None:
             result["broker_client_slice"] = self.broker_client_slice
+
+        if self.graph_id is not None:
+            result["graph_id"] = self.graph_id
         return result
 
     def __str__(self):
         return "slice_name: {} guid: {} owner: {} description: {} local_properties: {} config_properties: {} " \
                "request_properties: {} resource_properties: {} resource_type: {} client_slice: {} " \
-               "broker_client_slice: {}".format(self.slice_name, self.guid, self.owner, self.description,
+               "broker_client_slice: {} graph_id: {}".format(self.slice_name, self.guid, self.owner, self.description,
                                                 self.local_properties, self.config_properties,
                                                 self.request_properties, self.resource_properties, self.resource_type,
-                                                self.client_slice, self.broker_client_slice)
+                                                self.client_slice, self.broker_client_slice, self.graph_id)
 
     def print(self, all: bool = False):
         print("")
         print("Slice Name: {} Slice Guid: {}".format(self.slice_name, self.guid))
+        if self.graph_id is not None:
+            print("Graph ID: {}".format(self.graph_id))
         if all:
             if self.owner is not None:
                 print("Slice owner: {}".format(self.owner))
@@ -132,7 +140,6 @@ class SliceAvro:
                 print("request_properties: {}".format(self.request_properties))
             if self.resource_properties is not None:
                 print("resource_properties: {}".format(self.resource_properties))
-
         print("")
 
     def set_slice_name(self, value: str):
@@ -217,3 +224,6 @@ class SliceAvro:
                 self.broker_client_slice is None or self.guid is None:
             ret_val = False
         return ret_val
+
+    def get_graph_id(self) -> str:
+        return self.graph_id

@@ -33,6 +33,7 @@ from fabric.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric.message_bus.messages.add_reservations_avro import AddReservationsAvro
 from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
 from fabric.message_bus.messages.claim_avro import ClaimAvro
+from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationAvro
 from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
 from fabric.message_bus.messages.close_avro import CloseAvro
 from fabric.message_bus.messages.close_reservations_avro import CloseReservationsAvro
@@ -41,13 +42,16 @@ from fabric.message_bus.messages.extend_lease_avro import ExtendLeaseAvro
 from fabric.message_bus.messages.extend_reservation_avro import ExtendReservationAvro
 from fabric.message_bus.messages.extend_ticket_avro import ExtendTicketAvro
 from fabric.message_bus.messages.failed_rpc_avro import FailedRPCAvro
+from fabric.message_bus.messages.get_delegations_avro import GetDelegationsAvro
 from fabric.message_bus.messages.get_pool_info_avro import GetPoolInfoAvro
 from fabric.message_bus.messages.get_reservation_units_avro import GetReservationUnitsAvro
 from fabric.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
 from fabric.message_bus.messages.get_unit_avro import GetUnitAvro
 from fabric.message_bus.messages.reclaim_avro import ReclaimAvro
+from fabric.message_bus.messages.reclaim_delegation_avro import ReclaimDelegationAvro
 from fabric.message_bus.messages.reclaim_resources_avro import ReclaimResourcesAvro
 from fabric.message_bus.messages.result_actor_avro import ResultActorAvro
+from fabric.message_bus.messages.result_delegation_avro import ResultDelegationAvro
 from fabric.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
 from fabric.message_bus.messages.result_proxy_avro import ResultProxyAvro
 from fabric.message_bus.messages.result_reservation_avro import ResultReservationAvro
@@ -66,6 +70,7 @@ from fabric.message_bus.messages.result_string_avro import ResultStringAvro
 from fabric.message_bus.messages.result_strings_avro import ResultStringsAvro
 from fabric.message_bus.messages.result_unit_avro import ResultUnitAvro
 from fabric.message_bus.messages.ticket_avro import TicketAvro
+from fabric.message_bus.messages.update_delegation_avro import UpdateDelegationAvro
 from fabric.message_bus.messages.update_lease_avro import UpdateLeaseAvro
 from fabric.message_bus.messages.update_reservation_avro import UpdateReservationAvro
 from fabric.message_bus.messages.update_slice_avro import UpdateSliceAvro
@@ -123,6 +128,12 @@ class AvroConsumerApi(Base):
         elif value['name'] == IMessageAvro.Reclaim:
             message = ReclaimAvro()
             message.from_dict(value)
+        elif value['name'] == IMessageAvro.ClaimDelegation:
+            message = ClaimDelegationAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ReclaimDelegation:
+            message = ReclaimDelegationAvro()
+            message.from_dict(value)
         elif value['name'] == IMessageAvro.ExtendTicket:
             message = ExtendTicketAvro()
             message.from_dict(value)
@@ -140,6 +151,9 @@ class AvroConsumerApi(Base):
             message.from_dict(value)
         elif value['name'] == IMessageAvro.UpdateTicket:
             message = UpdateTicketAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.UpdateDelegation:
+            message = UpdateDelegationAvro()
             message.from_dict(value)
         elif value['name'] == IMessageAvro.UpdateLease:
             message = UpdateLeaseAvro()
@@ -190,6 +204,9 @@ class AvroConsumerApi(Base):
         elif value['name'] == IMessageAvro.GetReservationsRequest:
             message = GetReservationsRequestAvro()
             message.from_dict(value)
+        elif value['name'] == IMessageAvro.GetDelegations:
+            message = GetDelegationsAvro()
+            message.from_dict(value)
         elif value['name'] == IMessageAvro.GetReservationsStateRequest:
             message = GetReservationsStateRequestAvro()
             message.from_dict(value)
@@ -209,6 +226,9 @@ class AvroConsumerApi(Base):
             message.from_dict(value)
         elif value['name'] == IMessageAvro.ResultReservation:
             message = ResultReservationAvro()
+            message.from_dict(value)
+        elif value['name'] == IMessageAvro.ResultDelegation:
+            message = ResultDelegationAvro()
             message.from_dict(value)
         elif value['name'] == IMessageAvro.ResultReservationState:
             message = ResultReservationStateAvro()
@@ -235,7 +255,7 @@ class AvroConsumerApi(Base):
             self.log_error("Unsupported message: {}".format(value))
             return
 
-        self.handle_message(message)
+        self.handle_message(message=message)
 
     def handle_message(self, message: IMessageAvro):
         print(message)

@@ -32,7 +32,9 @@ class IMessageAvro:
         New Avro schema must be defined as per the inherited class and should be used for the producer/consumer
     """
     Claim = "Claim"
+    ClaimDelegation = "ClaimDelegation"
     Reclaim = "Reclaim"
+    ReclaimDelegation = "ReclaimDelegation"
     Close = "Close"
     ExtendLease = "ExtendLease"
     ExtendTicket = "ExtendTicket"
@@ -45,6 +47,7 @@ class IMessageAvro:
     UpdateLease = "UpdateLease"
     UpdateTicket = "UpdateTicket"
     Ticket = "Ticket"
+    UpdateDelegation = "UpdateDelegation"
 
     # Management APIs
     ClaimResources = "ClaimResources"
@@ -63,6 +66,7 @@ class IMessageAvro:
     GetReservationsStateRequest = "GetReservationsStateRequest"
     GetSlicesRequest = "GetSlicesRequest"
     GetReservationsRequest = "GetReservationsRequest"
+    GetDelegations = "GetDelegations"
     GetReservationUnitsRequest = "GetReservationUnitsRequest"
     GetUnitRequest = "GetUnitRequest"
     GetPoolInfoRequest = "GetPoolInfoRequest"
@@ -70,6 +74,7 @@ class IMessageAvro:
 
     ResultSlice = "ResultSlice"
     ResultReservation = "ResultReservation"
+    ResultDelegation = "ResultDelegation"
     ResultReservationState = "ResultReservationState"
     ResultStrings = "ResultStrings"
     ResultString = "ResultString"
