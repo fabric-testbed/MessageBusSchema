@@ -32,6 +32,7 @@ setup(
     include_package_data=True,
     data_files=[(SchemaDir, [KeySchemaFile, MessageSchemaFile])],
     long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
                   "Programming Language :: Python :: 3",
                   "License :: OSI Approved :: MIT License",
