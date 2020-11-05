@@ -31,7 +31,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class GetPoolInfoAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "broker_id", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "broker_id", "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetPoolInfoRequest
@@ -40,6 +40,7 @@ class GetPoolInfoAvro(IMessageAvro):
         self.auth = None
         self.callback_topic = None
         self.broker_id = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -51,6 +52,7 @@ class GetPoolInfoAvro(IMessageAvro):
         self.guid = value.get('guid')
         self.callback_topic = value.get('callback_topic')
         self.broker_id = value.get('broker_id', None)
+        self.id_token = value.get('id_token', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -68,7 +70,8 @@ class GetPoolInfoAvro(IMessageAvro):
             "message_id": self.message_id,
             "guid": self.guid,
             "callback_topic": self.callback_topic,
-            "broker_id": self.broker_id
+            "broker_id": self.broker_id,
+            "id_token": self.id_token
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -93,7 +96,9 @@ class GetPoolInfoAvro(IMessageAvro):
     def get_id(self) -> str:
         return self.id.__str__()
 
+    def get_id_token(self) -> str:
+        return self.id_token
+
     def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} callback_topic: {} broker_id: {}".format(self.name, self.message_id,
-                                                                                                   self.guid, self.auth,
-                                                                                                   self.callback_topic, self.broker_id)
+        return "name: {} message_id: {} guid: {} auth: {} callback_topic: {} broker_id: {} id_token: {}".format(
+            self.name, self.message_id, self.guid, self.auth, self.callback_topic, self.broker_id, self.id_token)

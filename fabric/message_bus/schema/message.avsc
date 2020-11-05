@@ -9,11 +9,6 @@
 			{
 				"name": "guid",
 				"type": "string"
-			},
-			{
-				"name": "id_token",
-				"type": ["null", "string"],
-				"default": null
 			}
 		]
 	},
@@ -563,6 +558,11 @@
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
 				"default": null
+			},
+			{
+				"name": "id_token",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
@@ -668,6 +668,11 @@
                 "default": null
             },
             {
+				"name": "id_token",
+				"type": ["null", "string"],
+				"default": null
+			},
+            {
 				"name": "reservation",
 				"type": ["null", "fabric.cf.model.ReservationRecord"],
 				"default": null
@@ -726,6 +731,11 @@
 			{
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
+				"default": null
+			},
+			{
+				"name": "id_token",
+				"type": ["null", "string"],
 				"default": null
 			}
 		]
@@ -925,6 +935,11 @@
 			{
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
+				"default": null
+			},
+			{
+				"name": "id_token",
+				"type": ["null", "string"],
 				"default": null
 			}
 		]

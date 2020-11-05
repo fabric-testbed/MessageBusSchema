@@ -32,7 +32,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 class GetDelegationsAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "delegation_id", "delegation_state", "type",
-                 "callback_topic", "id"]
+                 "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetDelegations
@@ -44,6 +44,7 @@ class GetDelegationsAvro(IMessageAvro):
         self.delegation_state = None
         self.type = None
         self.callback_topic = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -59,6 +60,7 @@ class GetDelegationsAvro(IMessageAvro):
         self.delegation_id = value.get("delegation_id", None)
         self.delegation_state = value.get("delegation_state", None)
         self.type = value.get("type", None)
+        self.id_token = value.get("id_token", None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -75,7 +77,8 @@ class GetDelegationsAvro(IMessageAvro):
             "name": self.name,
             "message_id": self.message_id,
             "guid": self.guid,
-            "callback_topic": self.callback_topic
+            "callback_topic": self.callback_topic,
+            "id_token": self.id_token
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -117,10 +120,15 @@ class GetDelegationsAvro(IMessageAvro):
     def get_reservation_type(self) -> str:
         return self.type
 
+    def get_id_token(self) -> str:
+        return self.id_token
+
     def __str__(self):
         return "name: {} message_id: {} guid: {} auth: {} slice_id: {} delegation_id: {} delegation_state: {} " \
-               "type: {} callback_topic: {}".format(self.name, self.message_id, self.guid, self.auth, self.slice_id,
-                                           self.delegation_id, self.type, self.delegation_state, self.callback_topic)
+               "type: {} callback_topic: {} id_token: {}".format(self.name, self.message_id, self.guid, self.auth,
+                                                                 self.slice_id, self.delegation_id, self.type,
+                                                                 self.delegation_state, self.callback_topic,
+                                                                 self.id_token)
 
     def validate(self) -> bool:
         ret_val = super().validate()

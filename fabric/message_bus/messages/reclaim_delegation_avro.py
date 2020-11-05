@@ -32,7 +32,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class ReclaimDelegationAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "delegation", "auth", "id"]
+    __slots__ = ["name", "message_id", "callback_topic", "delegation", "auth", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.ReclaimDelegation
@@ -40,6 +40,7 @@ class ReclaimDelegationAvro(IMessageAvro):
         self.delegation = None
         self.callback_topic = None
         self.auth = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -57,6 +58,7 @@ class ReclaimDelegationAvro(IMessageAvro):
         if res_dict is not None:
             self.delegation = DelegationAvro()
             self.delegation.from_dict(res_dict)
+        self.id_token = value.get("id_token", None)
 
     def to_dict(self) -> dict:
         """
@@ -70,7 +72,8 @@ class ReclaimDelegationAvro(IMessageAvro):
             "name": self.name,
             "message_id": self.message_id,
             "callback_topic": self.callback_topic,
-            "delegation": self.delegation.to_dict()
+            "delegation": self.delegation.to_dict(),
+            "id_token": self.id_token
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -86,7 +89,8 @@ class ReclaimDelegationAvro(IMessageAvro):
         return self.name
 
     def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} delegation: {}".format(self.name, self.message_id, self.callback_topic, self.delegation)
+        return "name: {} message_id: {} callback_topic: {} id_token: {} delegation: {}".format(
+            self.name, self.message_id, self.callback_topic, self.id_token, self.delegation)
 
     def get_id(self) -> str:
         return self.id.__str__()

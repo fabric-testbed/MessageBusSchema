@@ -132,6 +132,7 @@ class MessageBusTest(unittest.TestCase):
 
         # push messages to topics
 
+        id_token = 'id_token'
         # udd
         udd = UpdateDataAvro()
         udd.message = "message"
@@ -147,6 +148,7 @@ class MessageBusTest(unittest.TestCase):
         query.callback_topic = "topic"
         query.properties = {"abc": "def"}
         query.auth = auth
+        query.id_token = id_token
         #print(query.to_dict())
         producer.produce_sync("fabric-mb-public-test1", query)
 
@@ -179,6 +181,7 @@ class MessageBusTest(unittest.TestCase):
         claim_req.message_id = "test_claim_1"
         claim_req.callback_topic = "test"
         claim_req.slice_id = "slice_1"
+        claim_req.id_token = id_token
 
         #print(claim_req.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claim_req)
@@ -230,6 +233,7 @@ class MessageBusTest(unittest.TestCase):
         claimd.message_id = "msg4"
         claimd.callback_topic = "test"
         claimd.delegation = delegation
+        claimd.id_token = id_token
         #print(claim.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claimd)
 
@@ -262,6 +266,7 @@ class MessageBusTest(unittest.TestCase):
         update_d.update_data = UpdateDataAvro()
         update_d.update_data.failed = False
         update_d.update_data.message = ""
+        update_d.id_token = id_token
 
         #print(update_ticket.to_dict())
         producer.produce_sync("fabric-mb-public-test2", update_d)
@@ -271,6 +276,7 @@ class MessageBusTest(unittest.TestCase):
         get_slice.message_id = "msg11"
         get_slice.callback_topic = "test"
         get_slice.guid = "guid"
+        get_slice.id_token = id_token
 
         #print(get_slice.to_dict())
 
@@ -308,6 +314,7 @@ class MessageBusTest(unittest.TestCase):
         res_req.reservation_id = "res123"
         res_req.reservation_type = "broker"
         res_req.auth = auth
+        res_req.id_token = id_token
 
         print(res_req.to_dict())
 
@@ -518,6 +525,7 @@ class MessageBusTest(unittest.TestCase):
         res_state_req.reservation_ids.append("a1")
         res_state_req.callback_topic = "topic1"
         res_state_req.auth = auth
+        res_state_req.id_token = id_token
 
         producer.produce_sync("fabric-mb-public-test2", res_state_req)
 
@@ -548,6 +556,7 @@ class MessageBusTest(unittest.TestCase):
         ru.message_id = "msg1"
         ru.auth = auth
         ru.callback_topic = "test"
+        ru.id_token = id_token
 
         producer.produce_sync("fabric-mb-public-test2", ru)
 
@@ -558,6 +567,7 @@ class MessageBusTest(unittest.TestCase):
         ruu.message_id = "msg1"
         ruu.auth = auth
         ruu.callback_topic = "test"
+        ruu.id_token = id_token
 
         producer.produce_sync("fabric-mb-public-test2", ruu)
 
@@ -568,6 +578,7 @@ class MessageBusTest(unittest.TestCase):
         pool_info.auth = auth
         pool_info.callback_topic = "test"
         pool_info.broker_id = "broker11"
+        pool_info.id_token = id_token
 
         producer.produce_sync("fabric-mb-public-test2", pool_info)
 
@@ -578,6 +589,7 @@ class MessageBusTest(unittest.TestCase):
         actors_req.auth = auth
         actors_req.callback_topic = "test"
         actors_req.type = "Broker"
+        actors_req.id_token = id_token
 
         producer.produce_sync("fabric-mb-public-test2", actors_req)
 

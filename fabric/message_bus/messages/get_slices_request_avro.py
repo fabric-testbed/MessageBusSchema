@@ -31,7 +31,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class GetSlicesRequestAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "type", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "type", "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetSlicesRequest
@@ -41,6 +41,7 @@ class GetSlicesRequestAvro(IMessageAvro):
         self.slice_id = None
         self.callback_topic = None
         self.type = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -53,6 +54,7 @@ class GetSlicesRequestAvro(IMessageAvro):
         self.slice_id = value.get('slice_id', None)
         self.callback_topic = value.get('callback_topic', None)
         self.type = value.get('type', None)
+        self.id_token = value.get("id_token", None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -70,7 +72,8 @@ class GetSlicesRequestAvro(IMessageAvro):
             "name": self.name,
             "message_id": self.message_id,
             "guid": self.guid,
-            "callback_topic": self.callback_topic
+            "callback_topic": self.callback_topic,
+            "id_token": self.id_token
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -98,9 +101,12 @@ class GetSlicesRequestAvro(IMessageAvro):
     def get_slice_type(self) -> str:
         return self.type
 
+    def get_id_token(self) -> str:
+        return self.id_token
+
     def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} type: {} callback_topic: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.slice_id, self.type, self.callback_topic)
+        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} type: {} callback_topic: {} id_token: {}".format(
+            self.name, self.message_id, self.guid, self.auth, self.slice_id, self.type, self.callback_topic, self.id_token)
 
     def get_id(self) -> str:
         return self.id.__str__()

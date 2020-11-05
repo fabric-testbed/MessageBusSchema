@@ -31,7 +31,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class GetActorsAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "callback_topic", "type", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "callback_topic", "type", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.GetActorsRequest
@@ -40,6 +40,7 @@ class GetActorsAvro(IMessageAvro):
         self.auth = None
         self.callback_topic = None
         self.type = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -51,6 +52,7 @@ class GetActorsAvro(IMessageAvro):
         self.guid = value['guid']
         self.callback_topic = value['callback_topic']
         self.type = value.get("type", None)
+        self.id_token = value.get('id_token', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -68,6 +70,7 @@ class GetActorsAvro(IMessageAvro):
             "message_id": self.message_id,
             "guid": self.guid,
             "callback_topic": self.callback_topic,
+            "id_token": self.id_token
         }
         if self.type is not None:
             result['type'] = type
@@ -92,10 +95,12 @@ class GetActorsAvro(IMessageAvro):
     def get_id(self) -> str:
         return self.id.__str__()
 
+    def get_id_token(self) -> str:
+        return self.id_token
+
     def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} callback_topic: {} type: {}".format(self.name, self.message_id,
-                                                                                     self.guid, self.auth,
-                                                                                     self.callback_topic, self.type)
+        return "name: {} message_id: {} guid: {} auth: {} callback_topic: {} type: {} id_token: {}".format(
+            self.name, self.message_id, self.guid, self.auth, self.callback_topic, self.type, self.id_token)
 
     def validate(self) -> bool:
         ret_val = super().validate()

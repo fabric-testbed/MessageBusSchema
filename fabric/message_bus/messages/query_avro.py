@@ -31,7 +31,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class QueryAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "properties", "callback_topic", "auth", "id"]
+    __slots__ = ["name", "message_id", "properties", "callback_topic", "auth", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.Query
@@ -39,6 +39,7 @@ class QueryAvro(IMessageAvro):
         self.properties = None
         self.callback_topic = None
         self.auth = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -49,6 +50,7 @@ class QueryAvro(IMessageAvro):
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']
         self.properties = value['properties']
+        self.id_token = value.get("id_token", None)
         auth_temp = value.get('auth', None)
         if auth_temp is not None:
             self.auth = AuthAvro()
@@ -66,11 +68,15 @@ class QueryAvro(IMessageAvro):
             "name": self.name,
             "message_id": self.message_id,
             "callback_topic": self.callback_topic,
-            "properties": self.properties
+            "properties": self.properties,
+            "id_token": self.id_token
         }
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
         return result
+
+    def get_id_token(self) -> str:
+        return self.id_token
 
     def get_message_id(self) -> str:
         """
@@ -82,7 +88,8 @@ class QueryAvro(IMessageAvro):
         return self.name
 
     def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} properties: {}".format(self.name, self.message_id, self.callback_topic, self.properties)
+        return "name: {} message_id: {} callback_topic: {} properties: {} id_token: {}".format(
+            self.name, self.message_id, self.callback_topic, self.properties, self.id_token)
 
     def get_id(self) -> str:
         return self.id.__str__()

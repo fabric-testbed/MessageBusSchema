@@ -32,7 +32,7 @@ from fabric.message_bus.messages.message import IMessageAvro
 class ReclaimResourcesAvro(IMessageAvro):
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "broker_id", "reservation_id", "delegation_id", "slice_id", "auth",
-                 "callback_topic", "id"]
+                 "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.ReclaimResources
@@ -44,6 +44,7 @@ class ReclaimResourcesAvro(IMessageAvro):
         self.slice_id = None
         self.auth = None
         self.callback_topic = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -62,6 +63,7 @@ class ReclaimResourcesAvro(IMessageAvro):
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
         self.callback_topic = value['callback_topic']
+        self.id_token = value.get("id_token", None)
 
     def to_dict(self) -> dict:
         """
@@ -75,7 +77,8 @@ class ReclaimResourcesAvro(IMessageAvro):
             "message_id": self.message_id,
             "guid": self.guid,
             "broker_id": self.broker_id,
-            "callback_topic": self.callback_topic
+            "callback_topic": self.callback_topic,
+            "id_token": self.id_token
         }
         if self.delegation_id is not None:
             result['delegation_id'] = self.delegation_id
@@ -103,9 +106,9 @@ class ReclaimResourcesAvro(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} guid: {} broker_id: {} reservation_id: {} delegation_id: {} slice_id: {} " \
-               "auth: {} callback_topic: {}".format(self.name, self.message_id, self.guid, self.broker_id,
-                                                    self.reservation_id, self.delegation_id, self.slice_id,
-                                                    self.auth, self.callback_topic)
+               "auth: {} callback_topic: {} id_token {}".format(self.name, self.message_id, self.guid, self.broker_id,
+                                                                self.reservation_id, self.delegation_id, self.slice_id,
+                                                                self.auth, self.callback_topic, self.id_token)
 
     def get_id(self) -> str:
         return self.id.__str__()
