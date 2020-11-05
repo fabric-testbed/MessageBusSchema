@@ -933,6 +933,11 @@
 				"default": null
 			},
 			{
+				"name": "delegation_state",
+				"type": ["null", "int"],
+				"default": null
+			},
+			{
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
 				"default": null
