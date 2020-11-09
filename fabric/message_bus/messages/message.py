@@ -31,9 +31,7 @@ class IMessageAvro:
         a globally unique identifier. It must be inherited to include Actor specific fields and to_dict implementation.
         New Avro schema must be defined as per the inherited class and should be used for the producer/consumer
     """
-    Claim = "Claim"
     ClaimDelegation = "ClaimDelegation"
-    Reclaim = "Reclaim"
     ReclaimDelegation = "ReclaimDelegation"
     Close = "Close"
     ExtendLease = "ExtendLease"

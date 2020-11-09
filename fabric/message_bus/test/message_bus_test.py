@@ -33,7 +33,6 @@ from fabric.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric.message_bus.messages.add_reservations_avro import AddReservationsAvro
 from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
 from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.claim_avro import ClaimAvro
 from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationAvro
 from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
 from fabric.message_bus.messages.close_avro import CloseAvro
@@ -210,14 +209,6 @@ class MessageBusTest(unittest.TestCase):
                                                                      'pool.name': 'Net AM'}
 
         reservation.resource_set.concrete = b'\x80\x04\x95\xb9\x02\x00\x00\x00\x00\x00\x00\x8c\x16actor.core.core.Ticket\x94\x8c\x06Ticket\x94\x93\x94)\x81\x94}\x94(\x8c\tauthority\x94\x8c,actor.core.proxies.kafka.KafkaAuthorityProxy\x94\x8c\x13KafkaAuthorityProxy\x94\x93\x94)\x81\x94}\x94(\x8c\nproxy_type\x94\x8c\x05kafka\x94\x8c\x08callback\x94\x89\x8c\nactor_name\x94\x8c\x0cfabric-vm-am\x94\x8c\nactor_guid\x94\x8c\x12actor.core.util.ID\x94\x8c\x02ID\x94\x93\x94)\x81\x94}\x94\x8c\x02id\x94\x8c\x11fabric-vm-am-guid\x94sb\x8c\x04auth\x94\x8c\x18actor.security.AuthToken\x94\x8c\tAuthToken\x94\x93\x94)\x81\x94}\x94(\x8c\x04name\x94h\x0f\x8c\x04guid\x94h\x14ub\x8c\x0bkafka_topic\x94\x8c\x12fabric-vm-am-topic\x94\x8c\x04type\x94K\x03\x8c\x10bootstrap_server\x94\x8c\x0elocalhost:9092\x94\x8c\x0fschema_registry\x94\x8c\x15http://localhost:8081\x94\x8c\x0fkey_schema_file\x94\x8cK/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/key.avsc\x94\x8c\x11value_schema_file\x94\x8cO/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/message.avsc\x94ub\x8c\x0fresource_ticket\x94N\x8c\told_units\x94K\x0fub.'
-
-        claim = ClaimAvro()
-        claim.auth = auth
-        claim.message_id = "msg4"
-        claim.callback_topic = "test"
-        claim.reservation = reservation
-        #print(claim.to_dict())
-        producer.produce_sync("fabric-mb-public-test2", claim)
 
         delegation = DelegationAvro()
         delegation.delegation_id = "dlg123"

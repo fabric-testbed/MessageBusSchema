@@ -32,7 +32,6 @@ from fabric.message_bus.base import Base
 from fabric.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric.message_bus.messages.add_reservations_avro import AddReservationsAvro
 from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
-from fabric.message_bus.messages.claim_avro import ClaimAvro
 from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationAvro
 from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
 from fabric.message_bus.messages.close_avro import CloseAvro
@@ -47,7 +46,6 @@ from fabric.message_bus.messages.get_pool_info_avro import GetPoolInfoAvro
 from fabric.message_bus.messages.get_reservation_units_avro import GetReservationUnitsAvro
 from fabric.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
 from fabric.message_bus.messages.get_unit_avro import GetUnitAvro
-from fabric.message_bus.messages.reclaim_avro import ReclaimAvro
 from fabric.message_bus.messages.reclaim_delegation_avro import ReclaimDelegationAvro
 from fabric.message_bus.messages.reclaim_resources_avro import ReclaimResourcesAvro
 from fabric.message_bus.messages.result_actor_avro import ResultActorAvro
@@ -121,12 +119,6 @@ class AvroConsumerApi(Base):
             message.from_dict(value)
         elif value['name'] == IMessageAvro.Ticket:
             message = TicketAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.Claim:
-            message = ClaimAvro()
-            message.from_dict(value)
-        elif value['name'] == IMessageAvro.Reclaim:
-            message = ReclaimAvro()
             message.from_dict(value)
         elif value['name'] == IMessageAvro.ClaimDelegation:
             message = ClaimDelegationAvro()
