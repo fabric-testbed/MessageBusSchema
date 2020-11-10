@@ -651,10 +651,7 @@ class MessageBusTest(unittest.TestCase):
                 self.parent = parent
 
             def handle_message(self, message: IMessageAvro):
-                if message.get_message_name() == IMessageAvro.Claim:
-                   self.parent.validate_claim(message, claim)
-
-                elif message.get_message_name() == IMessageAvro.ClaimDelegation:
+                if message.get_message_name() == IMessageAvro.ClaimDelegation:
                    self.parent.validate_claim_delegation(message, claimd)
 
                 elif message.get_message_name() == IMessageAvro.Close:
@@ -822,13 +819,6 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
-    def validate_claim(self, incoming: ClaimAvro, outgoing: ClaimAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
     def validate_claim_delegation(self, incoming: ClaimDelegationAvro, outgoing: ClaimDelegationAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
@@ -919,7 +909,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
-    def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro, outgoing: GetReservationsStateRequestAvro):
+    def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro,
+                                                outgoing: GetReservationsStateRequestAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.message_id, outgoing.message_id)
@@ -952,7 +943,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.result, outgoing.result)
         self.assertEqual(incoming.status, outgoing.status)
 
-    def validate_result_reservation_state(self, incoming: ResultReservationStateAvro, outgoing: ResultReservationStateAvro):
+    def validate_result_reservation_state(self, incoming: ResultReservationStateAvro,
+                                          outgoing: ResultReservationStateAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.status, outgoing.status)
@@ -1071,7 +1063,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
-    def validate_get_reservations_unit_request(self, incoming: GetReservationUnitsAvro, outgoing: GetReservationUnitsAvro):
+    def validate_get_reservations_unit_request(self, incoming: GetReservationUnitsAvro,
+                                               outgoing: GetReservationUnitsAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.message_id, outgoing.message_id)
