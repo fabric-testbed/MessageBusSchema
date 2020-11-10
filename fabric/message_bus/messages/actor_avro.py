@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Represents Actor
+"""
 from fabric.message_bus.messages.auth_avro import AuthAvro
 
 

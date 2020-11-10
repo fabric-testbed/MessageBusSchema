@@ -981,6 +981,11 @@
 				"name": "auth",
 				"type": ["null", "fabric.cf.model.AuthRecord"],
 				"default": null
+			},
+			{
+				"name": "id_token",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
