@@ -85,7 +85,7 @@ class GetActorsAvro(IMessageAvro):
             "id_token": self.id_token
         }
         if self.type is not None:
-            result['type'] = type
+            result['type'] = self.type
 
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
