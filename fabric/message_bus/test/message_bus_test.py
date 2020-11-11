@@ -532,7 +532,6 @@ class MessageBusTest(unittest.TestCase):
         res_strings.result = []
         res_strings.result.append("r1")
 
-
         producer.produce_sync("fabric-mb-public-test2", res_strings)
 
         res_state = ResultReservationStateAvro()
@@ -653,9 +652,6 @@ class MessageBusTest(unittest.TestCase):
         print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
         class TestConsumer(AvroConsumerApi):
-            def __init__(self):
-                self.parent = None
-
             def set_parent(self, parent):
                 self.parent = parent
 
