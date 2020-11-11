@@ -23,9 +23,15 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Term
+"""
 
 
 class TermAvro:
+    """
+    Implements Avro representation of a Term
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["start_time", "end_time", "ticket_time", "new_start_time"]
 
@@ -36,6 +42,11 @@ class TermAvro:
         self.new_start_time = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.start_time = value.get('start_time', None)
         self.end_time = value.get('end_time', None)
         self.ticket_time = value.get('ticket_time', None)
@@ -43,8 +54,9 @@ class TermAvro:
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -72,6 +84,10 @@ class TermAvro:
                self.end_time == other.end_time and self.new_start_time == other.new_start_time
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.start_time is None or self.end_time is None or self.new_start_time is None:
 

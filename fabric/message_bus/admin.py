@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Defines Admin API class which exposes interface for various admin client functions
+"""
 import time
 
 from confluent_kafka.admin import AdminClient, NewTopic, NewPartitions, ConfigResource, ConfigSource
@@ -32,6 +35,9 @@ from fabric.message_bus.base import Base
 
 
 class AdminApi(Base):
+    """
+    Implements interface for Admin APIs
+    """
     def __init__(self, conf, logger=None):
         super().__init__(logger)
         self.admin_client = AdminClient(conf)
@@ -45,7 +51,8 @@ class AdminApi(Base):
             :return:
         """
 
-        new_topics = [NewTopic(topic, num_partitions=num_partitions, replication_factor=replication_factor) for topic in topics]
+        new_topics = [NewTopic(topic, num_partitions=num_partitions,
+                               replication_factor=replication_factor) for topic in topics]
 
         # Call create_topics to asynchronously create topics, a dict
         # of <topic,future> is returned.
@@ -115,11 +122,11 @@ class AdminApi(Base):
             :return:
         """
         self.log_info('%40s = %-50s  [%s,is:read-only=%r,default=%r,sensitive=%r,synonym=%r,synonyms=%s]' %
-                  ((' ' * depth) + config.name, config.value, ConfigSource(config.source),
-                  config.is_read_only, config.is_default,
-                  config.is_sensitive, config.is_synonym,
-                  ["%s:%s" % (x.name, ConfigSource(x.source))
-                  for x in iter(config.synonyms.values())]))
+                      ((' ' * depth) + config.name, config.value, ConfigSource(config.source),
+                       config.is_read_only, config.is_default,
+                       config.is_sensitive, config.is_synonym,
+                       ["%s:%s" % (x.name, ConfigSource(x.source))
+                        for x in iter(config.synonyms.values())]))
 
     def describe_configs(self, resources):
         """
@@ -149,7 +156,8 @@ class AdminApi(Base):
         """
             Alter configs atomically, replacing non-specified
             configuration properties with their default values.
-            :param resource_list: list of tuples (resource type, resource name, list of config params <config=val,config2=val2>)
+            :param resource_list: list of tuples (resource type, resource name,
+                                  list of config params <config=val,config2=val2>)
             :return:
         """
 
@@ -170,17 +178,17 @@ class AdminApi(Base):
             except Exception:
                 raise
 
-    def list(self, type=None) -> list:
+    def list(self, topic_type=None) -> list:
         """
             list topics and cluster metadata
-            :param type: list topics or brokers or all; allowed values (all|topics|brokers)
+            :param topic_type: list topics or brokers or all; allowed values (all|topics|brokers)
             :return:
         """
 
-        if type is None:
+        if topic_type is None:
             what = "all"
         else:
-            what = type
+            what = topic_type
 
         md = self.admin_client.list_topics(timeout=10)
 
@@ -234,15 +242,15 @@ if __name__ == '__main__':
 
     # create admin client
     api = AdminApi("localhost:9092")
-    topics = ['topic1', "topic2"]
+    test_topics = ['topic1', "topic2"]
 
     # create topics
-    api.create_topics(topics)
-    topic_partitions = [('topic1', 4), ("topic2", 4)]
+    api.create_topics(test_topics)
+    test_topic_partitions = [('topic1', 4), ("topic2", 4)]
 
     # create partitions
-    api.create_partitions(topic_partitions)
+    api.create_partitions(test_topic_partitions)
     time.sleep(5)
 
     # delete partitions
-    api.delete_topics(topics)
+    api.delete_topics(test_topics)

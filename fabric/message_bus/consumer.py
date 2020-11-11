@@ -24,7 +24,9 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 
-
+"""
+Defines AvroConsumer API class which exposes interface for various consumer functions
+"""
 from confluent_kafka.avro import AvroConsumer, SerializerError
 from confluent_kafka.cimpl import KafkaError
 
@@ -77,12 +79,16 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class AvroConsumerApi(Base):
-    def __init__(self, conf, key_schema, record_schema, topics, batchSize = 5, logger=None):
+    """
+    This class implements the Interface for Kafka consumer carrying Avro messages.
+    It is expected that the users would extend this class and override handle_message function.
+    """
+    def __init__(self, conf, key_schema, record_schema, topics, batch_size=5, logger=None):
         super().__init__(logger)
         self.consumer = AvroConsumer(conf, reader_key_schema=key_schema, reader_value_schema=record_schema)
         self.running = True
         self.topics = topics
-        self.batch_size = batchSize
+        self.batch_size = batch_size
 
     def shutdown(self):
         """
@@ -250,8 +256,11 @@ class AvroConsumerApi(Base):
         self.handle_message(message=message)
 
     def handle_message(self, message: IMessageAvro):
+        """
+        Handle incoming message; must be overridden by the derived class
+        :param message: incoming message
+        """
         print(message)
-        return
 
     def consume_auto(self):
         """
@@ -271,7 +280,8 @@ class AvroConsumerApi(Base):
                     self.log_error("Consumer error: {}".format(msg.error()))
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         # End of partition event
-                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(), msg.partition(), msg.offset()))
+                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(),
+                                                                                  msg.partition(), msg.offset()))
                     elif msg.error():
                         self.log_error("Consumer error: {}".format(msg.error()))
                         continue
@@ -306,7 +316,8 @@ class AvroConsumerApi(Base):
                     self.log_error("Consumer error: {}".format(msg.error()))
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         # End of partition event
-                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(), msg.partition(), msg.offset()))
+                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(),
+                                                                                  msg.partition(), msg.offset()))
                     elif msg.error():
                         self.log_error("Consumer error: {}".format(msg.error()))
                         continue

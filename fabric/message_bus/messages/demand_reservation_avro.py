@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of an Demand Reservation Message
+"""
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -31,6 +34,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class DemandReservationAvro(IMessageAvro):
+    """
+    Implements Avro representation of an Demand Reservation Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "reservation_id", "reservation_obj", "callback_topic", "id"]
 
@@ -47,6 +53,11 @@ class DemandReservationAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.DemandReservation:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -65,8 +76,9 @@ class DemandReservationAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -103,9 +115,17 @@ class DemandReservationAvro(IMessageAvro):
         return self.id.__str__()
 
     def get_reservation(self) -> ReservationMng:
+        """
+        Return Reservation
+        :return reservation
+        """
         return self.reservation_obj
 
     def get_reservation_id(self) -> str:
+        """
+        Return Reservation Id
+        :return reservation id
+        """
         return self.reservation_id
 
     def __str__(self):
@@ -114,6 +134,10 @@ class DemandReservationAvro(IMessageAvro):
                                            self.auth, self.reservation_id, self.reservation_obj, self.callback_topic)
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.guid is None or self.auth is None or self.callback_topic is None or \
                 (self.reservation_id is None and self.reservation_obj is None):

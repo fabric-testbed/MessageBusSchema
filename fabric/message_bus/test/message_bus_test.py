@@ -23,6 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Module to test various messages
+"""
+
 import unittest
 from datetime import datetime
 
@@ -89,6 +93,9 @@ from fabric.message_bus.producer import AvroProducerApi
 
 
 class MessageBusTest(unittest.TestCase):
+    """
+    Implements test functions
+    """
     def test_consumer_producer(self):
         from confluent_kafka import avro
         from threading import Thread
@@ -100,8 +107,7 @@ class MessageBusTest(unittest.TestCase):
                 'ssl.ca.location': '../../../secrets/snakeoil-ca-1.crt',
                 'ssl.key.location': '../../../secrets/kafkacat.client.key',
                 'ssl.key.password': 'confluent',
-                'ssl.certificate.location': '../../../secrets/kafkacat-ca1-signed.pem'
-        }
+                'ssl.certificate.location': '../../../secrets/kafkacat-ca1-signed.pem'}
         # Create Admin API object
         api = AdminApi(conf)
 
@@ -124,7 +130,7 @@ class MessageBusTest(unittest.TestCase):
         file.close()
         val_schema = avro.loads(val_bytes)
 
-        conf['schema.registry.url']="http://localhost:8081"
+        conf['schema.registry.url'] = "http://localhost:8081"
 
         # create a producer
         producer = AvroProducerApi(conf, key_schema, val_schema)
@@ -184,7 +190,7 @@ class MessageBusTest(unittest.TestCase):
 
         #print(claim_req.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claim_req)
-        
+
         reservation = ReservationAvro()
         reservation.reservation_id = "res123"
         reservation.sequence = 1
@@ -647,12 +653,15 @@ class MessageBusTest(unittest.TestCase):
         print("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
         class TestConsumer(AvroConsumerApi):
+            def __init__(self):
+                self.parent = None
+
             def set_parent(self, parent):
                 self.parent = parent
 
             def handle_message(self, message: IMessageAvro):
                 if message.get_message_name() == IMessageAvro.ClaimDelegation:
-                   self.parent.validate_claim_delegation(message, claimd)
+                    self.parent.validate_claim_delegation(message, claimd)
 
                 elif message.get_message_name() == IMessageAvro.Close:
                     self.parent.validate_close(message, close)
@@ -664,31 +673,31 @@ class MessageBusTest(unittest.TestCase):
                     self.parent.validate_extend_ticket(message, extend_ticket)
 
                 elif message.get_message_name() == IMessageAvro.FailedRPC:
-                   self.parent.validate_failed_rpc(message, failed_rpc)
+                    self.parent.validate_failed_rpc(message, failed_rpc)
 
                 elif message.get_message_name() == IMessageAvro.ModifyLease:
                     self.parent.validate_modify_lease(message, modify_lease)
 
                 elif message.get_message_name() == IMessageAvro.Query:
-                   self.parent.validate_query(message, query)
+                    self.parent.validate_query(message, query)
 
                 elif message.get_message_name() == IMessageAvro.QueryResult:
-                   self.parent.validate_query_result(message, query_result)
+                    self.parent.validate_query_result(message, query_result)
 
                 elif message.get_message_name() == IMessageAvro.Redeem:
-                   self.parent.validate_redeem(message, redeem)
+                    self.parent.validate_redeem(message, redeem)
 
                 elif message.get_message_name() == IMessageAvro.UpdateLease:
-                   self.parent.validate_update_lease(message, update_lease)
+                    self.parent.validate_update_lease(message, update_lease)
 
                 elif message.get_message_name() == IMessageAvro.UpdateTicket:
-                   self.parent.validate_update_ticket(message, update_ticket)
+                    self.parent.validate_update_ticket(message, update_ticket)
 
                 elif message.get_message_name() == IMessageAvro.Ticket:
-                   self.parent.validate_ticket(message, ticket)
+                    self.parent.validate_ticket(message, ticket)
 
                 elif message.get_message_name() == IMessageAvro.ClaimResources:
-                   self.parent.validate_claim_resources(message, claim_req)
+                    self.parent.validate_claim_resources(message, claim_req)
 
                 elif message.get_message_name() == IMessageAvro.AddSlice:
                     self.parent.validate_add_slice(message, add_slice)
@@ -721,31 +730,31 @@ class MessageBusTest(unittest.TestCase):
                     self.parent.validate_extend_reservation(message, extend_res)
 
                 elif message.get_message_name() == IMessageAvro.GetSlicesRequest:
-                   self.parent.validate_get_slices_request(message, get_slice)
+                    self.parent.validate_get_slices_request(message, get_slice)
 
                 elif message.get_message_name() == IMessageAvro.GetReservationsRequest:
-                   self.parent.validate_get_reservations_request(message, res_req)
+                    self.parent.validate_get_reservations_request(message, res_req)
 
                 elif message.get_message_name() == IMessageAvro.GetReservationsStateRequest:
-                   self.parent.validate_get_reservations_state_request(message, res_state_req)
+                    self.parent.validate_get_reservations_state_request(message, res_state_req)
 
                 elif message.get_message_name() == IMessageAvro.GetUnitRequest:
-                   self.parent.validate_get_unit_request(message, ruu)
+                    self.parent.validate_get_unit_request(message, ruu)
 
                 elif message.get_message_name() == IMessageAvro.GetReservationUnitsRequest:
-                   self.parent.validate_get_reservations_unit_request(message, ru)
+                    self.parent.validate_get_reservations_unit_request(message, ru)
 
                 elif message.get_message_name() == IMessageAvro.GetPoolInfoRequest:
-                   self.parent.validate_get_pool_info_request(message, pool_info)
+                    self.parent.validate_get_pool_info_request(message, pool_info)
 
                 elif message.get_message_name() == IMessageAvro.GetActorsRequest:
-                   self.parent.validate_get_actors_request(message, actors_req)
+                    self.parent.validate_get_actors_request(message, actors_req)
 
                 elif message.get_message_name() == IMessageAvro.ResultSlice:
-                   self.parent.validate_get_slices_response(message, slice_res)
+                    self.parent.validate_get_slices_response(message, slice_res)
 
                 elif message.get_message_name() == IMessageAvro.ResultReservation:
-                   self.parent.validate_get_reservations_response(message, res_res)
+                    self.parent.validate_get_reservations_response(message, res_res)
 
                 elif message.get_message_name() == IMessageAvro.ResultString:
                     self.parent.validate_status_response(message, status_resp)
@@ -898,7 +907,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.slices, outgoing.slices)
         self.assertEqual(incoming.status, outgoing.status)
 
-    def validate_get_reservations_request(self, incoming: GetReservationsRequestAvro, outgoing: GetReservationsRequestAvro):
+    def validate_get_reservations_request(self, incoming: GetReservationsRequestAvro,
+                                          outgoing: GetReservationsRequestAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.message_id, outgoing.message_id)

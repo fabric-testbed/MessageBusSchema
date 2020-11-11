@@ -24,9 +24,12 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message containing Reservation State
+"""
+from typing import List
 from uuid import uuid4
 
-from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.lease_reservation_state_avro import LeaseReservationStateAvro
 from fabric.message_bus.messages.reservation_state_avro import ReservationStateAvro
 from fabric.message_bus.messages.result_avro import ResultAvro
@@ -34,6 +37,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class ResultReservationStateAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Result Message containing Reservation State
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "status", "reservation_states", "id"]
 
@@ -47,6 +53,11 @@ class ResultReservationStateAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.ResultReservationState:
             raise Exception("Invalid message")
         self.status = ResultAvro()
@@ -66,8 +77,9 @@ class ResultReservationStateAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -98,13 +110,22 @@ class ResultReservationStateAvro(IMessageAvro):
     def get_id(self) -> str:
         return self.id.__str__()
 
-    def get_reservation_states(self) -> list:
+    def get_reservation_states(self) -> List[ReservationStateAvro]:
+        """
+        Return reservation states
+        """
         return self.reservation_states
 
     def get_status(self) -> ResultAvro:
+        """
+        Return status
+        """
         return self.status
 
     def set_status(self, status: ResultAvro):
+        """
+        Set status
+        """
         self.status = status
 
     def __str__(self):
@@ -115,6 +136,10 @@ class ResultReservationStateAvro(IMessageAvro):
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.status is None:
             ret_val = False

@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Get Pool Info Message
+"""
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -30,6 +33,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class GetPoolInfoAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Get Pool Info Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "broker_id", "callback_topic", "id_token", "id"]
 
@@ -46,6 +52,11 @@ class GetPoolInfoAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.GetPoolInfoRequest:
             raise Exception("Invalid message")
         self.message_id = value.get('message_id')
@@ -60,8 +71,9 @@ class GetPoolInfoAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -91,12 +103,20 @@ class GetPoolInfoAvro(IMessageAvro):
         return self.callback_topic
 
     def get_broker_id(self) -> str:
+        """
+        Returns broker id
+        @param broker id
+        """
         return self.broker_id
 
     def get_id(self) -> str:
         return self.id.__str__()
 
     def get_id_token(self) -> str:
+        """
+        Returns Identity Token used for PDP authorization
+        @param identity token
+        """
         return self.id_token
 
     def __str__(self):

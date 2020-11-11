@@ -22,7 +22,10 @@
 # SOFTWARE.
 #
 # Author Komal Thareja (kthare10@renci.org)
-
-SchemaDir = '/etc/fabric/message_bus/schema/'
-KeySchemaFile = 'fabric/message_bus/schema/key.avsc'
-MessageSchemaFile = 'fabric/message_bus/schema/message.avsc'
+"""
+Module defines AVRO schema, message classes, Producer, Consumer and Admin Client
+used by Fabric over Kafka
+"""
+SCHEMA_DIR = '/etc/fabric/message_bus/schema/'
+KEY_SCHEMA_FILE = 'fabric/message_bus/schema/key.avsc'
+MESSAGE_SCHEMA_FILE = 'fabric/message_bus/schema/message.avsc'

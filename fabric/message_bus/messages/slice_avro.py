@@ -23,10 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Slice
+"""
 from fabric.message_bus.messages.auth_avro import AuthAvro
 
 
 class SliceAvro:
+    """
+    Implements Avro representation of a Slice
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["slice_name", "guid", "owner", "description", "local_properties", "config_properties",
                  "request_properties", "resource_properties", "resource_type", "client_slice", "broker_client_slice",
@@ -47,6 +53,11 @@ class SliceAvro:
         self.graph_id = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.slice_name = value['slice_name']
         self.guid = value['guid']
         if value.get('owner', None) is not None:
@@ -66,8 +77,9 @@ class SliceAvro:
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -110,12 +122,16 @@ class SliceAvro:
     def __str__(self):
         return "slice_name: {} guid: {} owner: {} description: {} local_properties: {} config_properties: {} " \
                "request_properties: {} resource_properties: {} resource_type: {} client_slice: {} " \
-               "broker_client_slice: {} graph_id: {}".format(self.slice_name, self.guid, self.owner, self.description,
-                                                self.local_properties, self.config_properties,
-                                                self.request_properties, self.resource_properties, self.resource_type,
-                                                self.client_slice, self.broker_client_slice, self.graph_id)
+               "broker_client_slice: {} graph_id: {}".\
+            format(self.slice_name, self.guid, self.owner, self.description, self.local_properties,
+                   self.config_properties, self.request_properties, self.resource_properties, self.resource_type,
+                   self.client_slice, self.broker_client_slice, self.graph_id)
 
     def print(self, all: bool = False):
+        """
+        Print object on console
+        Used by management CLI
+        """
         print("")
         print("Slice Name: {} Slice Guid: {}".format(self.slice_name, self.guid))
         if self.graph_id is not None:
@@ -143,69 +159,155 @@ class SliceAvro:
         print("")
 
     def set_slice_name(self, value: str):
+        """
+        Set slice name
+        @param value value
+        """
         self.slice_name = value
 
     def get_slice_name(self) -> str:
+        """
+        Get Slice name
+        @return slice name
+        """
         return self.slice_name
 
     def set_owner(self, value: AuthAvro):
+        """
+        Set owner
+        @param value value
+        """
         self.owner = value
 
     def get_owner(self) -> AuthAvro:
+        """
+        Get Slice owner
+        @return slice owner
+        """
         return self.owner
 
     def set_description(self, value: str):
+        """
+        Set description
+        @param value value
+        """
         self.description = value
 
     def get_description(self) -> str:
+        """
+        Get Slice description
+        @return slice description
+        """
         return self.description
 
     def get_local_properties(self) -> dict:
+        """
+        Get local properties
+        @return local properties
+        """
         return self.local_properties
 
     def set_local_properties(self, value: dict):
+        """
+        Set local properties
+        @param value value
+        """
         self.local_properties = value
 
     def get_config_properties(self) -> dict:
+        """
+        Get config properties
+        @return config properties
+        """
         return self.config_properties
 
     def set_config_properties(self, value: dict):
+        """
+        Set config properties
+        @param value value
+        """
         self.config_properties = value
 
     def get_request_properties(self) -> dict:
+        """
+        Get request properties
+        @return request properties
+        """
         return self.request_properties
 
     def set_request_properties(self, value: dict):
+        """
+        Set request properties
+        @param value value
+        """
         self.request_properties = value
 
     def get_resource_properties(self) -> dict:
+        """
+        Get resource properties
+        @return resource properties
+        """
         return self.resource_properties
 
     def set_resource_properties(self, value: dict):
+        """
+        Set resource properties
+        @param value value
+        """
         self.resource_properties = value
 
     def get_resource_type(self) -> str:
+        """
+        Get resource type
+        @return resource type
+        """
         return self.resource_type
 
     def set_resource_type(self, value: str):
+        """
+        Set resource type
+        @param value value
+        """
         self.resource_type = value
 
     def is_client_slice(self):
+        """
+        Return True if slice is client slice else False
+        """
         return self.client_slice
 
-    def set_client_slice(self, value : bool):
+    def set_client_slice(self, value: bool):
+        """
+        Set slice is client slice
+        @param value value
+        """
         self.client_slice = value
 
     def is_broker_client_slice(self):
+        """
+        Return True if slice is broker client slice else False
+        """
         return self.broker_client_slice
 
     def set_broker_client_slice(self, value: bool):
+        """
+        Set slice as broker client slice
+        @param value value
+        """
         self.broker_client_slice = value
 
     def get_slice_id(self) -> str:
+        """
+        Return slice id
+        @return slice id
+        """
         return self.guid
 
     def set_slice_id(self, slice_id: str):
+        """
+        Set slice id
+        @param value value
+        """
         self.guid = slice_id
 
     def __eq__(self, other):
@@ -214,11 +316,16 @@ class SliceAvro:
 
         return self.slice_name == other.slice_name and self.guid == other.guid and self.owner == other.owner and \
             self.description == other.description and self.local_properties == other.local_properties and \
-            self.config_properties == other.config_properties and self.request_properties == other.request_properties and \
+            self.config_properties == other.config_properties and \
+               self.request_properties == other.request_properties and \
             self.resource_properties == other.resource_properties and self.resource_type == other.resource_type and \
             self.client_slice == other.client_slice and self.broker_client_slice == other.broker_client_slice
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.slice_name is None or self.owner is None or self.description is None or \
                 self.broker_client_slice is None or self.guid is None:
@@ -226,4 +333,8 @@ class SliceAvro:
         return ret_val
 
     def get_graph_id(self) -> str:
+        """
+        Return graph id
+        @return graph id
+        """
         return self.graph_id

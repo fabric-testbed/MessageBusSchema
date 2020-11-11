@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-from fabric import SchemaDir, MessageSchemaFile, KeySchemaFile
+from fabric import SCHEMA_DIR, MESSAGE_SCHEMA_FILE, KEY_SCHEMA_FILE
 
 NAME = "fabric-message-bus"
 VERSION = "0.3"
@@ -30,7 +30,7 @@ setup(
     install_requires=REQUIRES,
     packages=find_packages(),
     include_package_data=True,
-    data_files=[(SchemaDir, [KeySchemaFile, MessageSchemaFile])],
+    data_files=[(SCHEMA_DIR, [KEY_SCHEMA_FILE, MESSAGE_SCHEMA_FILE])],
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[

@@ -23,15 +23,21 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message containing Proxies
+"""
+from typing import List
 from uuid import uuid4
 
 from fabric.message_bus.messages.proxy_avro import ProxyAvro
 from fabric.message_bus.messages.result_avro import ResultAvro
-from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
 class ResultProxyAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Result Message containing Proxies
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "status", "proxies", "id"]
 
@@ -45,6 +51,11 @@ class ResultProxyAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.ResultProxy:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -61,8 +72,9 @@ class ResultProxyAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -90,15 +102,26 @@ class ResultProxyAvro(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} status: {} proxies: {}".format(self.name, self.message_id, self.status,
-                                                                      self.proxies)
+                                                                       self.proxies)
 
     def get_status(self) -> ResultAvro:
+        """
+        Return status
+        @return status
+        """
         return self.status
 
     def set_status(self, value: ResultAvro):
+        """
+        Set status
+        @param value value
+        """
         self.status = value
 
-    def get_proxies(self) -> list:
+    def get_proxies(self) -> List[ProxyAvro]:
+        """
+        Return proxies
+        """
         return self.proxies
 
     def get_id(self) -> str:
@@ -108,6 +131,10 @@ class ResultProxyAvro(IMessageAvro):
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.status is None:
             ret_val = False

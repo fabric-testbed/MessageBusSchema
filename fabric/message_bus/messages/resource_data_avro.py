@@ -23,9 +23,15 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Reservation Resource Data
+"""
 
 
 class ResourceDataAvro:
+    """
+    Implements Avro representation of a Reservation Resource Data
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["request_properties", "config_properties", "resource_properties"]
 
@@ -35,14 +41,20 @@ class ResourceDataAvro:
         self.resource_properties = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.request_properties = value.get('request_properties', None)
         self.config_properties = value.get('config_properties', None)
         self.resource_properties = value.get('resource_properties', None)
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -72,5 +84,9 @@ class ResourceDataAvro:
                self.resource_properties == other.resource_properties
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         return ret_val

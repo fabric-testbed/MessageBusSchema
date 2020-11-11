@@ -23,10 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Reservation Resource Set
+"""
 from fabric.message_bus.messages.resource_data_avro import ResourceDataAvro
 
 
 class ResourceSetAvro:
+    """
+    Implements Avro representation of a Reservation Resource Set
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["units", "type", "resource_data", "concrete"]
 
@@ -37,6 +43,11 @@ class ResourceSetAvro:
         self.concrete = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.units = value['units']
         self.type = value['type']
         if value.get('resource_data', None) is not None:
@@ -47,8 +58,9 @@ class ResourceSetAvro:
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -75,6 +87,10 @@ class ResourceSetAvro:
                self.resource_data == other.resource_data and self.concrete == other.concrete
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.units is None or self.type is None:
             ret_val = False

@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Defines AvroProducer API class which exposes interface for various producer functions
+"""
 import traceback
 
 from confluent_kafka.avro import AvroProducer
@@ -52,10 +55,13 @@ class AvroProducerApi(Base):
         self.producer = AvroProducer(conf, default_key_schema=key_schema, default_value_schema=record_schema)
 
     def set_logger(self, logger):
+        """
+        Set logger
+        :param logger: logger
+        """
         self.logger = logger
 
     def delivery_report(self, err, msg, obj):
-
         """
             Handle delivery reports served from producer.poll.
             This callback takes an extra argument, obj.
@@ -80,13 +86,13 @@ class AvroProducerApi(Base):
             # The message passed to the delivery callback will already be serialized.
             # To aid in debugging we provide the original object to the delivery callback.
             self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
-                             callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
+                                  callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
             # Serve on_delivery callbacks from previous asynchronous produce()
             self.producer.poll(0)
             return True
-        except ValueError as e:
+        except ValueError as ex:
             traceback.print_exc()
-            self.log_error("Invalid input, discarding record...{}".format(e))
+            self.log_error("Invalid input, discarding record...{}".format(ex))
         return False
 
     def produce_sync(self, topic, record: IMessageAvro) -> bool:
@@ -105,11 +111,10 @@ class AvroProducerApi(Base):
             self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict())
             self.producer.flush()
             return True
-        except ValueError as e:
+        except ValueError as ex:
             traceback.print_exc()
             self.log_error("Invalid input, discarding record...")
-            self.log_error(str(e))
-            print(e)
+            self.log_error(str(ex))
         return False
 
 
@@ -123,15 +128,15 @@ if __name__ == '__main__':
     # create topics
     api.create_topics(topics)
 
-    conf = {'bootstrap.servers': "localhost:9092",
-            'schema.registry.url': "http://localhost:8081"}
+    test_conf = {'bootstrap.servers': "localhost:9092",
+                 'schema.registry.url': "http://localhost:8081"}
 
     # load AVRO schema
-    key_schema = avro.loads(open('schema/key.avsc', "r").read())
-    val_schema = avro.loads(open('schema/message.avsc', "r").read())
+    test_key_schema = avro.loads(open('schema/key.avsc', "r").read())
+    test_val_schema = avro.loads(open('schema/message.avsc', "r").read())
 
     # create a producer
-    producer = AvroProducerApi(conf, key_schema, val_schema)
+    producer = AvroProducerApi(test_conf, test_key_schema, test_val_schema)
 
     # produce message to topics
     message = QueryAvro()

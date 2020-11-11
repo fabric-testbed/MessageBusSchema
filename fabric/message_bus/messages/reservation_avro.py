@@ -23,12 +23,18 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Reservation
+"""
 from fabric.message_bus.messages.resource_set_avro import ResourceSetAvro
 from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.term_avro import TermAvro
 
 
 class ReservationAvro:
+    """
+    Implements Avro representation of a Reservation
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["reservation_id", "slice", "resource_set", "term", "sequence"]
 
@@ -40,6 +46,11 @@ class ReservationAvro:
         self.sequence = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.reservation_id = value['reservation_id']
         self.sequence = value.get('sequence', None)
         self.slice = SliceAvro()
@@ -52,8 +63,9 @@ class ReservationAvro:
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -83,6 +95,10 @@ class ReservationAvro:
                self.term == other.term and self.resource_set == other.resource_set
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.reservation_id is None or self.slice is None or self.term is None:
             ret_val = False

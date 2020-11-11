@@ -23,7 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-
+"""
+Implements Avro Message Base class
+"""
 
 class IMessageAvro:
     """
@@ -81,30 +83,51 @@ class IMessageAvro:
     ResultPool = "ResultPool"
     ResultActor = "ResultActor"
 
-
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         raise NotImplementedError
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         raise NotImplementedError
 
     def get_message_id(self) -> str:
+        """
+        Returns the message_id
+        """
         raise NotImplementedError
 
     def get_message_name(self) -> str:
+        """
+        Returns the message name
+        """
         raise NotImplementedError
 
     def get_callback_topic(self) -> str:
+        """
+        Returns the callback topic
+        """
         raise NotImplementedError
 
     def get_id(self) -> str:
+        """
+        Returns the id
+        """
         raise NotImplementedError
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.get_message_name() is None or self.get_message_id() is None or self.get_id() is None:
             ret_val = False

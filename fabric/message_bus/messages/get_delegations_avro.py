@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Get Delegations Message
+"""
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -30,6 +33,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class GetDelegationsAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Get Delegations Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "delegation_id", "delegation_state", "type",
                  "callback_topic", "id_token", "id"]
@@ -50,6 +56,11 @@ class GetDelegationsAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.GetDelegations:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -68,8 +79,9 @@ class GetDelegationsAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -100,27 +112,51 @@ class GetDelegationsAvro(IMessageAvro):
         return self.message_id
 
     def get_message_name(self) -> str:
+        """
+        Returns the message name
+        """
         return self.name
 
     def get_callback_topic(self) -> str:
+        """
+        Returns the callback topic
+        """
         return self.callback_topic
 
     def get_id(self) -> str:
+        """
+        Returns the id
+        """
         return self.id.__str__()
 
     def get_slice_id(self) -> str:
+        """
+        Returns the slice id
+        """
         return self.slice_id
 
     def get_delegation_state(self) -> int:
+        """
+        Returns the delegation state
+        """
         return self.delegation_state
 
     def get_delegation_id(self) -> str:
+        """
+        Returns the delegation id
+        """
         return self.delegation_id
 
-    def get_reservation_type(self) -> str:
+    def get_delegation_type(self) -> str:
+        """
+        Return delegation Type
+        """
         return self.type
 
     def get_id_token(self) -> str:
+        """
+        Return ide token
+        """
         return self.id_token
 
     def __str__(self):
@@ -131,6 +167,10 @@ class GetDelegationsAvro(IMessageAvro):
                                                                  self.id_token)
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
 
         if self.guid is None or self.auth is None or self.callback_topic is None:

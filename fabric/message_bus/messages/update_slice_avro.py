@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Update Slice Message
+"""
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -31,6 +34,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class UpdateSliceAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Update Slice Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id"]
 
@@ -46,6 +52,11 @@ class UpdateSliceAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.UpdateSlice:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -61,8 +72,9 @@ class UpdateSliceAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -85,26 +97,38 @@ class UpdateSliceAvro(IMessageAvro):
         return self.message_id
 
     def get_message_name(self) -> str:
+        """
+        Returns the message name
+        """
         return self.name
 
     def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {}".format(self.name,
-                                                                                                   self.message_id,
-                                                                                                   self.callback_topic,
-                                                                                                   self.guid,
-                                                                                                   self.slice_obj,
-                                                                                                   self.auth)
+        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {}".format(
+            self.name, self.message_id, self.callback_topic, self.guid, self.slice_obj, self.auth)
 
     def get_id(self) -> str:
+        """
+        Returns the id
+        """
         return self.id.__str__()
 
     def get_slice_obj(self) -> SliceAvro:
+        """
+        Returns the slice object
+        """
         return self.slice_obj
 
     def get_callback_topic(self) -> str:
+        """
+        Returns the callback topic
+        """
         return self.callback_topic
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.auth is None or self.callback_topic is None or self.guid is None or self.slice_obj is None:
             ret_val = False

@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Query Message
+"""
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -30,6 +33,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class QueryAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Query Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "properties", "callback_topic", "auth", "id_token", "id"]
 
@@ -45,6 +51,11 @@ class QueryAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.Query:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -58,8 +69,9 @@ class QueryAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -76,6 +88,9 @@ class QueryAvro(IMessageAvro):
         return result
 
     def get_id_token(self) -> str:
+        """
+        Return id token
+        """
         return self.id_token
 
     def get_message_id(self) -> str:
@@ -85,6 +100,9 @@ class QueryAvro(IMessageAvro):
         return self.message_id
 
     def get_message_name(self) -> str:
+        """
+        Return message name
+        """
         return self.name
 
     def __str__(self):
@@ -92,12 +110,22 @@ class QueryAvro(IMessageAvro):
             self.name, self.message_id, self.callback_topic, self.properties, self.id_token)
 
     def get_id(self) -> str:
+        """
+        Return id
+        """
         return self.id.__str__()
 
     def get_callback_topic(self) -> str:
+        """
+        Return callback topic
+        """
         return self.callback_topic
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.auth is None or self.callback_topic is None or self.properties is None:
             ret_val = False

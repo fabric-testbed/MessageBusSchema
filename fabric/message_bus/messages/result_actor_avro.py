@@ -23,6 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message containing Actors
+"""
+from typing import List
 from uuid import uuid4
 
 from fabric.message_bus.messages.actor_avro import ActorAvro
@@ -31,6 +35,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class ResultActorAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Result Message containing Actors
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "status", "actors", "id"]
 
@@ -44,6 +51,11 @@ class ResultActorAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.ResultActor:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -60,8 +72,9 @@ class ResultActorAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -85,6 +98,9 @@ class ResultActorAvro(IMessageAvro):
         return self.message_id
 
     def get_message_name(self) -> str:
+        """
+        Returns the message name
+        """
         return self.name
 
     def __str__(self):
@@ -92,21 +108,45 @@ class ResultActorAvro(IMessageAvro):
                                                                       self.actors)
 
     def get_status(self) -> ResultAvro:
+        """
+        Returns the result status
+        @return status
+        """
         return self.status
 
     def set_status(self, value: ResultAvro):
+        """
+        Set Result status
+        @param value: value
+        """
         self.status = value
 
-    def get_actors(self) -> list:
+    def get_actors(self) -> List[ActorAvro]:
+        """
+        Return list of Actors
+        @return list of actors
+        """
         return self.actors
 
     def get_id(self) -> str:
+        """
+        Return id
+        @return id
+        """
         return self.id.__str__()
 
     def get_callback_topic(self) -> str:
+        """
+        Return callback topic
+        @return callback topic
+        """
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.status is None:
             ret_val = False

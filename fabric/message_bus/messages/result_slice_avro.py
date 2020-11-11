@@ -23,6 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message containing Slices
+"""
+from typing import List
 from uuid import uuid4
 
 from fabric.message_bus.messages.result_avro import ResultAvro
@@ -31,6 +35,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 
 class ResultSliceAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Result Message containing Slices
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "status", "slices", "id"]
 
@@ -44,6 +51,11 @@ class ResultSliceAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         if value['name'] != IMessageAvro.ResultSlice:
             raise Exception("Invalid message")
         self.message_id = value['message_id']
@@ -60,8 +72,9 @@ class ResultSliceAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
             raise Exception("Invalid arguments")
@@ -92,12 +105,24 @@ class ResultSliceAvro(IMessageAvro):
                                                                       self.slices)
 
     def get_status(self) -> ResultAvro:
+        """
+        Returns response status
+        @return response status
+        """
         return self.status
 
     def set_status(self, value: ResultAvro):
+        """
+        Set response status
+        @param value value
+        """
         self.status = value
 
-    def get_slices(self) -> list:
+    def get_slices(self) -> List[SliceAvro]:
+        """
+        Returns list of Slices
+        @param list of Slices
+        """
         return self.slices
 
     def get_id(self) -> str:
@@ -107,6 +132,10 @@ class ResultSliceAvro(IMessageAvro):
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.status is None:
             ret_val = False
