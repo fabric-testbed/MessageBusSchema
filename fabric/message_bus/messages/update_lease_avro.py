@@ -26,15 +26,11 @@
 """
 Implements Avro representation of a Update Lease Message
 """
-from uuid import uuid4
-
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.reservation_avro import ReservationAvro
-from fabric.message_bus.messages.update_data_avro import UpdateDataAvro
+from fabric.message_bus.messages.message_base import MessageBaseAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UpdateLeaseAvro(IMessageAvro):
+class UpdateLeaseAvro(MessageBaseAvro):
     """
     Implements Avro representation of a Update Lease Message
     """

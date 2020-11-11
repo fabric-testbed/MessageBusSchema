@@ -26,14 +26,11 @@
 """
 Implements Avro representation of a Relinquish Message
 """
-from uuid import uuid4
-
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.reservation_avro import ReservationAvro
 from fabric.message_bus.messages.message import IMessageAvro
+from fabric.message_bus.messages.message_base import MessageBaseAvro
 
 
-class RelinquishAvro(IMessageAvro):
+class RelinquishAvro(MessageBaseAvro):
     """
     Implements Avro representation of a Relinquish Message
     """

@@ -26,14 +26,11 @@
 """
 Implements Avro representation of a Redeem Message
 """
-from uuid import uuid4
-
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.reservation_avro import ReservationAvro
+from fabric.message_bus.messages.message_base import MessageBaseAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class RedeemAvro(IMessageAvro):
+class RedeemAvro(MessageBaseAvro):
     """
     Implements Avro representation of a Redeem Message
     """

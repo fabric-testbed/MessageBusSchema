@@ -73,7 +73,7 @@ class MessageBaseAvro(IMessageAvro):
             self.reservation = ReservationAvro()
             self.reservation.from_dict(res_dict)
         del_dict = value.get('delegation', None)
-        if res_dict is not None:
+        if del_dict is not None:
             self.delegation = DelegationAvro()
             self.delegation.from_dict(del_dict)
         auth_temp = value.get('auth', None)

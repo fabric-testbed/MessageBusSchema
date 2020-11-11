@@ -26,14 +26,12 @@
 """
 Implements Avro representation of an Extend Ticket Message
 """
-from uuid import uuid4
 
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.reservation_avro import ReservationAvro
+from fabric.message_bus.messages.message_base import MessageBaseAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ExtendTicketAvro(IMessageAvro):
+class ExtendTicketAvro(MessageBaseAvro):
     """
     Implements Avro representation of an Extend Ticket Message
     """
