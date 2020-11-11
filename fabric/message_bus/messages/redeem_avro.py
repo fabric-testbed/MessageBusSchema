@@ -37,18 +37,9 @@ class RedeemAvro(IMessageAvro):
     """
     Implements Avro representation of a Redeem Message
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
-
     def __init__(self):
+        super().__init__()
         self.name = IMessageAvro.Redeem
-        self.message_id = None
-        self.reservation = None
-        self.callback_topic = None
-        self.auth = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -58,54 +49,7 @@ class RedeemAvro(IMessageAvro):
         """
         if value['name'] != IMessageAvro.Redeem:
             raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.callback_topic = value['callback_topic']
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-        res_dict = value.get('reservation', None)
-        if res_dict is not None:
-            self.reservation = ReservationAvro()
-            self.reservation.from_dict(res_dict)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise Exception("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "reservation": self.reservation.to_dict()
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} reservation: {}".format(
-            self.name, self.message_id, self.callback_topic, self.reservation)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
+        super().from_dict(value)
 
     def validate(self) -> bool:
         """
