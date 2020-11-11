@@ -37,6 +37,10 @@
 		"type": "record",
 		"name": "ReservationStateRecord",
 		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+		    {
 				"name": "state",
 				"type": "int"
 			},
