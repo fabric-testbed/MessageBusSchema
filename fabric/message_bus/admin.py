@@ -178,51 +178,6 @@ class AdminApi(Base):
             except Exception:
                 raise
 
-    def list(self, topic_type=None) -> list:
-        """
-            list topics and cluster metadata
-            :param topic_type: list topics or brokers or all; allowed values (all|topics|brokers)
-            :return:
-        """
-
-        if topic_type is None:
-            what = "all"
-        else:
-            what = topic_type
-
-        md = self.admin_client.list_topics(timeout=10)
-
-        self.log_debug("Cluster {} metadata (response from broker {}):".format(md.cluster_id, md.orig_broker_name))
-
-        if what in ("all", "brokers"):
-            self.log_debug(" {} brokers:".format(len(md.brokers)))
-            for b in iter(md.brokers.values()):
-                if b.id == md.controller_id:
-                    self.log_debug("  {}  (controller)".format(b))
-                else:
-                    self.log_debug("  {}".format(b))
-
-        if what not in ("all", "topics"):
-            return
-
-        self.log_debug(" {} topics:".format(len(md.topics)))
-        for t in iter(md.topics.values()):
-            if t.error is not None:
-                errstr = ": {}".format(t.error)
-            else:
-                errstr = ""
-
-            self.log_debug("  \"{}\" with {} partition(s){}".format(t, len(t.partitions), errstr))
-
-            for p in iter(t.partitions.values()):
-                if p.error is not None:
-                    errstr = ": {}".format(p.error)
-                else:
-                    errstr = ""
-
-                self.log_debug("    partition {} leader: {}, replicas: {}, isrs: {}, errstr: {}".format(
-                    p.id, p.leader, p.replicas, p.isrs, errstr))
-
     def list_topics(self, timeout: int = 10) -> list:
         """
             list topics and cluster metadata
