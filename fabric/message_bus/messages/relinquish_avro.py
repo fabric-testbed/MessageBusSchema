@@ -27,10 +27,10 @@
 Implements Avro representation of a Relinquish Message
 """
 from fabric.message_bus.messages.message import IMessageAvro
-from fabric.message_bus.messages.message_base import MessageBaseAvro
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
-class RelinquishAvro(MessageBaseAvro):
+class RelinquishWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Relinquish Message
     """

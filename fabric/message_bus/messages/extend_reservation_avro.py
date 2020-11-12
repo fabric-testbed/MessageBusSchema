@@ -38,7 +38,7 @@ class ExtendReservationAvro(IMessageAvro):
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "reservation_id", "end_time", "new_units", "new_resource_type",
-                 "request_properties", "config_properties", "callback_topic", "id"]
+                 "request_properties", "config_properties", "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.ExtendReservation
@@ -52,6 +52,7 @@ class ExtendReservationAvro(IMessageAvro):
         self.new_resource_type = None
         self.request_properties = None
         self.config_properties = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -77,6 +78,7 @@ class ExtendReservationAvro(IMessageAvro):
         self.new_resource_type = value.get('new_resource_type', None)
         self.request_properties = value.get('request_properties', None)
         self.config_properties = value.get('config_properties', None)
+        self.id_token = value.get("id_token", None)
 
     def to_dict(self) -> dict:
         """
@@ -96,6 +98,9 @@ class ExtendReservationAvro(IMessageAvro):
             "new_units": self.new_units,
             "callback_topic": self.callback_topic
         }
+        if self.id_token is not None:
+            result["id_token"] = self.id_token
+
         if self.new_resource_type is not None:
             result['new_resource_type'] = self.new_resource_type
         if self.request_properties is not None:
@@ -116,15 +121,21 @@ class ExtendReservationAvro(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} callback_topic: {} reservation_id: {} end_time: {} new_units: {} " \
-               "new_resource_type: {} request_properties: {} config_properties: {}".\
+               "new_resource_type: {} request_properties: {} config_properties: {} id_token: {}".\
             format(self.name, self.message_id, self.callback_topic, self.reservation_id, self.end_time, self.new_units,
-                   self.new_resource_type, self.request_properties, self.config_properties)
+                   self.new_resource_type, self.request_properties, self.config_properties, self.id_token)
 
     def get_id(self) -> str:
         return self.id.__str__()
 
     def get_callback_topic(self) -> str:
         return self.callback_topic
+
+    def get_id_token(self) -> str:
+        """
+        Return identity token
+        """
+        return self.id_token
 
     def validate(self) -> bool:
         """

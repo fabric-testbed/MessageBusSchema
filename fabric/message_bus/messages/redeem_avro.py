@@ -26,11 +26,11 @@
 """
 Implements Avro representation of a Redeem Message
 """
-from fabric.message_bus.messages.message_base import MessageBaseAvro
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class RedeemAvro(MessageBaseAvro):
+class RedeemWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Redeem Message
     """

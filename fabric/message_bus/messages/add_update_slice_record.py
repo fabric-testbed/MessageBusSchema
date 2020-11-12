@@ -24,29 +24,29 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Get Reservations State Message
+Implements Avro representation of an Add Slice Message
 """
-from typing import List
 from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
+from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class GetReservationsStateRequestAvro(IMessageAvro):
+class AddUpdateSliceRecord(IMessageAvro):
     """
-    Implements Avro representation of a Get Reservations State Message
+    Implements Avro representation of an Add Slice Message
     """
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "reservation_ids", "callback_topic", "id_token", "id"]
+    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.GetReservationsStateRequest
+        self.name = None
         self.message_id = None
         self.guid = None
-        self.auth = None
-        self.reservation_ids = None
+        self.slice_obj = None
         self.callback_topic = None
+        self.auth = None
         self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
@@ -58,17 +58,20 @@ class GetReservationsStateRequestAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.GetReservationsStateRequest:
-            raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-        self.callback_topic = value['callback_topic']
-        self.reservation_ids = value.get("reservation_ids", None)
-        self.id_token = value.get("id_token", None)
 
-        if value.get('auth', None) is not None:
+        self.message_id = value.get('message_id', None)
+        self.callback_topic = value.get('callback_topic', None)
+        self.guid = value.get('guid', None)
+        self.id_token = value.get('id_token', None)
+
+        auth_temp = value.get('auth', None)
+        if auth_temp is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
+
+        temp_slice = value.get('slice_obj', None)
+        self.slice_obj = SliceAvro()
+        self.slice_obj.from_dict(temp_slice)
 
     def to_dict(self) -> dict:
         """
@@ -81,18 +84,14 @@ class GetReservationsStateRequestAvro(IMessageAvro):
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "guid": self.guid,
-            "callback_topic": self.callback_topic
+            "callback_topic": self.callback_topic,
+            "slice_obj": self.slice_obj.to_dict(),
+            "guid": self.guid
         }
         if self.id_token is not None:
-            result["id_token"] = self.id_token
-
+            result['id_token'] = self.id_token
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
-
-        if self.reservation_ids is not None:
-            result['reservation_ids'] = self.reservation_ids
-
         return result
 
     def get_message_id(self) -> str:
@@ -104,27 +103,27 @@ class GetReservationsStateRequestAvro(IMessageAvro):
     def get_message_name(self) -> str:
         return self.name
 
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
+    def __str__(self):
+        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {} id_token: {}".format(
+            self.name, self.message_id, self.callback_topic, self.guid, self.slice_obj, self.auth, self.id_token)
 
     def get_id(self) -> str:
         return self.id.__str__()
 
-    def get_reservation_ids(self) -> List[str]:
+    def get_slice_obj(self) -> SliceAvro:
         """
-        Return list of reservation ids
+        Return slice object
         """
-        return self.reservation_ids
+        return self.slice_obj
+
+    def get_callback_topic(self) -> str:
+        return self.callback_topic
 
     def get_id_token(self) -> str:
         """
-        Return identity token
+        Return id token
         """
         return self.id_token
-
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} reservation_ids: {} callback_topic: {} id_token: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.reservation_ids, self.callback_topic, self.id_token)
 
     def validate(self) -> bool:
         """
@@ -132,8 +131,6 @@ class GetReservationsStateRequestAvro(IMessageAvro):
         :return True on success; False on failure
         """
         ret_val = super().validate()
-
-        if self.guid is None or self.auth is None or self.callback_topic is None or self.reservation_ids is None:
+        if self.callback_topic is None or self.slice_obj is None or self.auth is None:
             ret_val = False
-
         return ret_val

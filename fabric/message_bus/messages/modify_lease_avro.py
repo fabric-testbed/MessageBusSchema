@@ -27,11 +27,11 @@
 Implements Avro representation of a Modify Slice Message
 """
 
-from fabric.message_bus.messages.message_base import MessageBaseAvro
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ModifyLeaseAvro(MessageBaseAvro):
+class ModifyLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Modify Slice Message
     """

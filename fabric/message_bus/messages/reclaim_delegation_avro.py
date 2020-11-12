@@ -26,89 +26,18 @@
 """
 Implements Avro representation of a Reclaim Delegation Message
 """
-from uuid import uuid4
 
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.message import IMessageAvro
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
-class ReclaimDelegationAvro(IMessageAvro):
+class ReclaimDelegationRecordAvro(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Reclaim Delegation Message
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "delegation", "auth", "id_token", "id"]
-
     def __init__(self):
+        super().__init__()
         self.name = IMessageAvro.ReclaimDelegation
-        self.message_id = None
-        self.delegation = None
-        self.callback_topic = None
-        self.auth = None
-        self.id_token = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != IMessageAvro.ReclaimDelegation:
-            raise Exception("Invalid message")
-        self.message_id = value.get('message_id', None)
-        self.callback_topic = value.get('callback_topic', None)
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-        res_dict = value.get('delegation', None)
-        if res_dict is not None:
-            self.delegation = DelegationAvro()
-            self.delegation.from_dict(res_dict)
-        self.id_token = value.get("id_token", None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise Exception("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "delegation": self.delegation.to_dict(),
-            "id_token": self.id_token
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} id_token: {} delegation: {}".format(
-            self.name, self.message_id, self.callback_topic, self.id_token, self.delegation)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
 
     def validate(self) -> bool:
         """

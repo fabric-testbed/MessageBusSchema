@@ -40,7 +40,7 @@ class AddReservationsAvro(IMessageAvro):
     Implements Avro representation of an Add Reservations Message
     """
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "reservation_list", "callback_topic", "id"]
+    __slots__ = ["name", "message_id", "guid", "auth", "reservation_list", "callback_topic", "id_token", "id"]
 
     def __init__(self):
         self.name = IMessageAvro.AddReservations
@@ -49,6 +49,7 @@ class AddReservationsAvro(IMessageAvro):
         self.auth = None
         self.reservation_list = None
         self.callback_topic = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -61,9 +62,10 @@ class AddReservationsAvro(IMessageAvro):
         """
         if value['name'] != IMessageAvro.AddReservations:
             raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-        self.callback_topic = value['callback_topic']
+        self.message_id = value.get('message_id', None)
+        self.guid = value.get('guid', None)
+        self.callback_topic = value.get('callback_topic', None)
+        self.id_token = value.get('id_token', None)
 
         if value.get("reservation_list", None) is not None:
             res_list = value.get("reservation_list", None)
@@ -91,6 +93,9 @@ class AddReservationsAvro(IMessageAvro):
             "guid": self.guid,
             "callback_topic": self.callback_topic
         }
+        if self.id_token is not None:
+            result['id_token'] = self.id_token
+
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
 
@@ -117,6 +122,12 @@ class AddReservationsAvro(IMessageAvro):
     def get_id(self) -> str:
         return self.id.__str__()
 
+    def get_id_token(self) -> str:
+        """
+        Return id token
+        """
+        return self.id_token
+
     def get_reservation(self) -> List[TicketReservationAvro]:
         """
         Returns reservation list
@@ -125,8 +136,8 @@ class AddReservationsAvro(IMessageAvro):
         return self.reservation_list
 
     def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} reservation_list: {} callback_topic: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.reservation_list, self.callback_topic)
+        return "name: {} message_id: {} guid: {} auth: {} reservation_list: {} callback_topic: {} id_token: {}".format(
+            self.name, self.message_id, self.guid, self.auth, self.reservation_list, self.callback_topic, self.id_token)
 
     def validate(self) -> bool:
         """

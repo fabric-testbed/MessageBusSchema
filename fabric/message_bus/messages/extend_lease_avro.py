@@ -26,11 +26,11 @@
 """
 Implements Avro representation of an Extend Lease Message
 """
-from fabric.message_bus.messages.message_base import MessageBaseAvro
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ExtendLeaseAvro(MessageBaseAvro):
+class ExtendLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
     """
     Implements Avro representation of an Extend Lease Message
     """

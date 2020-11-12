@@ -24,7 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of an Extend Lease Message
+Implements Avro representation of Messages containing Reservation or Delegation
 """
 from uuid import uuid4
 
@@ -35,9 +35,9 @@ from fabric.message_bus.messages.message import IMessageAvro
 from fabric.message_bus.messages.update_data_avro import UpdateDataAvro
 
 
-class MessageBaseAvro(IMessageAvro):
+class ReservationOrDelegationRecord(IMessageAvro):
     """
-    Implements Avro representation of an Base Message for Reservation/Delegation Messages
+    Implements Avro representation of Messages containing Reservation or Delegation
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "callback_topic", "update_data", "reservation", "delegation", "auth",
