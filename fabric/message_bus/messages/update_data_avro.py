@@ -26,6 +26,7 @@
 """
 Implements UpdateDataAvro class
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class UpdateDataAvro:
@@ -55,7 +56,7 @@ class UpdateDataAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "failed": self.failed,

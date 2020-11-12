@@ -28,6 +28,7 @@ Implements Avro representation of an UpdateAddReservation Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_mng import ReservationMng
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
@@ -90,7 +91,7 @@ class AddUpdateReservationRecord(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

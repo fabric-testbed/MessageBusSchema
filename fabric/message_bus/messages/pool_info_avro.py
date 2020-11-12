@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Pool Info
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class PoolInfoAvro:
@@ -54,7 +55,7 @@ class PoolInfoAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

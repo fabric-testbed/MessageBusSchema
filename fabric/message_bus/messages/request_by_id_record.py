@@ -28,6 +28,7 @@ Implements Avro representation of a Get Request Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
@@ -89,7 +90,7 @@ class RequestByIdRecord(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
         result = {
             "name": self.name,
             "callback_topic": self.callback_topic,

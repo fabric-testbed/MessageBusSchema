@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Slice
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 
 
@@ -82,7 +83,7 @@ class SliceAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "slice_name": self.slice_name,

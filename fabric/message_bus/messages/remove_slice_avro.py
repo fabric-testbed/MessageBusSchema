@@ -30,92 +30,16 @@ from uuid import uuid4
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
+from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 
 
-class RemoveSliceAvro(IMessageAvro):
+class RemoveSliceAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Remove Slice Message
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_id", "auth", "id"]
-
     def __init__(self):
+        super().__init__()
         self.name = IMessageAvro.RemoveSlice
-        self.message_id = None
-        self.guid = None
-        self.slice_id = None
-        self.callback_topic = None
-        self.auth = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != IMessageAvro.RemoveSlice:
-            raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.callback_topic = value['callback_topic']
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-        self.slice_id = value.get('slice_id', None)
-        self.guid = value.get('guid', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise Exception("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "slice_id": self.slice_id,
-            "guid": self.guid
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} guid: {} slice_id: {} auth: {}".format(self.name,
-                                                                                                  self.message_id,
-                                                                                                  self.callback_topic,
-                                                                                                  self.guid,
-                                                                                                  self.slice_id,
-                                                                                                  self.auth)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_slice_id(self) -> str:
-        """
-        Return slice id
-        @return slice id
-        """
-        return self.slice_id
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
 
     def validate(self) -> bool:
         """

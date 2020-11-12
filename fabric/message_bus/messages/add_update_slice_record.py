@@ -28,6 +28,7 @@ Implements Avro representation of an Add Slice Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.message import IMessageAvro
@@ -80,7 +81,7 @@ class AddUpdateSliceRecord(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
         result = {
             "name": self.name,
             "message_id": self.message_id,

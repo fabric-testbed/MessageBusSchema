@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Reservation Resource Set
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.resource_data_avro import ResourceDataAvro
 
 
@@ -63,7 +64,7 @@ class ResourceSetAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "units": self.units,

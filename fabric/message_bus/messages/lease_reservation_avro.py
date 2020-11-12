@@ -31,6 +31,7 @@ from __future__ import annotations
 
 from typing import List
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_predecessor_avro import ReservationPredecessorAvro
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
@@ -71,7 +72,7 @@ class LeaseReservationAvro(TicketReservationAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = super().to_dict()
         if result is None:

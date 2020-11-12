@@ -26,6 +26,8 @@
 """
 Implements Avro representation of a Unit
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
+
 
 class UnitAvro:
     """
@@ -65,7 +67,7 @@ class UnitAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "properties": self.properties

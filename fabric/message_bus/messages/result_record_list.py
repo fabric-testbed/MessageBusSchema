@@ -29,6 +29,7 @@ Implements Avro representation of a Result Record List
 from typing import List
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.actor_avro import ActorAvro
 from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.lease_reservation_avro import LeaseReservationAvro
@@ -164,7 +165,7 @@ class ResultRecordList(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

@@ -26,6 +26,7 @@
 """
 Represents Reservation object returned from Management Interface APIs
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class ReservationMng:
@@ -78,7 +79,7 @@ class ReservationMng:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {'name': self.name,
                   'reservation_id': self.reservation_id,

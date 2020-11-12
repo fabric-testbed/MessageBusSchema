@@ -26,7 +26,7 @@
 """
 Implements Avro representation of a Modify Slice Message
 """
-
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
@@ -46,7 +46,7 @@ class ModifyLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.ModifyLease:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         super().from_dict(value)
 
     def validate(self) -> bool:

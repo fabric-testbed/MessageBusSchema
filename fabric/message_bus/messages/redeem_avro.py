@@ -38,16 +38,6 @@ class RedeemWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
         super().__init__()
         self.name = IMessageAvro.Redeem
 
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != IMessageAvro.Redeem:
-            raise Exception("Invalid message")
-        super().from_dict(value)
-
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields

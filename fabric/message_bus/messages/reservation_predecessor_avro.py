@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Reservation Predecessor
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class ReservationPredecessorAvro:
@@ -52,7 +53,7 @@ class ReservationPredecessorAvro:
                 :return dict representing the class
                 """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {'reservation_id': self.reservation_id,
                   'filter': self.filter}

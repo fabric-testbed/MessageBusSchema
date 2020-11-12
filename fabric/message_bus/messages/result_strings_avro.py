@@ -31,6 +31,7 @@ from __future__ import annotations
 from typing import List
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.message import IMessageAvro
 from fabric.message_bus.messages.result_avro import ResultAvro
 
@@ -58,7 +59,7 @@ class ResultStringsAvro(IMessageAvro):
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.ResultStrings:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.status = ResultAvro()
         self.status.from_dict(value['status'])
@@ -71,7 +72,7 @@ class ResultStringsAvro(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

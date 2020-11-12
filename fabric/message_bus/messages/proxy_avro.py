@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Proxy
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class ProxyAvro:
@@ -61,7 +62,7 @@ class ProxyAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "protocol": self.protocol,

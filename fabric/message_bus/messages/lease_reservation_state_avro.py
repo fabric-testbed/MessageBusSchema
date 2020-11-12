@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Lease Reservation State
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_state_avro import ReservationStateAvro
 
 
@@ -69,7 +70,7 @@ class LeaseReservationStateAvro(ReservationStateAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             'name':self.name,

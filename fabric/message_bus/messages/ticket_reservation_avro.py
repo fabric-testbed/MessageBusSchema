@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Ticket Reservation from Management Interface
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_mng import ReservationMng
 
 
@@ -60,7 +61,7 @@ class TicketReservationAvro(ReservationMng):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = super().to_dict()
         if result is None:

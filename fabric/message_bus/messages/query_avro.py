@@ -28,6 +28,7 @@ Implements Avro representation of a Query Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
@@ -57,7 +58,7 @@ class QueryAvro(IMessageAvro):
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.Query:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']
         self.properties = value['properties']
@@ -74,7 +75,7 @@ class QueryAvro(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

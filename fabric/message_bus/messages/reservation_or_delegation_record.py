@@ -28,6 +28,7 @@ Implements Avro representation of Messages containing Reservation or Delegation
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.reservation_avro import ReservationAvro
@@ -89,7 +90,7 @@ class ReservationOrDelegationRecord(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

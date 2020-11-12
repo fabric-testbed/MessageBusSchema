@@ -28,6 +28,7 @@ Implements Avro representation of a Failed RPC Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
@@ -58,7 +59,7 @@ class FailedRPCAvro(IMessageAvro):
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.FailedRPC:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.request_type = value['request_type']
         self.request_id = value.get('request_id', None)
@@ -76,7 +77,7 @@ class FailedRPCAvro(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,

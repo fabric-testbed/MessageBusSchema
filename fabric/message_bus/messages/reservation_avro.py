@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Reservation
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.resource_set_avro import ResourceSetAvro
 from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.term_avro import TermAvro
@@ -68,7 +69,7 @@ class ReservationAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "reservation_id": self.reservation_id,

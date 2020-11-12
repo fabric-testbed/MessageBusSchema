@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Delegation
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.slice_avro import SliceAvro
 
 
@@ -61,7 +62,7 @@ class DelegationAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "delegation_id": self.delegation_id,

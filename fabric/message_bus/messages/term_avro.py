@@ -26,6 +26,7 @@
 """
 Implements Avro representation of a Term
 """
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class TermAvro:
@@ -59,7 +60,7 @@ class TermAvro:
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "start_time": self.start_time,

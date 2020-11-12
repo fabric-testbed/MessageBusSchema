@@ -28,6 +28,7 @@ Implements Avro representation of an Extend Reservation Message
 """
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
@@ -64,7 +65,7 @@ class ExtendReservationAvro(IMessageAvro):
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.ExtendReservation:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         self.guid = value.get('guid', None)
         self.message_id = value.get('message_id', None)
         self.callback_topic = value.get('callback_topic', None)
@@ -87,7 +88,7 @@ class ExtendReservationAvro(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
         result = {
             "name": self.name,
             "message_id": self.message_id,

@@ -24,26 +24,12 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of an Close Message
+Message Bus Exception
 """
-from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
-from fabric.message_bus.messages.message import IMessageAvro
 
 
-class CloseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class MessageBusException(Exception):
     """
-    Implements Avro representation of an Close Message
+    Message Bus Exception
     """
-    def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.Close
-
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.callback_topic is None or self.reservation is None:
-            ret_val = False
-        return ret_val
+    pass

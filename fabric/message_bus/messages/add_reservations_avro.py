@@ -29,6 +29,7 @@ Implements Avro representation of an Add Reservations Message
 from typing import List
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
 from fabric.message_bus.messages.auth_avro import AuthAvro
@@ -61,7 +62,7 @@ class AddReservationsAvro(IMessageAvro):
         :param value: incoming message dictionary
         """
         if value['name'] != IMessageAvro.AddReservations:
-            raise Exception("Invalid message")
+            raise MessageBusException("Invalid message")
         self.message_id = value.get('message_id', None)
         self.guid = value.get('guid', None)
         self.callback_topic = value.get('callback_topic', None)
@@ -86,7 +87,7 @@ class AddReservationsAvro(IMessageAvro):
         :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
         result = {
             "name": self.name,
             "message_id": self.message_id,
