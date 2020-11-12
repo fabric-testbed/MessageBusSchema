@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from fabric import SCHEMA_DIR, MESSAGE_SCHEMA_FILE, KEY_SCHEMA_FILE
 
 NAME = "fabric-message-bus"
-VERSION = "0.3"
+VERSION = "0.4"
 # To install the library, run the following
 #
 # python setup.py install
