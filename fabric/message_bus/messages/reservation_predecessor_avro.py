@@ -23,20 +23,37 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Reservation Predecessor
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class ReservationPredecessorAvro:
+    """
+    Implements Avro representation of a Reservation Predecessor
+    """
     def __init__(self):
         self.reservation_id = None
         self.filter = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.reservation_id = value.get('reservation_id', None)
         self.filter = value.get('filter', None)
 
     def to_dict(self) -> dict:
+        """
+                The Avro Python library does not support code generation.
+                For this reason we must provide a dict representation of our class for serialization.
+                :return dict representing the class
+                """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {'reservation_id': self.reservation_id,
                   'filter': self.filter}
@@ -46,15 +63,31 @@ class ReservationPredecessorAvro:
         return "reservation_id: {} filter: {}".format(self.reservation_id, self.filter)
 
     def get_reservation_id(self) -> str:
+        """
+        Return reservation id
+        @return reservation id
+        """
         return self.reservation_id
 
     def set_reservation_id(self, value: str):
+        """
+        Set reservation id
+        @param value value
+        """
         self.reservation_id = value
 
     def get_filter_properties(self) -> dict:
+        """
+        Get filter properties
+        @return filter
+        """
         return self.filter
 
     def set_filter_properties(self, value: dict):
+        """
+        Set filter properties
+        @param value value
+        """
         self.filter = value
 
     def __eq__(self, other):
@@ -64,6 +97,10 @@ class ReservationPredecessorAvro:
         return self.reservation_id == other.reservation_id and self.filter == other.filter
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.reservation_id is None or self.filter is None:
             ret_val = False

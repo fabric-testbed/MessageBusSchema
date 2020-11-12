@@ -23,6 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro Message Base class
+"""
 
 
 class IMessageAvro:
@@ -31,80 +34,104 @@ class IMessageAvro:
         a globally unique identifier. It must be inherited to include Actor specific fields and to_dict implementation.
         New Avro schema must be defined as per the inherited class and should be used for the producer/consumer
     """
-    ClaimDelegation = "ClaimDelegation"
-    ReclaimDelegation = "ReclaimDelegation"
-    Close = "Close"
-    ExtendLease = "ExtendLease"
-    ExtendTicket = "ExtendTicket"
-    FailedRPC = "FailedRPC"
-    ModifyLease = "ModifyLease"
-    Query = "Query"
-    QueryResult = "QueryResult"
-    Redeem = "Redeem"
-    Relinquish = "Relinquish"
-    UpdateLease = "UpdateLease"
-    UpdateTicket = "UpdateTicket"
-    Ticket = "Ticket"
-    UpdateDelegation = "UpdateDelegation"
+    """
+    NAMING Convention: Respective Class Name for each message should look like: <Message Name>Avro
+    """
+    claim_delegation = "ClaimDelegation"
+    reclaim_delegation = "ReclaimDelegation"
+    close = "Close"
+    extend_lease = "ExtendLease"
+    extend_ticket = "ExtendTicket"
+    failed_rpc = "FailedRpc"
+    modify_lease = "ModifyLease"
+    query = "Query"
+    query_result = "QueryResult"
+    redeem = "Redeem"
+    relinquish = "Relinquish"
+    update_lease = "UpdateLease"
+    update_ticket = "UpdateTicket"
+    ticket = "Ticket"
+    update_delegation = "UpdateDelegation"
 
     # Management APIs
-    ClaimResources = "ClaimResources"
-    ReclaimResources = "ReclaimResources"
-    RemoveSlice = "RemoveSlice"
-    AddSlice = "AddSlice"
-    UpdateSlice = "UpdateSlice"
-    RemoveReservation = "RemoveReservation"
-    CloseReservations = "CloseReservations"
-    UpdateReservation = "UpdateReservation"
-    AddReservation = "AddReservation"
-    AddReservations = "AddReservations"
-    DemandReservation = "DemandReservation"
-    ExtendReservation = "ExtendReservation"
+    claim_resources = "ClaimResources"
+    reclaim_resources = "ReclaimResources"
+    remove_slice = "RemoveSlice"
+    add_slice = "AddSlice"
+    update_slice = "UpdateSlice"
+    remove_reservation = "RemoveReservation"
+    close_reservations = "CloseReservations"
+    update_reservation = "UpdateReservation"
+    add_reservation = "AddReservation"
+    add_reservations = "AddReservations"
+    demand_reservation = "DemandReservation"
+    extend_reservation = "ExtendReservation"
 
-    GetReservationsStateRequest = "GetReservationsStateRequest"
-    GetSlicesRequest = "GetSlicesRequest"
-    GetReservationsRequest = "GetReservationsRequest"
-    GetDelegations = "GetDelegations"
-    GetReservationUnitsRequest = "GetReservationUnitsRequest"
-    GetUnitRequest = "GetUnitRequest"
-    GetPoolInfoRequest = "GetPoolInfoRequest"
-    GetActorsRequest = "GetActorsRequest"
+    get_reservations_state_request = "GetReservationsStateRequest"
+    get_slices_request = "GetSlicesRequest"
+    get_reservations_request = "GetReservationsRequest"
+    get_delegations = "GetDelegations"
+    get_reservation_units_request = "GetReservationUnitsRequest"
+    get_unit_request = "GetUnitRequest"
+    get_pool_info_request = "GetPoolInfoRequest"
+    get_actors_request = "GetActorsRequest"
 
-    ResultSlice = "ResultSlice"
-    ResultReservation = "ResultReservation"
-    ResultDelegation = "ResultDelegation"
-    ResultReservationState = "ResultReservationState"
-    ResultStrings = "ResultStrings"
-    ResultString = "ResultString"
-    ResultUnits = "ResultUnits"
-    ResultProxy = "ResultProxy"
-    ResultPool = "ResultPool"
-    ResultActor = "ResultActor"
-
+    result_slice = "ResultSlice"
+    result_reservation = "ResultReservation"
+    result_delegation = "ResultDelegation"
+    result_reservation_state = "ResultReservationState"
+    result_strings = "ResultStrings"
+    result_string = "ResultString"
+    result_units = "ResultUnits"
+    result_proxy = "ResultProxy"
+    result_pool_info = "ResultPoolInfo"
+    result_actor = "ResultActor"
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         raise NotImplementedError
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         raise NotImplementedError
 
     def get_message_id(self) -> str:
+        """
+        Returns the message_id
+        """
         raise NotImplementedError
 
     def get_message_name(self) -> str:
+        """
+        Returns the message name
+        """
         raise NotImplementedError
 
     def get_callback_topic(self) -> str:
+        """
+        Returns the callback topic
+        """
         raise NotImplementedError
 
     def get_id(self) -> str:
+        """
+        Returns the id
+        """
         raise NotImplementedError
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.get_message_name() is None or self.get_message_id() is None or self.get_id() is None:
             ret_val = False

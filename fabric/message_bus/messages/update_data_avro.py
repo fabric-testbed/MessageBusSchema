@@ -23,9 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements UpdateDataAvro class
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class UpdateDataAvro:
+    """
+    Represents the Update Data sent from one actor to another
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["failed", "message"]
 
@@ -34,16 +41,22 @@ class UpdateDataAvro:
         self.message = ""
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.failed = value.get('failed', None)
         self.message = value.get('message', None)
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "failed": self.failed,
@@ -61,6 +74,10 @@ class UpdateDataAvro:
         return self.failed == other.failed and self.message == other.message
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
 
         if self.failed is None or self.message is None:

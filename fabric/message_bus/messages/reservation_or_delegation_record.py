@@ -24,29 +24,35 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Tickets
+Implements Avro representation of Messages containing Reservation or Delegation
 """
 from uuid import uuid4
 
 from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
+from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.reservation_avro import ReservationAvro
 from fabric.message_bus.messages.message import IMessageAvro
+from fabric.message_bus.messages.update_data_avro import UpdateDataAvro
 
 
-class TicketAvro(IMessageAvro):
+class ReservationOrDelegationRecord(IMessageAvro):
     """
-    Implements Avro representation of a ticket
+    Implements Avro representation of Messages containing Reservation or Delegation
     """
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
+    __slots__ = ["name", "message_id", "callback_topic", "update_data", "reservation", "delegation", "auth",
+                 "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ticket
+        self.name = None
         self.message_id = None
-        self.reservation = None
         self.callback_topic = None
+        self.update_data = None
+        self.reservation = None
+        self.delegation = None
         self.auth = None
+        self.id_token = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -57,16 +63,25 @@ class TicketAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.ticket:
-            raise MessageBusException("Invalid message")
-        self.message_id = value['message_id']
-        self.callback_topic = value['callback_topic']
-        self.reservation = ReservationAvro()
-        self.reservation.from_dict(value['reservation'])
+        self.message_id = value.get('message_id', None)
+        self.callback_topic = value.get('callback_topic', None)
+        udd = value.get('update_data', None)
+        if udd is not None:
+            self.update_data = UpdateDataAvro()
+            self.update_data.from_dict(udd)
+        res_dict = value.get('reservation', None)
+        if res_dict is not None:
+            self.reservation = ReservationAvro()
+            self.reservation.from_dict(res_dict)
+        del_dict = value.get('delegation', None)
+        if del_dict is not None:
+            self.delegation = DelegationAvro()
+            self.delegation.from_dict(del_dict)
         auth_temp = value.get('auth', None)
         if auth_temp is not None:
             self.auth = AuthAvro()
             self.auth.from_dict(value['auth'])
+        self.id_token = value.get('id_token', None)
 
     def to_dict(self) -> dict:
         """
@@ -80,38 +95,46 @@ class TicketAvro(IMessageAvro):
         result = {
             "name": self.name,
             "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "reservation": self.reservation.to_dict()
+            "callback_topic": self.callback_topic
         }
+        if self.update_data is not None:
+            result['update_data'] = self.update_data.to_dict()
+        if self.reservation is not None:
+            result['reservation'] = self.reservation.to_dict()
+        if self.delegation is not None:
+            result['delegation'] = self.delegation.to_dict()
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
+        if self.id_token is not None:
+            result['id_token'] = self.id_token
         return result
 
-    def get_message_id(self):
+    def get_message_id(self) -> str:
         """
-        Returns the slice id
+        Returns the message_id
         """
         return self.message_id
-
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} reservation: {}".format(
-            self.name, self.message_id, self.callback_topic, self.reservation)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
 
     def get_message_name(self) -> str:
         return self.name
 
+    def __str__(self):
+        self.name = None
+        self.message_id = None
+        self.callback_topic = None
+        self.update_data = None
+        self.reservation = None
+        self.delegation = None
+        self.auth = None
+        self.id_token = None
+
+        return "name: {} message_id: {} callback_topic: {} update_data: {} reservation: {} " \
+               "delegation: {} auth: {} id_token: {}".\
+            format(self.name, self.message_id, self.callback_topic, self.update_data, self.reservation,
+                   self.delegation, self.auth, self.id_token)
+
+    def get_id(self) -> str:
+        return self.id.__str__()
+
     def get_callback_topic(self) -> str:
         return self.callback_topic
-
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.auth is None or self.callback_topic is None or self.reservation is None:
-            ret_val = False
-        return ret_val

@@ -24,26 +24,16 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of an Claim Delegation Message
+Implements Avro representation of a Result Message containing Units
 """
 from fabric.message_bus.messages.message import IMessageAvro
-from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
+from fabric.message_bus.messages.result_record_list import ResultRecordList
 
 
-class ClaimDelegationAvro(ReservationOrDelegationRecord):
+class ResultUnitsAvro(ResultRecordList):
     """
-    Implements Avro representation of an Claim Delegation Message
+    Implements Avro representation of a Result Message containing Units
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.claim_delegation
-
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.callback_topic is None or self.delegation is None:
-            ret_val = False
-        return ret_val
+        self.name = IMessageAvro.result_units

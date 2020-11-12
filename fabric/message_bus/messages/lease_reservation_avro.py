@@ -23,14 +23,23 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Lease Reservation
+"""
 
 from __future__ import annotations
 
+from typing import List
+
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_predecessor_avro import ReservationPredecessorAvro
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
 
 class LeaseReservationAvro(TicketReservationAvro):
+    """
+    Implements Avro representation of a Lease Reservation
+    """
     def __init__(self):
         super().__init__()
         self.authority = None
@@ -40,6 +49,11 @@ class LeaseReservationAvro(TicketReservationAvro):
         self.name = self.__class__.__name__
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         super().from_dict(value)
         self.authority = value.get('authority', None)
         self.join_state = value.get('join_state', None)
@@ -52,8 +66,13 @@ class LeaseReservationAvro(TicketReservationAvro):
                 self.redeem_processors.append(predecessor)
 
     def to_dict(self) -> dict:
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
+        """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = super().to_dict()
         if result is None:
@@ -81,6 +100,10 @@ class LeaseReservationAvro(TicketReservationAvro):
                                                                                                self.redeem_processors)
 
     def print(self):
+        """
+        Print reservation on console
+        Used by management cli
+        """
         print("")
         print("Reservation ID: {} Slice ID: {}".format(self.reservation_id, self.slice_id))
         if self.rtype is not None or self.notices is not None:
@@ -95,7 +118,7 @@ class LeaseReservationAvro(TicketReservationAvro):
         print("Broker: {}".format(self.broker))
 
         if self.ticket is not None:
-            print("Ticket properties: {}".format(self.ticket))
+            print("ticket properties: {}".format(self.ticket))
 
         if self.renewable is not None:
             print("Renewable: {}".format(self.renewable))
@@ -114,7 +137,7 @@ class LeaseReservationAvro(TicketReservationAvro):
         if self.redeem_processors is not None:
             index = 0
             for rp in self.redeem_processors:
-                print("Redeem Predecessor# {}: {}".format(index, rp))
+                print("redeem Predecessor# {}: {}".format(index, rp))
                 index += 1
 
         if self.local is not None:
@@ -128,24 +151,52 @@ class LeaseReservationAvro(TicketReservationAvro):
         print("")
 
     def get_authority(self) -> str:
+        """
+        Return authority
+        @return authority
+        """
         return self.authority
 
     def set_authority(self, value: str):
+        """
+        Set authority
+        @param value value
+        """
         self.authority = value
 
     def get_join_state(self) -> int:
+        """
+        Return Join State
+        @return join state
+        """
         return self.join_state
 
     def set_join_state(self, value: int):
+        """
+        Set join state
+        @param value value
+        """
         self.join_state = value
 
     def get_leased_units(self) -> int:
+        """
+        Return number of leased units
+        @return leased units
+        """
         return self.leased_units
 
     def set_leased_units(self, value: int):
+        """
+        Set leased units
+        @param value value
+        """
         self.leased_units = value
 
-    def get_redeem_predecessors(self) -> list:
+    def get_redeem_predecessors(self) -> List[ReservationPredecessorAvro]:
+        """
+        Return redeem processors
+        @return redeem processors
+        """
         return self.redeem_processors
 
     def __eq__(self, other):
@@ -154,10 +205,14 @@ class LeaseReservationAvro(TicketReservationAvro):
 
         return self.name == other.name and self.reservation_id == other.reservation_id and \
                 self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
-                self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
-                self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
-                self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
-                self.broker == other.broker and self.ticket == other.ticket and self.renewable == other.renewable and \
+                self.requested_end == other.requested_end and self.rtype == other.rtype and \
+               self.units == other.units and \
+                self.state == other.state and self.pending_state == other.pending_state and \
+               self.local == other.local and \
+                self.request == other.request and self.resource == other.resource and \
+               self.notices == other.notices and \
+                self.broker == other.broker and self.ticket == other.ticket and \
+               self.renewable == other.renewable and \
                 self.renewable == other.renew_time and \
                 self.authority == other.authority and self.join_state == other.join_state and \
                 self.leased_units == other.leased_units and self.redeem_processors == other.redeem_processors

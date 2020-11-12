@@ -23,18 +23,26 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Get Reservations State Message
+"""
+from typing import List
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
 class GetReservationsStateRequestAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Get Reservations State Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "guid", "auth", "reservation_ids", "callback_topic", "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.GetReservationsStateRequest
+        self.name = IMessageAvro.get_reservations_state_request
         self.message_id = None
         self.guid = None
         self.auth = None
@@ -46,8 +54,13 @@ class GetReservationsStateRequestAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.GetReservationsStateRequest:
-            raise Exception("Invalid message")
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value['name'] != IMessageAvro.get_reservations_state_request:
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.guid = value['guid']
         self.callback_topic = value['callback_topic']
@@ -60,18 +73,21 @@ class GetReservationsStateRequestAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
         result = {
             "name": self.name,
             "message_id": self.message_id,
             "guid": self.guid,
-            "callback_topic": self.callback_topic,
-            "id_token": self.id_token
+            "callback_topic": self.callback_topic
         }
+        if self.id_token is not None:
+            result["id_token"] = self.id_token
+
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
 
@@ -95,10 +111,16 @@ class GetReservationsStateRequestAvro(IMessageAvro):
     def get_id(self) -> str:
         return self.id.__str__()
 
-    def get_reservation_ids(self) -> list:
+    def get_reservation_ids(self) -> List[str]:
+        """
+        Return list of reservation ids
+        """
         return self.reservation_ids
 
     def get_id_token(self) -> str:
+        """
+        Return identity token
+        """
         return self.id_token
 
     def __str__(self):
@@ -106,6 +128,10 @@ class GetReservationsStateRequestAvro(IMessageAvro):
             self.name, self.message_id, self.guid, self.auth, self.reservation_ids, self.callback_topic, self.id_token)
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
 
         if self.guid is None or self.auth is None or self.callback_topic is None or self.reservation_ids is None:

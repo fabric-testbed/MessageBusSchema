@@ -23,9 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message Status
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class ResultAvro:
+    """
+    Implements Avro representation of a Result Message Status
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["code", "message", "details"]
 
@@ -35,17 +42,23 @@ class ResultAvro:
         self.details = ""
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.code = value.get("code", None)
         self.message = value.get("message", None)
         self.details = value.get("details", None)
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "code": self.code
@@ -60,21 +73,44 @@ class ResultAvro:
         return "code: {} message: {} details: {}".format(self.code, self.message, self.details)
 
     def get_code(self) -> int:
+        """
+        Return Status code
+        """
         return self.code
 
     def set_code(self, code: int):
+        """
+        Set status code
+        @param code code
+        """
         self.code = code
 
     def get_message(self) -> str:
+        """
+        Return status message
+        @return status message
+        """
         return self.message
 
     def set_message(self, msg: str):
+        """
+        Set status message
+        @param msg msg
+        """
         self.message = msg
 
     def get_details(self) -> str:
+        """
+        Return details
+        @return details
+        """
         return self.details
 
     def set_details(self, value: str):
+        """
+        Set details
+        @param value value
+        """
         self.details = value
 
     def __eq__(self, other):
@@ -84,6 +120,10 @@ class ResultAvro:
         return self.code == other.code and self.message == other.message and self.details == other.details
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
         if self.code is None:
             ret_val = False

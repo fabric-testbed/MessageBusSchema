@@ -23,18 +23,25 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Failed RPC Message
+"""
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class FailedRPCAvro(IMessageAvro):
+class FailedRpcAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Failed RPC Message
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "request_id", "properties", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.FailedRPC
+        self.name = IMessageAvro.failed_rpc
         self.message_id = None
         self.request_type = None
         self.request_id = None
@@ -46,8 +53,13 @@ class FailedRPCAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.FailedRPC:
-            raise Exception("Invalid message")
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value['name'] != IMessageAvro.failed_rpc:
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.request_type = value['request_type']
         self.request_id = value.get('request_id', None)
@@ -60,11 +72,12 @@ class FailedRPCAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,
@@ -91,7 +104,8 @@ class FailedRPCAvro(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} request_id: {} request_type: {} reservation_id:{} error_details:{}"\
-            .format(self.name, self.message_id, self.request_id, self.request_type, self.reservation_id, self.error_details)
+            .format(self.name, self.message_id, self.request_id, self.request_type, self.reservation_id,
+                    self.error_details)
 
     def get_id(self) -> str:
         return self.id.__str__()
@@ -100,6 +114,10 @@ class FailedRPCAvro(IMessageAvro):
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
 
         if self.auth is None or self.request_id is None or self.request_type is None:

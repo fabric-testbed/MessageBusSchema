@@ -23,10 +23,17 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a ticket Reservation from Management Interface
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_mng import ReservationMng
 
 
 class TicketReservationAvro(ReservationMng):
+    """
+    Implements Avro representation of a ticket Reservation from Management Interface
+    """
     def __init__(self):
         super().__init__()
         self.broker = None
@@ -36,6 +43,11 @@ class TicketReservationAvro(ReservationMng):
         self.name = self.__class__.__name__
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         super().from_dict(value)
         self.broker = value.get('broker', None)
         self.ticket = value.get('ticket', None)
@@ -43,8 +55,13 @@ class TicketReservationAvro(ReservationMng):
         self.renew_time = value.get('renew_time', None)
 
     def to_dict(self) -> dict:
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
+        """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = super().to_dict()
         if result is None:
@@ -84,7 +101,7 @@ class TicketReservationAvro(ReservationMng):
         print("Broker: {}".format(self.broker))
 
         if self.ticket is not None:
-            print("Ticket properties: {}".format(self.ticket))
+            print("ticket properties: {}".format(self.ticket))
 
         if self.renewable is not None:
             print("Renewable: {}".format(self.renewable))
@@ -103,27 +120,59 @@ class TicketReservationAvro(ReservationMng):
         print("")
 
     def get_broker(self) -> str:
+        """
+        Returns broker
+        @return broker
+        """
         return self.broker
 
     def set_broker(self, value: str):
+        """
+        Set broker
+        @param value value
+        """
         self.broker = value
 
     def get_ticket_properties(self) -> dict:
+        """
+        Returns ticket properties
+        @return dict
+        """
         return self.ticket
 
     def set_ticket_properties(self, value: dict):
+        """
+        Set ticket properties
+        @param value value
+        """
         self.ticket = value
 
     def is_renewable(self) -> bool:
+        """
+        Returns true if renewable else False
+        @return true if renewable else False
+        """
         return self.renewable
 
     def set_renewable(self, value: bool):
+        """
+        Set renewable
+        @param value value
+        """
         self.renewable = value
 
     def get_renew_time(self) -> int:
+        """
+        Return renew time
+        @return renew time
+        """
         return self.renew_time
 
     def set_renew_time(self, value: int):
+        """
+        Set renew time
+        @param value value
+        """
         self.renew_time = value
 
     def __eq__(self, other):

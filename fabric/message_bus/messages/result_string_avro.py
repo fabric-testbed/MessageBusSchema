@@ -23,20 +23,27 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Result Message containing String
+"""
 
 from __future__ import annotations
 from uuid import uuid4
 
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.message import IMessageAvro
 from fabric.message_bus.messages.result_avro import ResultAvro
 
 
 class ResultStringAvro(IMessageAvro):
+    """
+    Implements Avro representation of a Result Message containing String
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "result_str", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ResultString
+        self.name = IMessageAvro.result_string
         self.message_id = None
         self.status = None
         self.result_str = None
@@ -45,8 +52,13 @@ class ResultStringAvro(IMessageAvro):
         self.id = uuid4()
 
     def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.ResultString:
-            raise Exception("Invalid message")
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value['name'] != IMessageAvro.result_string:
+            raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.status = ResultAvro()
         self.status.from_dict(value['status'])
@@ -54,11 +66,12 @@ class ResultStringAvro(IMessageAvro):
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name,
@@ -80,27 +93,44 @@ class ResultStringAvro(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} status: {} result_str: {}".format(self.name, self.message_id, self.status,
-                                                                      self.result_str)
+                                                                          self.result_str)
 
     def get_status(self) -> ResultAvro:
+        """
+        Return status
+        """
         return self.status
 
     def set_status(self, value: ResultAvro):
+        """
+        Set status
+        @param value value
+        """
         self.status = value
 
     def get_id(self) -> str:
         return self.id.__str__()
 
     def get_result(self) -> str:
+        """
+        Return result string
+        """
         return self.result_str
 
     def set_result(self, result: str):
+        """
+        Set result string
+        """
         self.result_str = result
 
     def get_callback_topic(self) -> str:
         return None
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = super().validate()
         if self.status is None:
             ret_val = False

@@ -23,9 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of an Auth Token
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class AuthAvro:
+    """
+    Implements Avro representation of an Auth Token
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "guid", "id_token"]
 
@@ -35,6 +42,11 @@ class AuthAvro:
         self.id_token = None
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.name = value['name']
         if 'guid' in value and value['guid'] != "null":
             self.guid = value['guid']
@@ -43,11 +55,12 @@ class AuthAvro:
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "name": self.name
@@ -68,6 +81,10 @@ class AuthAvro:
         return self.name == other.name and self.guid == other.guid and self.id_token == other.id_token
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         if self.name is None:
             return False
         return True

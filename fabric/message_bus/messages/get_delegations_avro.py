@@ -23,117 +23,17 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from uuid import uuid4
-
-from fabric.message_bus.messages.auth_avro import AuthAvro
+"""
+Implements Avro representation of a Get Delegations Message
+"""
+from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class GetDelegationsAvro(IMessageAvro):
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "guid", "auth", "slice_id", "delegation_id", "delegation_state", "type",
-                 "callback_topic", "id_token", "id"]
-
+class GetDelegationsAvro(RequestByIdRecord):
+    """
+    Implements Avro representation of a Get Delegations Message
+    """
     def __init__(self):
-        self.name = IMessageAvro.GetDelegations
-        self.message_id = None
-        self.guid = None
-        self.auth = None
-        self.slice_id = None
-        self.delegation_id = None
-        self.delegation_state = None
-        self.type = None
-        self.callback_topic = None
-        self.id_token = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
-
-    def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.GetDelegations:
-            raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-        self.callback_topic = value['callback_topic']
-
-        self.slice_id = value.get("slice_id", None)
-        self.delegation_id = value.get("delegation_id", None)
-        self.delegation_state = value.get("delegation_state", None)
-        self.type = value.get("type", None)
-        self.id_token = value.get("id_token", None)
-
-        if value.get('auth', None) is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
-        """
-        if not self.validate():
-            raise Exception("Invalid arguments")
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "guid": self.guid,
-            "callback_topic": self.callback_topic,
-            "id_token": self.id_token
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-
-        if self.slice_id is not None:
-            result['slice_id'] = self.slice_id
-        if self.delegation_id is not None:
-            result['delegation_id'] = self.delegation_id
-        if self.delegation_state is not None:
-            result['delegation_state'] = self.delegation_state
-        if self.type is not None:
-            result['type'] = self.type
-        return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_slice_id(self) -> str:
-        return self.slice_id
-
-    def get_delegation_state(self) -> int:
-        return self.delegation_state
-
-    def get_delegation_id(self) -> str:
-        return self.delegation_id
-
-    def get_reservation_type(self) -> str:
-        return self.type
-
-    def get_id_token(self) -> str:
-        return self.id_token
-
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} slice_id: {} delegation_id: {} delegation_state: {} " \
-               "type: {} callback_topic: {} id_token: {}".format(self.name, self.message_id, self.guid, self.auth,
-                                                                 self.slice_id, self.delegation_id, self.type,
-                                                                 self.delegation_state, self.callback_topic,
-                                                                 self.id_token)
-
-    def validate(self) -> bool:
-        ret_val = super().validate()
-
-        if self.guid is None or self.auth is None or self.callback_topic is None:
-            ret_val = False
-
-        return ret_val
+        super().__init__()
+        self.name = IMessageAvro.get_delegations

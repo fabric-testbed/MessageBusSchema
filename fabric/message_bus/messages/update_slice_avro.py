@@ -23,89 +23,18 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from uuid import uuid4
+"""
+Implements Avro representation of a Update Slice Message
+"""
 
-from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.slice_avro import SliceAvro
+from fabric.message_bus.messages.add_update_slice_record import AddUpdateSliceRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UpdateSliceAvro(IMessageAvro):
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id"]
-
+class UpdateSliceAvro(AddUpdateSliceRecord):
+    """
+    Implements Avro representation of a Update Slice Message
+    """
     def __init__(self):
-        self.name = IMessageAvro.UpdateSlice
-        self.message_id = None
-        self.guid = None
-        self.slice_obj = None
-        self.callback_topic = None
-        self.auth = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
-
-    def from_dict(self, value: dict):
-        if value['name'] != IMessageAvro.UpdateSlice:
-            raise Exception("Invalid message")
-        self.message_id = value['message_id']
-        self.callback_topic = value['callback_topic']
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-        temp_slice = value.get('slice_obj', None)
-        self.slice_obj = SliceAvro()
-        self.slice_obj.from_dict(temp_slice)
-        self.guid = value.get('guid', None)
-
-    def to_dict(self) -> dict:
-        """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
-        """
-        if not self.validate():
-            raise Exception("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "callback_topic": self.callback_topic,
-            "slice_obj": self.slice_obj.to_dict(),
-            "guid": self.guid
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def __str__(self):
-        return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {}".format(self.name,
-                                                                                                   self.message_id,
-                                                                                                   self.callback_topic,
-                                                                                                   self.guid,
-                                                                                                   self.slice_obj,
-                                                                                                   self.auth)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_slice_obj(self) -> SliceAvro:
-        return self.slice_obj
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
-
-    def validate(self) -> bool:
-        ret_val = super().validate()
-        if self.auth is None or self.callback_topic is None or self.guid is None or self.slice_obj is None:
-            ret_val = False
-        return ret_val
+        super().__init__()
+        self.name = IMessageAvro.update_slice

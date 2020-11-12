@@ -23,12 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-
-from __future__ import annotations
-from typing import TYPE_CHECKING
+"""
+Implements Avro representation of a Unit
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 
 
 class UnitAvro:
+    """
+    Implements Avro representation of a Unit
+    """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["properties"]
 
@@ -36,21 +40,34 @@ class UnitAvro:
         self.properties = None
 
     def get_properties(self) -> dict:
+        """
+        Return properties
+        """
         return self.properties
 
     def set_properties(self, value: dict):
+        """
+        Set properties
+        @param value value
+        """
         self.properties = value
 
     def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.properties = value.get('properties', None)
 
     def to_dict(self) -> dict:
         """
-            The Avro Python library does not support code generation.
-            For this reason we must provide a dict representation of our class for serialization.
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
         """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             "properties": self.properties
@@ -64,6 +81,10 @@ class UnitAvro:
         return self.properties == other.properties
 
     def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
         ret_val = True
 
         if self.properties is None:

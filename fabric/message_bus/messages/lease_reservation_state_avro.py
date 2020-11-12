@@ -23,30 +23,54 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+"""
+Implements Avro representation of a Lease Reservation State
+"""
+from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_state_avro import ReservationStateAvro
 
 
 class LeaseReservationStateAvro(ReservationStateAvro):
+    """
+    Implements Avro representation of a Lease Reservation State
+    """
     def __init__(self):
         super().__init__()
         self.name = self.__class__.__name__
         self.joining = None
 
     def get_joining(self) -> int:
+        """
+        Return join state
+        """
         return self.joining
 
     def set_joining(self, value: int):
+        """
+        Set join state
+        @param value value
+        """
         self.joining = value
 
     def from_dict(self, values: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
         self.name = values.get('name', None)
         self.state = values.get('state', None)
         self.pending_state = values.get('pending_state', None)
         self.joining = values.get('joining', None)
 
     def to_dict(self) -> dict:
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
+        """
         if not self.validate():
-            raise Exception("Invalid arguments")
+            raise MessageBusException("Invalid arguments")
 
         result = {
             'name':self.name,

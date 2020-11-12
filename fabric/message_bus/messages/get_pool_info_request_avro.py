@@ -24,26 +24,16 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of an Claim Delegation Message
+Implements Avro representation of a Get Pool Info Message
 """
+from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
-from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
-class ClaimDelegationAvro(ReservationOrDelegationRecord):
+class GetPoolInfoRequestAvro(RequestByIdRecord):
     """
-    Implements Avro representation of an Claim Delegation Message
+    Implements Avro representation of a Get Pool Info Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.claim_delegation
-
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.callback_topic is None or self.delegation is None:
-            ret_val = False
-        return ret_val
+        self.name = IMessageAvro.get_pool_info_request
