@@ -69,27 +69,28 @@ class ResultRecordList(IMessageAvro):
         # Do *not* include in the serialized object.
         self.id = uuid4()
 
-    def from_dict(self, value: dict):
+    def from_dict_slices(self, value: list):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.message_id = value['message_id']
-        self.status = ResultAvro()
-        self.status.from_dict(value['status'])
-        slices_list = value.get('slices', None)
-        if slices_list is not None:
-            for s in slices_list:
+        if value is not None:
+            for s in value:
                 slice_obj = SliceAvro()
                 slice_obj.from_dict(s)
                 if self.slices is None:
                     self.slices = []
                 self.slices.append(slice_obj)
 
-        reservations_list = value.get('reservations', None)
-        if reservations_list is not None:
-            for s in reservations_list:
+    def from_dict_reservations(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            for s in value:
                 res_obj = None
                 if s.get('name') == LeaseReservationAvro.__name__:
                     res_obj = LeaseReservationAvro()
@@ -102,10 +103,15 @@ class ResultRecordList(IMessageAvro):
                     self.reservations = []
                 self.reservations.append(res_obj)
 
-        rs_list = value.get("reservation_states", None)
-        if rs_list is not None:
+    def from_dict_reservation_states(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
             self.reservation_states = []
-            for rs in rs_list:
+            for rs in value:
                 rs_state = None
                 if rs.get('name') == LeaseReservationStateAvro.__name__:
                     rs_state = LeaseReservationStateAvro()
@@ -114,49 +120,174 @@ class ResultRecordList(IMessageAvro):
                 rs_state.from_dict(rs)
                 self.reservation_states.append(rs_state)
 
-        temp_units = value.get('units', None)
-        if temp_units is not None:
+    def from_dict_units(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
             self.units = []
-            for u in temp_units:
+            for u in value:
                 unit = UnitAvro()
                 unit.from_dict(u)
                 self.units.append(unit)
 
-        proxies_list = value.get('proxies', None)
-        if proxies_list is not None:
-            for p in proxies_list:
+    def from_dict_proxies(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            for p in value:
                 proxy_obj = ProxyAvro()
                 proxy_obj.from_dict(p)
                 if self.proxies is None:
                     self.proxies = []
                 self.proxies.append(proxy_obj)
 
-        pools_list = value.get('pools', None)
-        if pools_list is not None:
-            for p in pools_list:
+    def from_dict_pools(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            for p in value:
                 pool_obj = PoolInfoAvro()
                 pool_obj.from_dict(p)
                 if self.pools is None:
                     self.pools = []
                 self.pools.append(pool_obj)
 
-        actors_list = value.get('actors', None)
-        if actors_list is not None:
-            for s in actors_list:
+    def from_dict_actors(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            for s in value:
                 actor_obj = ActorAvro()
                 actor_obj.from_dict(s)
                 if self.actors is None:
                     self.actors = []
                 self.actors.append(actor_obj)
 
-        delegations_list = value.get('delegations', None)
-        if delegations_list is not None:
-            for d in delegations_list:
+    def from_dict_delegations(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            for d in value:
                 del_obj = DelegationAvro()
                 del_obj.from_dict(d)
                 if self.delegations is None:
                     self.delegations = []
                 self.delegations.append(del_obj)
+
+    def from_dict(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        self.message_id = value['message_id']
+        self.status = ResultAvro()
+        self.status.from_dict(value['status'])
+        slices_list = value.get('slices', None)
+        self.from_dict_slices(slices_list)
+
+        reservations_list = value.get('reservations', None)
+        self.from_dict_reservations(reservations_list)
+
+        rs_list = value.get("reservation_states", None)
+        self.from_dict_reservation_states(rs_list)
+
+        temp_units = value.get('units', None)
+        self.from_dict_units(temp_units)
+
+        proxies_list = value.get('proxies', None)
+        self.from_dict_proxies(proxies_list)
+
+        pools_list = value.get('pools', None)
+        self.from_dict_pools(pools_list)
+
+        actors_list = value.get('actors', None)
+        self.from_dict_actors(actors_list)
+
+        delegations_list = value.get('delegations', None)
+        self.from_dict_delegations(delegations_list)
+
+    def to_dict_slices(self, result: dict):
+        if self.slices is not None:
+            temp = []
+            for s in self.slices:
+                temp.append(s.to_dict())
+            result["slices"] = temp
+
+        return result
+
+    def to_dict_reservations(self, result: dict):
+        if self.reservations is not None:
+            temp = []
+            for s in self.reservations:
+                temp.append(s.to_dict())
+            result["reservations"] = temp
+        return result
+
+    def to_dict_reservation_states(self, result: dict):
+        if self.reservation_states is not None:
+            rs_list = []
+            for state in self.reservation_states:
+                rs_list.append(state.to_dict())
+            result['reservation_states'] = rs_list
+
+        return result
+
+    def to_dict_units(self, result: dict):
+        if self.units is not None:
+            temp = []
+            for u in self.units:
+                temp.append(u.to_dict())
+            result["units"] = temp
+
+        return result
+
+    def to_dict_proxies(self, result: dict):
+        if self.proxies is not None:
+            temp = []
+            for s in self.proxies:
+                temp.append(s.to_dict())
+            result["proxies"] = temp
+        return result
+
+    def to_dict_pools(self, result: dict):
+        if self.pools is not None:
+            result["pools"] = []
+            for p in self.pools:
+                result["pools"].append(p.to_dict())
+
+        return result
+
+    def to_dict_actors(self, result: dict):
+        if self.actors is not None:
+            temp = []
+            for s in self.actors:
+                temp.append(s.to_dict())
+            result["actors"] = temp
+        return result
+
+    def to_dict_delegations(self, result: dict):
+        if self.delegations is not None:
+            temp = []
+            for s in self.delegations:
+                temp.append(s.to_dict())
+            result["delegations"] = temp
+        return result
 
     def to_dict(self) -> dict:
         """
@@ -172,45 +303,14 @@ class ResultRecordList(IMessageAvro):
             "message_id": self.message_id,
             "status": self.status.to_dict()
         }
-        if self.slices is not None:
-            temp = []
-            for s in self.slices:
-                temp.append(s.to_dict())
-            result["slices"] = temp
-        if self.reservations is not None:
-            temp = []
-            for s in self.reservations:
-                temp.append(s.to_dict())
-            result["reservations"] = temp
-        if self.reservation_states is not None:
-            rs_list = []
-            for state in self.reservation_states:
-                rs_list.append(state.to_dict())
-            result['reservation_states'] = rs_list
-        if self.units is not None:
-            temp = []
-            for u in self.units:
-                temp.append(u.to_dict())
-            result["units"] = temp
-        if self.proxies is not None:
-            temp = []
-            for s in self.proxies:
-                temp.append(s.to_dict())
-            result["proxies"] = temp
-        if self.pools is not None:
-            result["pools"] = []
-            for p in self.pools:
-                result["pools"].append(p.to_dict())
-        if self.actors is not None:
-            temp = []
-            for s in self.actors:
-                temp.append(s.to_dict())
-            result["actors"] = temp
-        if self.delegations is not None:
-            temp = []
-            for s in self.delegations:
-                temp.append(s.to_dict())
-            result["delegations"] = temp
+        result = self.to_dict_slices(result)
+        result = self.to_dict_reservations(result)
+        result = self.to_dict_reservation_states(result)
+        result = self.to_dict_units(result)
+        result = self.to_dict_proxies(result)
+        result = self.to_dict_pools(result)
+        result = self.to_dict_actors(result)
+        result = self.to_dict_delegations(result)
         return result
 
     def get_message_id(self) -> str:
