@@ -36,7 +36,7 @@ class RemoveReservationAvro(RequestByIdRecord):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.RemoveReservation
+        self.name = IMessageAvro.remove_reservation
 
     def validate(self) -> bool:
         """

@@ -39,7 +39,7 @@ class RemoveSliceAvro(RequestByIdRecord):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.RemoveSlice
+        self.name = IMessageAvro.remove_slice
 
     def validate(self) -> bool:
         """

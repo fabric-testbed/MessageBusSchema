@@ -30,13 +30,13 @@ from fabric.message_bus.messages.message import IMessageAvro
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
-class ClaimDelegationRecordAvro(ReservationOrDelegationRecord):
+class ClaimDelegationAvro(ReservationOrDelegationRecord):
     """
     Implements Avro representation of an Claim Delegation Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ClaimDelegation
+        self.name = IMessageAvro.claim_delegation
 
     def validate(self) -> bool:
         """

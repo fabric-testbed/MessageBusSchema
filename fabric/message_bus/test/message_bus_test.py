@@ -36,37 +36,42 @@ from fabric.message_bus.messages.actor_avro import ActorAvro
 from fabric.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric.message_bus.messages.add_reservations_avro import AddReservationsAvro
 from fabric.message_bus.messages.add_slice_avro import AddSliceAvro
+from fabric.message_bus.messages.add_update_reservation_record import AddUpdateReservationRecord
+from fabric.message_bus.messages.add_update_slice_record import AddUpdateSliceRecord
 from fabric.message_bus.messages.auth_avro import AuthAvro
-from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationRecordAvro
+from fabric.message_bus.messages.claim_delegation_avro import ClaimDelegationAvro
 from fabric.message_bus.messages.claim_resources_avro import ClaimResourcesAvro
-from fabric.message_bus.messages.close_avro import CloseWithReservationOrDelegationRecord
+from fabric.message_bus.messages.close_avro import CloseAvro
 from fabric.message_bus.messages.close_reservations_avro import CloseReservationsAvro
 from fabric.message_bus.messages.delegation_avro import DelegationAvro
 from fabric.message_bus.messages.demand_reservation_avro import DemandReservationAvro
-from fabric.message_bus.messages.extend_lease_avro import ExtendLeaseWithReservationOrDelegationRecord
+from fabric.message_bus.messages.extend_lease_avro import ExtendLeaseAvro
 from fabric.message_bus.messages.extend_reservation_avro import ExtendReservationAvro
-from fabric.message_bus.messages.extend_ticket_avro import ExtendTicketWithReservationOrDelegationRecord
-from fabric.message_bus.messages.failed_rpc_avro import FailedRPCAvro
-from fabric.message_bus.messages.get_actors_avro import ActorsAvroById
-from fabric.message_bus.messages.get_pool_info_avro import PoolInfoAvroById
-from fabric.message_bus.messages.get_reservation_units_avro import ReservationUnitsAvroById
-from fabric.message_bus.messages.get_reservations_request_avro import ReservationsRequestByIdAvro
+from fabric.message_bus.messages.extend_ticket_avro import ExtendTicketAvro
+from fabric.message_bus.messages.failed_rpc_avro import FailedRpcAvro
+from fabric.message_bus.messages.get_actors_request_avro import GetActorsRequestAvro
+from fabric.message_bus.messages.get_pool_info_request_avro import GetPoolInfoRequestAvro
+from fabric.message_bus.messages.get_reservation_units_request_avro import GetReservationUnitsRequestAvro
+from fabric.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
 from fabric.message_bus.messages.get_reservations_state_request_avro import GetReservationsStateRequestAvro
-from fabric.message_bus.messages.get_unit_avro import UnitAvroById
-from fabric.message_bus.messages.modify_lease_avro import ModifyLeaseWithReservationOrDelegationRecord
+from fabric.message_bus.messages.get_unit_request_avro import GetUnitRequestAvro
+from fabric.message_bus.messages.modify_lease_avro import ModifyLeaseAvro
 from fabric.message_bus.messages.pool_info_avro import PoolInfoAvro
 from fabric.message_bus.messages.proxy_avro import ProxyAvro
+from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
+from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.reservation_state_avro import ReservationStateAvro
 from fabric.message_bus.messages.result_actor_avro import ResultActorAvro
 from fabric.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
 from fabric.message_bus.messages.result_proxy_avro import ResultProxyAvro
+from fabric.message_bus.messages.result_record_list import ResultRecordList
 from fabric.message_bus.messages.result_reservation_avro import ResultReservationAvro
-from fabric.message_bus.messages.get_slices_request_avro import SlicesRequestByIdAvro
+from fabric.message_bus.messages.get_slices_request_avro import GetSlicesRequestAvro
 from fabric.message_bus.messages.result_reservation_state_avro import ResultReservationStateAvro
 from fabric.message_bus.messages.result_slice_avro import ResultSliceAvro
 from fabric.message_bus.messages.query_avro import QueryAvro
 from fabric.message_bus.messages.query_result_avro import QueryResultAvro
-from fabric.message_bus.messages.redeem_avro import RedeemWithReservationOrDelegationRecord
+from fabric.message_bus.messages.redeem_avro import RedeemAvro
 from fabric.message_bus.messages.remove_reservation_avro import RemoveReservationAvro
 from fabric.message_bus.messages.remove_slice_avro import RemoveSliceAvro
 from fabric.message_bus.messages.reservation_avro import ReservationAvro
@@ -76,15 +81,15 @@ from fabric.message_bus.messages.resource_set_avro import ResourceSetAvro
 from fabric.message_bus.messages.result_avro import ResultAvro
 from fabric.message_bus.messages.result_string_avro import ResultStringAvro
 from fabric.message_bus.messages.result_strings_avro import ResultStringsAvro
-from fabric.message_bus.messages.result_unit_avro import ResultUnitAvro
+from fabric.message_bus.messages.result_units_avro import ResultUnitsAvro
 from fabric.message_bus.messages.slice_avro import SliceAvro
 from fabric.message_bus.messages.term_avro import TermAvro
 from fabric.message_bus.messages.ticket_avro import TicketAvro
 from fabric.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 from fabric.message_bus.messages.unit_avro import UnitAvro
 from fabric.message_bus.messages.update_data_avro import UpdateDataAvro
-from fabric.message_bus.messages.update_delegation_avro import UpdateDelegationRecordAvro
-from fabric.message_bus.messages.update_lease_avro import UpdateLeaseWithReservationOrDelegationRecord
+from fabric.message_bus.messages.update_delegation_avro import UpdateDelegationAvro
+from fabric.message_bus.messages.update_lease_avro import UpdateLeaseAvro
 from fabric.message_bus.messages.update_reservation_avro import UpdateReservationAvro
 from fabric.message_bus.messages.update_slice_avro import UpdateSliceAvro
 from fabric.message_bus.messages.update_ticket_avro import UpdateTicketAvro
@@ -147,7 +152,7 @@ class MessageBusTest(unittest.TestCase):
         auth.guid = "testguid"
         auth.name = "testactor"
 
-        # Query
+        # query
         query = QueryAvro()
         query.message_id = "msg1"
         query.callback_topic = "topic"
@@ -157,7 +162,7 @@ class MessageBusTest(unittest.TestCase):
         #print(query.to_dict())
         producer.produce_sync("fabric-mb-public-test1", query)
 
-        # QueryResult
+        # query_result
         query_result = QueryResultAvro()
         query_result.message_id = "msg2"
         query_result.request_id = "req2"
@@ -167,7 +172,7 @@ class MessageBusTest(unittest.TestCase):
         producer.produce_sync("fabric-mb-public-test2", query_result)
 
         # FailedRPC
-        failed_rpc = FailedRPCAvro()
+        failed_rpc = FailedRpcAvro()
         failed_rpc.message_id = "msg3"
         failed_rpc.request_id = "req3"
         failed_rpc.reservation_id = "rsv_abc"
@@ -214,7 +219,7 @@ class MessageBusTest(unittest.TestCase):
                                                                      'resource.class.invfortype.value': 'actor.core.policy.SimplerUnitsInventory.SimplerUnitsInventory',
                                                                      'pool.name': 'Net AM'}
 
-        reservation.resource_set.concrete = b'\x80\x04\x95\xb9\x02\x00\x00\x00\x00\x00\x00\x8c\x16actor.core.core.Ticket\x94\x8c\x06Ticket\x94\x93\x94)\x81\x94}\x94(\x8c\tauthority\x94\x8c,actor.core.proxies.kafka.KafkaAuthorityProxy\x94\x8c\x13KafkaAuthorityProxy\x94\x93\x94)\x81\x94}\x94(\x8c\nproxy_type\x94\x8c\x05kafka\x94\x8c\x08callback\x94\x89\x8c\nactor_name\x94\x8c\x0cfabric-vm-am\x94\x8c\nactor_guid\x94\x8c\x12actor.core.util.ID\x94\x8c\x02ID\x94\x93\x94)\x81\x94}\x94\x8c\x02id\x94\x8c\x11fabric-vm-am-guid\x94sb\x8c\x04auth\x94\x8c\x18actor.security.AuthToken\x94\x8c\tAuthToken\x94\x93\x94)\x81\x94}\x94(\x8c\x04name\x94h\x0f\x8c\x04guid\x94h\x14ub\x8c\x0bkafka_topic\x94\x8c\x12fabric-vm-am-topic\x94\x8c\x04type\x94K\x03\x8c\x10bootstrap_server\x94\x8c\x0elocalhost:9092\x94\x8c\x0fschema_registry\x94\x8c\x15http://localhost:8081\x94\x8c\x0fkey_schema_file\x94\x8cK/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/key.avsc\x94\x8c\x11value_schema_file\x94\x8cO/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/message.avsc\x94ub\x8c\x0fresource_ticket\x94N\x8c\told_units\x94K\x0fub.'
+        reservation.resource_set.concrete = b'\x80\x04\x95\xb9\x02\x00\x00\x00\x00\x00\x00\x8c\x16actor.core.core.ticket\x94\x8c\x06Ticket\x94\x93\x94)\x81\x94}\x94(\x8c\tauthority\x94\x8c,actor.core.proxies.kafka.KafkaAuthorityProxy\x94\x8c\x13KafkaAuthorityProxy\x94\x93\x94)\x81\x94}\x94(\x8c\nproxy_type\x94\x8c\x05kafka\x94\x8c\x08callback\x94\x89\x8c\nactor_name\x94\x8c\x0cfabric-vm-am\x94\x8c\nactor_guid\x94\x8c\x12actor.core.util.ID\x94\x8c\x02ID\x94\x93\x94)\x81\x94}\x94\x8c\x02id\x94\x8c\x11fabric-vm-am-guid\x94sb\x8c\x04auth\x94\x8c\x18actor.security.AuthToken\x94\x8c\tAuthToken\x94\x93\x94)\x81\x94}\x94(\x8c\x04name\x94h\x0f\x8c\x04guid\x94h\x14ub\x8c\x0bkafka_topic\x94\x8c\x12fabric-vm-am-topic\x94\x8c\x04type\x94K\x03\x8c\x10bootstrap_server\x94\x8c\x0elocalhost:9092\x94\x8c\x0fschema_registry\x94\x8c\x15http://localhost:8081\x94\x8c\x0fkey_schema_file\x94\x8cK/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/key.avsc\x94\x8c\x11value_schema_file\x94\x8cO/Users/komalthareja/renci/code/fabric/ActorBase/message_bus/schema/message.avsc\x94ub\x8c\x0fresource_ticket\x94N\x8c\told_units\x94K\x0fub.'
 
         delegation = DelegationAvro()
         delegation.delegation_id = "dlg123"
@@ -225,7 +230,7 @@ class MessageBusTest(unittest.TestCase):
         delegation.slice.description = "test description"
         delegation.slice.owner = auth
 
-        claimd = ClaimDelegationRecordAvro()
+        claimd = ClaimDelegationAvro()
         claimd.auth = auth
         claimd.message_id = "msg4"
         claimd.callback_topic = "test"
@@ -234,8 +239,8 @@ class MessageBusTest(unittest.TestCase):
         #print(claim.to_dict())
         producer.produce_sync("fabric-mb-public-test2", claimd)
 
-        # Redeem
-        redeem = RedeemWithReservationOrDelegationRecord()
+        # redeem
+        redeem = RedeemAvro()
         redeem.message_id = "msg4"
         redeem.callback_topic = "test"
         redeem.reservation = reservation
@@ -255,7 +260,7 @@ class MessageBusTest(unittest.TestCase):
         #print(update_ticket.to_dict())
         producer.produce_sync("fabric-mb-public-test2", update_ticket)
 
-        update_d = UpdateDelegationRecordAvro()
+        update_d = UpdateDelegationAvro()
         update_d.auth = auth
         update_d.message_id = "msg11"
         update_d.callback_topic = "test"
@@ -268,7 +273,7 @@ class MessageBusTest(unittest.TestCase):
         #print(update_ticket.to_dict())
         producer.produce_sync("fabric-mb-public-test2", update_d)
 
-        get_slice = SlicesRequestByIdAvro()
+        get_slice = GetSlicesRequestAvro()
         get_slice.auth = auth
         get_slice.message_id = "msg11"
         get_slice.callback_topic = "test"
@@ -304,7 +309,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", slice_res)
 
-        res_req = ReservationsRequestByIdAvro()
+        res_req = GetReservationsRequestAvro()
         res_req.message_id = "abc123"
         res_req.callback_topic = "test"
         res_req.guid = "guid"
@@ -464,7 +469,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", extend_res)
 
-        close = CloseWithReservationOrDelegationRecord()
+        close = CloseAvro()
         close.message_id = "msg1"
         close.reservation = reservation
         close.callback_topic = "topic1"
@@ -472,7 +477,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", close)
 
-        extend_lease = ExtendLeaseWithReservationOrDelegationRecord()
+        extend_lease = ExtendLeaseAvro()
         extend_lease.message_id = "msg1"
         extend_lease.reservation = reservation
         extend_lease.callback_topic = "topic1"
@@ -480,7 +485,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", extend_lease)
 
-        extend_ticket = ExtendTicketWithReservationOrDelegationRecord()
+        extend_ticket = ExtendTicketAvro()
         extend_ticket.message_id = "msg1"
         extend_ticket.reservation = reservation
         extend_ticket.callback_topic = "topic1"
@@ -488,7 +493,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", extend_ticket)
 
-        modify_lease = ModifyLeaseWithReservationOrDelegationRecord()
+        modify_lease = ModifyLeaseAvro()
         modify_lease.message_id = "msg1"
         modify_lease.reservation = reservation
         modify_lease.callback_topic = "topic1"
@@ -496,7 +501,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", modify_lease)
 
-        update_lease = UpdateLeaseWithReservationOrDelegationRecord()
+        update_lease = UpdateLeaseAvro()
         update_lease.message_id = "msg1"
         update_lease.reservation = reservation
         update_lease.callback_topic = "topic1"
@@ -545,7 +550,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", res_state)
 
-        ru = ReservationUnitsAvroById()
+        ru = GetReservationUnitsRequestAvro()
         ru.message_id = "msg1"
         ru.reservation_id = "rid1"
         ru.guid = "gud1"
@@ -556,7 +561,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", ru)
 
-        ruu = UnitAvroById()
+        ruu = GetUnitRequestAvro()
         ruu.message_id = "msg1"
         ruu.unit_id = "uid1"
         ruu.guid = "gud1"
@@ -567,7 +572,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", ruu)
 
-        pool_info = PoolInfoAvroById()
+        pool_info = GetPoolInfoRequestAvro()
         pool_info.message_id = "msg1"
         pool_info.guid = "gud1"
         pool_info.message_id = "msg1"
@@ -578,7 +583,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", pool_info)
 
-        actors_req = ActorsAvroById()
+        actors_req = GetActorsRequestAvro()
         actors_req.message_id = "msg1"
         actors_req.guid = "gud1"
         actors_req.message_id = "msg1"
@@ -589,7 +594,7 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric-mb-public-test2", actors_req)
 
-        result_unit = ResultUnitAvro()
+        result_unit = ResultUnitsAvro()
         unit = UnitAvro()
         unit.properties = {'test':'value'}
         result_unit.message_id = "msg1"
@@ -656,122 +661,122 @@ class MessageBusTest(unittest.TestCase):
                 self.parent = parent
 
             def handle_message(self, message: IMessageAvro):
-                if message.get_message_name() == IMessageAvro.ClaimDelegation:
-                    self.parent.validate_claim_delegation(message, claimd)
+                if message.get_message_name() == IMessageAvro.claim_delegation:
+                    self.parent.validate_reservation_or_delegation_record(message, claimd)
 
-                elif message.get_message_name() == IMessageAvro.Close:
-                    self.parent.validate_close(message, close)
+                elif message.get_message_name() == IMessageAvro.close:
+                    self.parent.validate_reservation_or_delegation_record(message, close)
 
-                elif message.get_message_name() == IMessageAvro.ExtendLease:
-                    self.parent.validate_extend_lease(message, extend_lease)
+                elif message.get_message_name() == IMessageAvro.extend_lease:
+                    self.parent.validate_reservation_or_delegation_record(message, extend_lease)
 
-                elif message.get_message_name() == IMessageAvro.ExtendTicket:
-                    self.parent.validate_extend_ticket(message, extend_ticket)
+                elif message.get_message_name() == IMessageAvro.extend_ticket:
+                    self.parent.validate_reservation_or_delegation_record(message, extend_ticket)
 
-                elif message.get_message_name() == IMessageAvro.FailedRPC:
+                elif message.get_message_name() == IMessageAvro.failed_rpc:
                     self.parent.validate_failed_rpc(message, failed_rpc)
 
-                elif message.get_message_name() == IMessageAvro.ModifyLease:
-                    self.parent.validate_modify_lease(message, modify_lease)
+                elif message.get_message_name() == IMessageAvro.modify_lease:
+                    self.parent.validate_reservation_or_delegation_record(message, modify_lease)
 
-                elif message.get_message_name() == IMessageAvro.Query:
+                elif message.get_message_name() == IMessageAvro.query:
                     self.parent.validate_query(message, query)
 
-                elif message.get_message_name() == IMessageAvro.QueryResult:
+                elif message.get_message_name() == IMessageAvro.query_result:
                     self.parent.validate_query_result(message, query_result)
 
-                elif message.get_message_name() == IMessageAvro.Redeem:
-                    self.parent.validate_redeem(message, redeem)
+                elif message.get_message_name() == IMessageAvro.redeem:
+                    self.parent.validate_reservation_or_delegation_record(message, redeem)
 
-                elif message.get_message_name() == IMessageAvro.UpdateLease:
-                    self.parent.validate_update_lease(message, update_lease)
+                elif message.get_message_name() == IMessageAvro.update_lease:
+                    self.parent.validate_reservation_or_delegation_record(message, update_lease)
 
-                elif message.get_message_name() == IMessageAvro.UpdateTicket:
-                    self.parent.validate_update_ticket(message, update_ticket)
+                elif message.get_message_name() == IMessageAvro.update_ticket:
+                    self.parent.validate_reservation_or_delegation_record(message, update_ticket)
 
-                elif message.get_message_name() == IMessageAvro.Ticket:
+                elif message.get_message_name() == IMessageAvro.ticket:
                     self.parent.validate_ticket(message, ticket)
 
-                elif message.get_message_name() == IMessageAvro.ClaimResources:
-                    self.parent.validate_claim_resources(message, claim_req)
+                elif message.get_message_name() == IMessageAvro.claim_resources:
+                    self.parent.validate_request_by_id(message, claim_req)
 
-                elif message.get_message_name() == IMessageAvro.AddSlice:
-                    self.parent.validate_add_slice(message, add_slice)
+                elif message.get_message_name() == IMessageAvro.add_slice:
+                    self.parent.validate_add_update_slice(message, add_slice)
 
-                elif message.get_message_name() == IMessageAvro.UpdateSlice:
-                    self.parent.validate_update_slice(message, update_slice)
+                elif message.get_message_name() == IMessageAvro.update_slice:
+                    self.parent.validate_add_update_slice(message, update_slice)
 
-                elif message.get_message_name() == IMessageAvro.RemoveSlice:
-                    self.parent.validate_remove_slice(message, remove_slice)
+                elif message.get_message_name() == IMessageAvro.remove_slice:
+                    self.parent.validate_request_by_id(message, remove_slice)
 
-                elif message.get_message_name() == IMessageAvro.RemoveReservation:
-                    self.parent.validate_remove_reservation(message, remove_res)
+                elif message.get_message_name() == IMessageAvro.remove_reservation:
+                    self.parent.validate_request_by_id(message, remove_res)
 
-                elif message.get_message_name() == IMessageAvro.CloseReservations:
-                    self.parent.validate_close_reservation(message, close_res)
+                elif message.get_message_name() == IMessageAvro.close_reservations:
+                    self.parent.validate_request_by_id(message, close_res)
 
-                elif message.get_message_name() == IMessageAvro.UpdateReservation:
-                    self.parent.validate_update_reservation(message, update_res)
+                elif message.get_message_name() == IMessageAvro.update_reservation:
+                    self.parent.validate_add_update_reservation_record(message, update_res)
 
-                elif message.get_message_name() == IMessageAvro.AddReservation:
-                    self.parent.validate_add_reservation(message, add_res)
+                elif message.get_message_name() == IMessageAvro.add_reservation:
+                    self.parent.validate_add_update_reservation_record(message, add_res)
 
-                elif message.get_message_name() == IMessageAvro.AddReservations:
+                elif message.get_message_name() == IMessageAvro.add_reservations:
                     self.parent.validate_add_reservations(message, add_ress)
 
-                elif message.get_message_name() == IMessageAvro.DemandReservation:
-                    self.parent.validate_demand_reservation(message, demand_res)
+                elif message.get_message_name() == IMessageAvro.demand_reservation:
+                    self.parent.validate_add_update_reservation_record(message, demand_res)
 
-                elif message.get_message_name() == IMessageAvro.ExtendReservation:
+                elif message.get_message_name() == IMessageAvro.extend_reservation:
                     self.parent.validate_extend_reservation(message, extend_res)
 
-                elif message.get_message_name() == IMessageAvro.GetSlicesRequest:
-                    self.parent.validate_get_slices_request(message, get_slice)
+                elif message.get_message_name() == IMessageAvro.get_slices_request:
+                    self.parent.validate_request_by_id(message, get_slice)
 
-                elif message.get_message_name() == IMessageAvro.GetReservationsRequest:
-                    self.parent.validate_get_reservations_request(message, res_req)
+                elif message.get_message_name() == IMessageAvro.get_reservations_request:
+                    self.parent.validate_request_by_id(message, res_req)
 
-                elif message.get_message_name() == IMessageAvro.GetReservationsStateRequest:
+                elif message.get_message_name() == IMessageAvro.get_reservations_state_request:
                     self.parent.validate_get_reservations_state_request(message, res_state_req)
 
-                elif message.get_message_name() == IMessageAvro.GetUnitRequest:
-                    self.parent.validate_get_unit_request(message, ruu)
+                elif message.get_message_name() == IMessageAvro.get_unit_request:
+                    self.parent.validate_request_by_id(message, ruu)
 
-                elif message.get_message_name() == IMessageAvro.GetReservationUnitsRequest:
-                    self.parent.validate_get_reservations_unit_request(message, ru)
+                elif message.get_message_name() == IMessageAvro.get_reservation_units_request:
+                    self.parent.validate_request_by_id(message, ru)
 
-                elif message.get_message_name() == IMessageAvro.GetPoolInfoRequest:
-                    self.parent.validate_get_pool_info_request(message, pool_info)
+                elif message.get_message_name() == IMessageAvro.get_pool_info_request:
+                    self.parent.validate_request_by_id(message, pool_info)
 
-                elif message.get_message_name() == IMessageAvro.GetActorsRequest:
-                    self.parent.validate_get_actors_request(message, actors_req)
+                elif message.get_message_name() == IMessageAvro.get_actors_request:
+                    self.parent.validate_request_by_id(message, actors_req)
 
-                elif message.get_message_name() == IMessageAvro.ResultSlice:
-                    self.parent.validate_get_slices_response(message, slice_res)
+                elif message.get_message_name() == IMessageAvro.result_slice:
+                    self.parent.validate_result_record(message, slice_res)
 
-                elif message.get_message_name() == IMessageAvro.ResultReservation:
-                    self.parent.validate_get_reservations_response(message, res_res)
+                elif message.get_message_name() == IMessageAvro.result_reservation:
+                    self.parent.validate_result_record(message, res_res)
 
-                elif message.get_message_name() == IMessageAvro.ResultString:
-                    self.parent.validate_status_response(message, status_resp)
+                elif message.get_message_name() == IMessageAvro.result_string:
+                    self.parent.validate_result_string(message, status_resp)
 
-                elif message.get_message_name() == IMessageAvro.ResultStrings:
+                elif message.get_message_name() == IMessageAvro.result_strings:
                     self.parent.validate_result_strings(message, res_strings)
 
-                elif message.get_message_name() == IMessageAvro.ResultReservationState:
-                    self.parent.validate_result_reservation_state(message, res_state)
+                elif message.get_message_name() == IMessageAvro.result_reservation_state:
+                    self.parent.validate_result_record(message, res_state)
 
-                elif message.get_message_name() == IMessageAvro.ResultUnits:
-                    self.parent.validate_result_units(message, result_unit)
+                elif message.get_message_name() == IMessageAvro.result_units:
+                    self.parent.validate_result_record(message, result_unit)
 
-                elif message.get_message_name() == IMessageAvro.ResultProxy:
-                    self.parent.validate_result_proxy(message, result_proxy)
+                elif message.get_message_name() == IMessageAvro.result_proxy:
+                    self.parent.validate_result_record(message, result_proxy)
 
-                elif message.get_message_name() == IMessageAvro.ResultPool:
-                    self.parent.validate_result_pool(message, result_pool)
+                elif message.get_message_name() == IMessageAvro.result_pool_info:
+                    self.parent.validate_result_record(message, result_pool)
 
-                elif message.get_message_name() == IMessageAvro.ResultActor:
-                    self.parent.validate_result_actor(message, result_actor)
+                elif message.get_message_name() == IMessageAvro.result_actor:
+                    self.parent.validate_result_record(message, result_actor)
 
         # create a consumer
         consumer = TestConsumer(conf, key_schema, val_schema, topics)
@@ -779,7 +784,6 @@ class MessageBusTest(unittest.TestCase):
 
         # start a thread to consume messages
         consume_thread = Thread(target=consumer.consume_auto, daemon=True)
-        # consume_thread = Thread(target = consumer.consume_sync, daemon=True)
 
         consume_thread.start()
         time.sleep(10)
@@ -804,7 +808,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.properties, outgoing.properties)
         self.assertEqual(incoming.auth, outgoing.auth)
 
-    def validate_failed_rpc(self, incoming: FailedRPCAvro, outgoing: FailedRPCAvro):
+    def validate_failed_rpc(self, incoming: FailedRpcAvro, outgoing: FailedRpcAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.error_details, outgoing.error_details)
@@ -813,72 +817,30 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.request_id, outgoing.request_id)
         self.assertEqual(incoming.auth, outgoing.auth)
 
-    def validate_claim_resources(self, incoming: ClaimResourcesAvro, outgoing: ClaimResourcesAvro):
+    def validate_request_by_id(self, incoming: RequestByIdRecord, outgoing: RequestByIdRecord):
         self.assertEqual(incoming.name, outgoing.name)
+        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.broker_id, outgoing.broker_id)
+        self.assertEqual(incoming.slice_id, outgoing.slice_id)
         self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
         self.assertEqual(incoming.delegation_id, outgoing.delegation_id)
-        self.assertEqual(incoming.slice_id, outgoing.slice_id)
+        self.assertEqual(incoming.type, outgoing.type)
+        self.assertEqual(incoming.unit_id, outgoing.unit_id)
+        self.assertEqual(incoming.broker_id, outgoing.broker_id)
+        self.assertEqual(incoming.reservation_state, outgoing.reservation_state)
+        self.assertEqual(incoming.delegation_state, outgoing.delegation_state)
         self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+        self.assertEqual(incoming.id_token, outgoing.id_token)
 
-    def validate_claim_delegation(self, incoming: ClaimDelegationRecordAvro, outgoing: ClaimDelegationRecordAvro):
+    def validate_reservation_or_delegation_record(self, incoming: ReservationOrDelegationRecord,
+                                                  outgoing: ReservationOrDelegationRecord):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
+        self.assertEqual(incoming.update_data, outgoing.update_data)
+        self.assertEqual(incoming.reservation, outgoing.reservation)
+        self.assertEqual(incoming.id_token, outgoing.id_token)
         self.assertEqual(incoming.delegation, outgoing.delegation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_close(self, incoming: CloseWithReservationOrDelegationRecord, outgoing: CloseWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_extend_lease(self, incoming: ExtendLeaseWithReservationOrDelegationRecord, outgoing: ExtendLeaseWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_extend_ticket(self, incoming: ExtendTicketWithReservationOrDelegationRecord, outgoing: ExtendTicketWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_modify_lease(self, incoming: ModifyLeaseWithReservationOrDelegationRecord, outgoing: ModifyLeaseWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_update_lease(self, incoming: UpdateLeaseWithReservationOrDelegationRecord, outgoing: UpdateLeaseWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.update_data, outgoing.update_data)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_redeem(self, incoming: RedeemWithReservationOrDelegationRecord, outgoing: RedeemWithReservationOrDelegationRecord):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_update_ticket(self, incoming: UpdateTicketAvro, outgoing: UpdateTicketAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation, outgoing.reservation)
-        self.assertEqual(incoming.update_data, outgoing.update_data)
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
@@ -889,31 +851,18 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
-    def validate_get_slices_request(self, incoming: SlicesRequestByIdAvro, outgoing: SlicesRequestByIdAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.slice_id, outgoing.slice_id)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_get_slices_response(self, incoming: ResultSliceAvro, outgoing: ResultSliceAvro):
+    def validate_result_record(self, incoming: ResultRecordList, outgoing: ResultRecordList):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.slices, outgoing.slices)
         self.assertEqual(incoming.status, outgoing.status)
-
-    def validate_get_reservations_request(self, incoming: ReservationsRequestByIdAvro,
-                                          outgoing: ReservationsRequestByIdAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.slice_id, outgoing.slice_id)
-        self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
-        self.assertEqual(incoming.reservation_state, outgoing.reservation_state)
-        self.assertEqual(incoming.type, outgoing.type)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+        self.assertEqual(incoming.slices, outgoing.slices)
+        self.assertEqual(incoming.reservations, outgoing.reservations)
+        self.assertEqual(incoming.reservation_states, outgoing.reservation_states)
+        self.assertEqual(incoming.units, outgoing.units)
+        self.assertEqual(incoming.proxies, outgoing.proxies)
+        self.assertEqual(incoming.pools, outgoing.pools)
+        self.assertEqual(incoming.actors, outgoing.actors)
+        self.assertEqual(incoming.delegations, outgoing.delegations)
 
     def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro,
                                                 outgoing: GetReservationsStateRequestAvro):
@@ -924,20 +873,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
-    def validate_get_reservations_response(self, incoming: ResultReservationAvro, outgoing: ResultReservationAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservations, outgoing.reservations)
-        self.assertEqual(incoming.status, outgoing.status)
-
-    def validate_remove_slice(self, incoming: RemoveSliceAvro, outgoing: RemoveSliceAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.slice_id, outgoing.slice_id)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_status_response(self, incoming: ResultStringAvro, outgoing: ResultStringAvro):
+    def validate_result_string(self, incoming: ResultStringAvro, outgoing: ResultStringAvro):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.result_str, outgoing.result_str)
@@ -949,57 +885,23 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.result, outgoing.result)
         self.assertEqual(incoming.status, outgoing.status)
 
-    def validate_result_reservation_state(self, incoming: ResultReservationStateAvro,
-                                          outgoing: ResultReservationStateAvro):
+    def validate_add_update_slice(self, incoming: AddUpdateSliceRecord, outgoing: AddUpdateSliceRecord):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.status, outgoing.status)
-        self.assertEqual(len(incoming.reservation_states), len(outgoing.reservation_states))
-        for i in range(len(incoming.reservation_states)):
-            self.assertEqual(incoming.reservation_states[i], outgoing.reservation_states[i])
-
-    def validate_add_slice(self, incoming: AddSliceAvro, outgoing: AddSliceAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
+        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
         self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.slice_obj, outgoing.slice_obj)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_update_slice(self, incoming: UpdateSliceAvro, outgoing: UpdateSliceAvro):
         self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.slice_obj, outgoing.slice_obj)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+        self.assertEqual(incoming.id_token, outgoing.id_token)
 
-    def validate_remove_reservation(self, incoming: RemoveReservationAvro, outgoing: RemoveReservationAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
+    def validate_add_update_reservation_record(self, incoming: AddUpdateReservationRecord, outgoing: AddUpdateReservationRecord):
         self.assertEqual(incoming.name, outgoing.name)
+        self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_close_reservation(self, incoming: CloseReservationsAvro, outgoing: CloseReservationsAvro):
         self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.slice_id, outgoing.slice_id)
-        self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_update_reservation(self, incoming: UpdateReservationAvro, outgoing: UpdateReservationAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
         self.assertEqual(incoming.reservation_obj, outgoing.reservation_obj)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_add_reservation(self, incoming: AddReservationAvro, outgoing: AddReservationAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.reservation_obj, outgoing.reservation_obj)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+        self.assertEqual(incoming.id_token, outgoing.id_token)
 
     def validate_add_reservations(self, incoming: AddReservationsAvro, outgoing: AddReservationsAvro):
         self.assertEqual(incoming.auth, outgoing.auth)
@@ -1009,13 +911,6 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(len(incoming.reservation_list), len(outgoing.reservation_list))
         for i in range(len(incoming.reservation_list)):
             self.assertEqual(incoming.reservation_list[i], outgoing.reservation_list[i])
-
-    def validate_demand_reservation(self, incoming: DemandReservationAvro, outgoing: DemandReservationAvro):
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.reservation_obj, outgoing.reservation_obj)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
     def validate_extend_reservation(self, incoming: ExtendReservationAvro, outgoing: ExtendReservationAvro):
         self.assertEqual(incoming.auth, outgoing.auth)
@@ -1027,69 +922,4 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.new_units, outgoing.new_units)
         self.assertEqual(incoming.request_properties, outgoing.request_properties)
         self.assertEqual(incoming.config_properties, outgoing.config_properties)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_result_units(self, incoming: ResultUnitAvro, outgoing: ResultUnitAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.status, outgoing.status)
-        self.assertEqual(len(incoming.units), len(outgoing.units))
-        for i in range(len(incoming.units)):
-            self.assertEqual(incoming.units[i], outgoing.units[i])
-
-    def validate_result_proxy(self, incoming: ResultProxyAvro, outgoing: ResultProxyAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.status, outgoing.status)
-        self.assertEqual(len(incoming.proxies), len(outgoing.proxies))
-        for i in range(len(incoming.proxies)):
-            self.assertEqual(incoming.proxies[i], outgoing.proxies[i])
-
-    def validate_result_pool(self, incoming: ResultPoolInfoAvro, outgoing: ResultPoolInfoAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.status, outgoing.status)
-        self.assertEqual(len(incoming.pools), len(outgoing.pools))
-        for i in range(len(incoming.pools)):
-            self.assertEqual(incoming.pools[i], outgoing.pools[i])
-
-    def validate_result_actor(self, incoming: ResultActorAvro, outgoing: ResultActorAvro):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.status, outgoing.status)
-        self.assertEqual(len(incoming.actors), len(outgoing.actors))
-        for i in range(len(incoming.actors)):
-            self.assertEqual(incoming.actors[i], outgoing.actors[i])
-
-    def validate_get_unit_request(self, incoming: UnitAvroById, outgoing: UnitAvroById):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.unit_id, outgoing.unit_id)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_get_reservations_unit_request(self, incoming: ReservationUnitsAvroById,
-                                               outgoing: ReservationUnitsAvroById):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.reservation_id, outgoing.reservation_id)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_get_pool_info_request(self, incoming: PoolInfoAvroById, outgoing: PoolInfoAvroById):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.broker_id, outgoing.broker_id)
-        self.assertEqual(incoming.auth, outgoing.auth)
-        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
-
-    def validate_get_actors_request(self, incoming: ActorsAvroById, outgoing: ActorsAvroById):
-        self.assertEqual(incoming.name, outgoing.name)
-        self.assertEqual(incoming.guid, outgoing.guid)
-        self.assertEqual(incoming.message_id, outgoing.message_id)
-        self.assertEqual(incoming.type, outgoing.type)
-        self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)

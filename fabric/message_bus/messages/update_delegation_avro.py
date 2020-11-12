@@ -30,13 +30,13 @@ from fabric.message_bus.messages.reservation_or_delegation_record import Reserva
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UpdateDelegationRecordAvro(ReservationOrDelegationRecord):
+class UpdateDelegationAvro(ReservationOrDelegationRecord):
     """
     Implements Update Delegation Avro Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.UpdateDelegation
+        self.name = IMessageAvro.update_delegation
 
     def validate(self) -> bool:
         """

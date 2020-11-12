@@ -24,16 +24,28 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Result Message containing Units
+Implements Avro representation of a Get Reservation Units Message
 """
+from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
-from fabric.message_bus.messages.result_record_list import ResultRecordList
 
 
-class ResultUnitAvro(ResultRecordList):
+class GetReservationUnitsRequestAvro(RequestByIdRecord):
     """
-    Implements Avro representation of a Result Message containing Units
+    Implements Avro representation of a Get Reservation Units Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultUnits
+        self.name = IMessageAvro.get_reservation_units_request
+
+    def validate(self) -> bool:
+        """
+        Check if the object is valid and contains all mandatory fields
+        :return True on success; False on failure
+        """
+        ret_val = super().validate()
+
+        if self.guid is None or self.auth is None or self.callback_topic is None or self.reservation_id is None:
+            ret_val = False
+
+        return ret_val

@@ -37,4 +37,4 @@ class ResultReservationStateAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultReservationState
+        self.name = IMessageAvro.result_reservation_state

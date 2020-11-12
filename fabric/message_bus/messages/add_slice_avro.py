@@ -38,4 +38,4 @@ class AddSliceAvro(AddUpdateSliceRecord):
 
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.AddSlice
+        self.name = IMessageAvro.add_slice

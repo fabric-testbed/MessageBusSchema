@@ -36,4 +36,4 @@ class ResultSliceAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultSlice
+        self.name = IMessageAvro.result_slice

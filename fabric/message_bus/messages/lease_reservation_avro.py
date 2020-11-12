@@ -118,7 +118,7 @@ class LeaseReservationAvro(TicketReservationAvro):
         print("Broker: {}".format(self.broker))
 
         if self.ticket is not None:
-            print("Ticket properties: {}".format(self.ticket))
+            print("ticket properties: {}".format(self.ticket))
 
         if self.renewable is not None:
             print("Renewable: {}".format(self.renewable))
@@ -137,7 +137,7 @@ class LeaseReservationAvro(TicketReservationAvro):
         if self.redeem_processors is not None:
             index = 0
             for rp in self.redeem_processors:
-                print("Redeem Predecessor# {}: {}".format(index, rp))
+                print("redeem Predecessor# {}: {}".format(index, rp))
                 index += 1
 
         if self.local is not None:

@@ -26,28 +26,17 @@
 """
 Implements Avro representation of a Modify Slice Message
 """
-from fabric.message_bus.message_bus_exception import MessageBusException
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ModifyLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class ModifyLeaseAvro(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Modify Slice Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ModifyLease
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != IMessageAvro.ModifyLease:
-            raise MessageBusException("Invalid message")
-        super().from_dict(value)
+        self.name = IMessageAvro.modify_lease
 
     def validate(self) -> bool:
         """

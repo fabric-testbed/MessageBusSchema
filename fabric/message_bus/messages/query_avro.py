@@ -24,7 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Query Message
+Implements Avro representation of a query Message
 """
 from uuid import uuid4
 
@@ -35,13 +35,13 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class QueryAvro(IMessageAvro):
     """
-    Implements Avro representation of a Query Message
+    Implements Avro representation of a query Message
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "properties", "callback_topic", "auth", "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.Query
+        self.name = IMessageAvro.query
         self.message_id = None
         self.properties = None
         self.callback_topic = None
@@ -57,7 +57,7 @@ class QueryAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.Query:
+        if value['name'] != IMessageAvro.query:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']

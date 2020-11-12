@@ -37,4 +37,4 @@ class AddReservationAvro(AddUpdateReservationRecord):
 
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.AddReservation
+        self.name = IMessageAvro.add_reservation

@@ -33,7 +33,7 @@ from fabric.message_bus.messages.auth_avro import AuthAvro
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class FailedRPCAvro(IMessageAvro):
+class FailedRpcAvro(IMessageAvro):
     """
     Implements Avro representation of a Failed RPC Message
     """
@@ -41,7 +41,7 @@ class FailedRPCAvro(IMessageAvro):
     __slots__ = ["name", "message_id", "request_id", "properties", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.FailedRPC
+        self.name = IMessageAvro.failed_rpc
         self.message_id = None
         self.request_type = None
         self.request_id = None
@@ -58,7 +58,7 @@ class FailedRPCAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.FailedRPC:
+        if value['name'] != IMessageAvro.failed_rpc:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.request_type = value['request_type']

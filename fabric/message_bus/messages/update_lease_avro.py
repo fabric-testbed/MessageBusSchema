@@ -30,14 +30,14 @@ from fabric.message_bus.messages.reservation_or_delegation_record import Reserva
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UpdateLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class UpdateLeaseAvro(ReservationOrDelegationRecord):
     """
     Implements Avro representation of a Update Lease Message
     """
 
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.UpdateLease
+        self.name = IMessageAvro.update_lease
 
     def validate(self) -> bool:
         """

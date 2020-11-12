@@ -30,10 +30,10 @@ from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class PoolInfoAvroById(RequestByIdRecord):
+class GetPoolInfoRequestAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Get Pool Info Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.GetPoolInfoRequest
+        self.name = IMessageAvro.get_pool_info_request

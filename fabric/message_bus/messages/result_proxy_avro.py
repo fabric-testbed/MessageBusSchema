@@ -36,4 +36,4 @@ class ResultProxyAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultProxy
+        self.name = IMessageAvro.result_proxy

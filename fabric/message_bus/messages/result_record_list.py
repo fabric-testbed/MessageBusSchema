@@ -54,7 +54,7 @@ class ResultRecordList(IMessageAvro):
                  "proxies", "pools", "actors", "delegations", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ResultDelegation
+        self.name = None
         self.message_id = None
         self.status = None
         self.slices = None

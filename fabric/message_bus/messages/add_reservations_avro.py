@@ -44,7 +44,7 @@ class AddReservationsAvro(IMessageAvro):
     __slots__ = ["name", "message_id", "guid", "auth", "reservation_list", "callback_topic", "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.AddReservations
+        self.name = IMessageAvro.add_reservations
         self.message_id = None
         self.guid = None
         self.auth = None
@@ -61,7 +61,7 @@ class AddReservationsAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.AddReservations:
+        if value['name'] != IMessageAvro.add_reservations:
             raise MessageBusException("Invalid message")
         self.message_id = value.get('message_id', None)
         self.guid = value.get('guid', None)

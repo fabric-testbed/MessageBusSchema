@@ -36,13 +36,13 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class TicketAvro(IMessageAvro):
     """
-    Implements Avro representation of a Ticket
+    Implements Avro representation of a ticket
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.Ticket
+        self.name = IMessageAvro.ticket
         self.message_id = None
         self.reservation = None
         self.callback_topic = None
@@ -57,7 +57,7 @@ class TicketAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.Ticket:
+        if value['name'] != IMessageAvro.ticket:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']

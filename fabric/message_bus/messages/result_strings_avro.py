@@ -44,7 +44,7 @@ class ResultStringsAvro(IMessageAvro):
     __slots__ = ["name", "message_id", "result", "callback_topic", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ResultStrings
+        self.name = IMessageAvro.result_strings
         self.message_id = None
         self.status = None
         self.result = None
@@ -58,7 +58,7 @@ class ResultStringsAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.ResultStrings:
+        if value['name'] != IMessageAvro.result_strings:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.status = ResultAvro()

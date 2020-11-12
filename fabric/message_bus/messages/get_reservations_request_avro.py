@@ -30,13 +30,13 @@ from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ReservationsRequestByIdAvro(RequestByIdRecord):
+class GetReservationsRequestAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Get Reservations Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.GetReservationsRequest
+        self.name = IMessageAvro.get_reservations_request
 
     def validate(self) -> bool:
         """

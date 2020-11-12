@@ -36,4 +36,4 @@ class ResultPoolInfoAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultPool
+        self.name = IMessageAvro.result_pool_info

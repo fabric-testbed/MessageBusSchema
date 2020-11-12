@@ -36,4 +36,4 @@ class ResultDelegationAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultDelegation
+        self.name = IMessageAvro.result_delegation

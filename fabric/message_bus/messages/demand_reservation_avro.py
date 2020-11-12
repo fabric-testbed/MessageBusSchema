@@ -37,7 +37,7 @@ class DemandReservationAvro(AddUpdateReservationRecord):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.DemandReservation
+        self.name = IMessageAvro.demand_reservation
 
     def validate(self) -> bool:
         """

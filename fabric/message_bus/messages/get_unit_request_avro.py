@@ -30,13 +30,13 @@ from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class UnitAvroById(RequestByIdRecord):
+class GetUnitRequestAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Get Unit Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.GetUnitRequest
+        self.name = IMessageAvro.get_unit_request
 
     def validate(self) -> bool:
         """

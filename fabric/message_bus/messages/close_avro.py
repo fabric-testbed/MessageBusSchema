@@ -24,19 +24,19 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of an Close Message
+Implements Avro representation of an close Message
 """
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class CloseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class CloseAvro(ReservationOrDelegationRecord):
     """
-    Implements Avro representation of an Close Message
+    Implements Avro representation of an close Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.Close
+        self.name = IMessageAvro.close
 
     def validate(self) -> bool:
         """

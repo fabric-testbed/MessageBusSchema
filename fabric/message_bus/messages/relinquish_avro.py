@@ -24,19 +24,19 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Relinquish Message
+Implements Avro representation of a relinquish Message
 """
 from fabric.message_bus.messages.message import IMessageAvro
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
-class RelinquishWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class RelinquishAvro(ReservationOrDelegationRecord):
     """
-    Implements Avro representation of a Relinquish Message
+    Implements Avro representation of a relinquish Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.Relinquish
+        self.name = IMessageAvro.relinquish
 
     def validate(self) -> bool:
         """

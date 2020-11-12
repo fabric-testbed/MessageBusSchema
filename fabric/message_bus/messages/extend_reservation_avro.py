@@ -42,7 +42,7 @@ class ExtendReservationAvro(IMessageAvro):
                  "request_properties", "config_properties", "callback_topic", "id_token", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.ExtendReservation
+        self.name = IMessageAvro.extend_reservation
         self.guid = None
         self.message_id = None
         self.callback_topic = None
@@ -64,7 +64,7 @@ class ExtendReservationAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.ExtendReservation:
+        if value['name'] != IMessageAvro.extend_reservation:
             raise MessageBusException("Invalid message")
         self.guid = value.get('guid', None)
         self.message_id = value.get('message_id', None)

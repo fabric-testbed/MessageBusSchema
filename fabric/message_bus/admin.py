@@ -114,70 +114,6 @@ class AdminApi(Base):
             except Exception as e:
                 self.log_error("Failed to add partitions to topic {}: {}".format(topic, e))
 
-    def _print_config(self, config, depth):
-        """
-            Prints the config
-            :param config: config to be printed
-            :param depth: number of spaces to be printed before config
-            :return:
-        """
-        self.log_info('%40s = %-50s  [%s,is:read-only=%r,default=%r,sensitive=%r,synonym=%r,synonyms=%s]' %
-                      ((' ' * depth) + config.name, config.value, ConfigSource(config.source),
-                       config.is_read_only, config.is_default,
-                       config.is_sensitive, config.is_synonym,
-                       ["%s:%s" % (x.name, ConfigSource(x.source))
-                        for x in iter(config.synonyms.values())]))
-
-    def describe_configs(self, resources):
-        """
-            describe configs
-            :param resources: list of tuples (resource type, resource name)
-            :return:
-        """
-
-        resources = [ConfigResource(restype, resname) for
-                     restype, resname in resources]
-
-        fs = self.admin_client.describe_configs(resources)
-
-        # Wait for operation to finish.
-        for res, f in fs.items():
-            try:
-                configs = f.result()
-                for config in iter(configs.values()):
-                    self._print_config(config, 1)
-
-            except KafkaException as e:
-                self.log_error("Failed to describe {}: {}".format(res, e))
-            except Exception:
-                raise
-
-    def alter_configs(self, resource_list):
-        """
-            Alter configs atomically, replacing non-specified
-            configuration properties with their default values.
-            :param resource_list: list of tuples (resource type, resource name,
-                                  list of config params <config=val,config2=val2>)
-            :return:
-        """
-
-        resources = []
-        for restype, resname, configs in resource_list:
-            resource = ConfigResource(restype, resname)
-            resources.append(resource)
-            for k, v in [conf.split('=') for conf in configs.split(',')]:
-                resource.set_config(k, v)
-
-        fs = self.admin_client.alter_configs(resources)
-
-        # Wait for operation to finish.
-        for res, f in fs.items():
-            try:
-                f.result()  # empty, but raises exception on failure
-                self.log_debug("{} configuration successfully altered".format(res))
-            except Exception:
-                raise
-
     def list_topics(self, timeout: int = 10) -> list:
         """
             list topics and cluster metadata
@@ -192,6 +128,7 @@ class AdminApi(Base):
             result.append(str(t))
 
         return result
+
 
 if __name__ == '__main__':
 

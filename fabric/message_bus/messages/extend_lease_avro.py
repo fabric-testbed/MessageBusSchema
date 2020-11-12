@@ -30,13 +30,13 @@ from fabric.message_bus.messages.reservation_or_delegation_record import Reserva
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ExtendLeaseWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class ExtendLeaseAvro(ReservationOrDelegationRecord):
     """
     Implements Avro representation of an Extend Lease Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ExtendLease
+        self.name = IMessageAvro.extend_lease
 
     def validate(self) -> bool:
         """

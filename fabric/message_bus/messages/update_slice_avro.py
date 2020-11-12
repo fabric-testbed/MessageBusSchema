@@ -37,4 +37,4 @@ class UpdateSliceAvro(AddUpdateSliceRecord):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.UpdateSlice
+        self.name = IMessageAvro.update_slice

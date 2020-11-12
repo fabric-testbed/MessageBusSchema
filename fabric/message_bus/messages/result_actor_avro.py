@@ -36,4 +36,4 @@ class ResultActorAvro(ResultRecordList):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ResultActor
+        self.name = IMessageAvro.result_actor

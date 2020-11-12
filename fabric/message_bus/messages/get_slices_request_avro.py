@@ -33,13 +33,13 @@ from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class SlicesRequestByIdAvro(RequestByIdRecord):
+class GetSlicesRequestAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Get Slices Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.GetSlicesRequest
+        self.name = IMessageAvro.get_slices_request
 
     def validate(self) -> bool:
         """

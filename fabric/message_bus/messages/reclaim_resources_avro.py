@@ -36,7 +36,7 @@ class ReclaimResourcesAvro(RequestByIdRecord):
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.ReclaimResources
+        self.name = IMessageAvro.reclaim_resources
 
     def validate(self) -> bool:
         """

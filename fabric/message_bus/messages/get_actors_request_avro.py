@@ -30,10 +30,10 @@ from fabric.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class ActorsAvroById(RequestByIdRecord):
+class GetActorsRequestAvro(RequestByIdRecord):
     """
     Implements Avro representation of a Get Actors Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.GetActorsRequest
+        self.name = IMessageAvro.get_actors_request

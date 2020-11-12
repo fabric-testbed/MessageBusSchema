@@ -24,19 +24,19 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Redeem Message
+Implements Avro representation of a redeem Message
 """
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
 
 
-class RedeemWithReservationOrDelegationRecord(ReservationOrDelegationRecord):
+class RedeemAvro(ReservationOrDelegationRecord):
     """
-    Implements Avro representation of a Redeem Message
+    Implements Avro representation of a redeem Message
     """
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.Redeem
+        self.name = IMessageAvro.redeem
 
     def validate(self) -> bool:
         """

@@ -24,7 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 """
-Implements Avro representation of a Update Ticket Message
+Implements Avro representation of a Update ticket Message
 """
 from fabric.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric.message_bus.messages.message import IMessageAvro
@@ -32,12 +32,12 @@ from fabric.message_bus.messages.message import IMessageAvro
 
 class UpdateTicketAvro(ReservationOrDelegationRecord):
     """
-    Implements Avro representation of a Update Ticket Message
+    Implements Avro representation of a Update ticket Message
     """
 
     def __init__(self):
         super().__init__()
-        self.name = IMessageAvro.UpdateTicket
+        self.name = IMessageAvro.update_ticket
 
     def validate(self) -> bool:
         """
