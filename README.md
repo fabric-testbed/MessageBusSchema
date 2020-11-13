@@ -1,5 +1,5 @@
-# Message Bus
-Basic framework for a Fabric Message Bus for Inter Actor Communication 
+# Message Bus Schema and Message Definition
+Basic framework for a Fabric Message Bus Schema and Messages for Inter Actor Communication 
 
 
 ## Overview
