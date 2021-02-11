@@ -34,12 +34,12 @@ class AuthAvro:
     Implements Avro representation of an Auth Token
     """
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "guid", "id_token"]
+    __slots__ = ["name", "guid", "oidc_sub_claim"]
 
     def __init__(self):
         self.name = None
         self.guid = None
-        self.id_token = None
+        self.oidc_sub_claim = None
 
     def from_dict(self, value: dict):
         """
@@ -50,8 +50,8 @@ class AuthAvro:
         self.name = value['name']
         if 'guid' in value and value['guid'] != "null":
             self.guid = value['guid']
-        if 'id_token' in value and value['id_token'] != "null":
-            self.id_token = value['id_token']
+        if 'oidc_sub_claim' in value and value['oidc_sub_claim'] != "null":
+            self.oidc_sub_claim = value['oidc_sub_claim']
 
     def to_dict(self) -> dict:
         """
@@ -68,17 +68,17 @@ class AuthAvro:
         if self.guid is not None:
             result['guid'] = self.guid
 
-        if self.id_token is not None:
-            result['id_token'] = self.id_token
+        if self.oidc_sub_claim is not None:
+            result['oidc_sub_claim'] = self.oidc_sub_claim
         return result
 
     def __str__(self):
-        return "name: {} guid: {} id_token: {}".format(self.name, self.guid, self.id_token)
+        return "name: {} guid: {} oidc_sub_claim: {}".format(self.name, self.guid, self.oidc_sub_claim)
 
     def __eq__(self, other):
         if not isinstance(other, AuthAvro):
             return False
-        return self.name == other.name and self.guid == other.guid and self.id_token == other.id_token
+        return self.name == other.name and self.guid == other.guid and self.oidc_sub_claim == other.oidc_sub_claim
 
     def validate(self) -> bool:
         """
@@ -88,3 +88,12 @@ class AuthAvro:
         if self.name is None:
             return False
         return True
+
+    def get_name(self) -> str:
+        return self.name
+
+    def get_guid(self) -> str:
+        return self.guid
+
+    def get_oidc_sub_claim(self) -> str:
+        return self.oidc_sub_claim

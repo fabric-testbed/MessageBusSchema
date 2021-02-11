@@ -26,9 +26,6 @@
 """
 Implements Avro representation of a Get Slices Message
 """
-from uuid import uuid4
-
-from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric_mb.message_bus.messages.message import IMessageAvro
 

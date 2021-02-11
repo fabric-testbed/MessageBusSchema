@@ -28,6 +28,8 @@ Implements Avro representation of a Reservation Resource Set
 """
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.resource_data_avro import ResourceDataAvro
+from fabric_mb.message_bus.messages.ticket import Ticket
+from fabric_mb.message_bus.messages.unit_avro import UnitAvro
 
 
 class ResourceSetAvro:
@@ -35,13 +37,14 @@ class ResourceSetAvro:
     Implements Avro representation of a Reservation Resource Set
     """
     # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["units", "type", "resource_data", "concrete"]
+    __slots__ = ["units", "type", "resource_data", "ticket", "unit_set"]
 
     def __init__(self):
         self.units = None
         self.type = None
         self.resource_data = None
-        self.concrete = None
+        self.ticket = None
+        self.unit_set = None
 
     def from_dict(self, value: dict):
         """
@@ -54,8 +57,18 @@ class ResourceSetAvro:
         if value.get('resource_data', None) is not None:
             self.resource_data = ResourceDataAvro()
             self.resource_data.from_dict(value['resource_data'])
-        if value.get('concrete', None) is not None:
-            self.concrete = value['concrete']
+        temp = value.get('ticket', None)
+        if temp is not None:
+            self.ticket = Ticket()
+            self.ticket.from_dict(value=temp)
+
+        temp = value.get('unit_set', None)
+        if temp is not None:
+            self.unit_set = []
+            for t in temp:
+                u = UnitAvro()
+                u.from_dict(value=t)
+                self.unit_set.append(u)
 
     def to_dict(self) -> dict:
         """
@@ -72,20 +85,37 @@ class ResourceSetAvro:
         }
         if self.resource_data is not None:
             result['resource_data'] = self.resource_data.to_dict()
-        if self.concrete is not None:
-            result['concrete'] = self.concrete
+        if self.ticket is not None:
+            result['ticket'] = self.ticket.to_dict()
+        if self.unit_set is not None:
+            value = []
+            for u in self.unit_set:
+                value.append(u.to_dict())
+            result['unit_set'] = value
         return result
 
     def __str__(self):
-        return "units: {} type: {} resource_data: {} concrete: {}"\
-            .format(self.units, self.type, self.resource_data, self.concrete)
+        return f"units: {self.units} type: {self.type} resource_data: {self.resource_data} ticket: [{self.ticket}] " \
+               f"unit_set: [{self.unit_set}]"
 
     def __eq__(self, other):
         if not isinstance(other, ResourceSetAvro):
             return False
 
-        return self.units == other.units and self.type == other.type and \
-               self.resource_data == other.resource_data and self.concrete == other.concrete
+        ret_val = self.units == other.units and self.type == other.type and \
+                  self.resource_data == other.resource_data and self.ticket == other.ticket
+
+        if ret_val and self.unit_set is not None and other.unit_set is not None and \
+                len(self.unit_set) == len(other.unit_set):
+            count = 0
+            length = len(self.unit_set)
+            for i in range(length):
+                if self.unit_set[i] == other.unit_set[i]:
+                    count += 1
+            if length == count:
+                ret_val = True
+
+        return ret_val
 
     def validate(self) -> bool:
         """

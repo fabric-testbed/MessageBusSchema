@@ -125,32 +125,32 @@ class ReservationMng:
         Prints ReservationMng
         """
         print("")
-        print("Reservation ID: {} Slice ID: {}".format(self.reservation_id, self.slice_id))
+        print(f"Reservation ID: {self.reservation_id} Slice ID: {self.slice_id}")
         if self.rtype is not None or self.notices is not None:
-            print("Resource Type: {} Notices: {}".format(self.rtype, self.notices))
+            print(f"Resource Type: {self.rtype} Notices: {self.notices}")
 
         if self.start is not None or self.end is not None or self.requested_end is not None:
-            print("Start: {} End: {} Requested End: {}".format(self.start, self.end, self.requested_end))
+            print(f"Start: {self.start} End: {self.end} Requested End: {self.requested_end}")
 
         if self.units is not None or self.state is not None or self.pending_state is not None:
-            print("Units: {} State: {} Pending State: {}".format(self.units, self.state, self.pending_state))
+            print(f"Units: {self.units} State: {self.state} Pending State: {self.pending_state}")
 
         if self.local is not None:
-            print("Local Properties: {}".format(self.local))
+            print(f"Local Properties: {self.local}")
         if self.config is not None:
-            print("Config Properties: {}".format(self.config))
+            print(f"Config Properties: {self.config}")
         if self.request is not None:
-            print("Request Properties: {}".format(self.request))
+            print(f"Request Properties: {self.request}")
         if self.resource is not None:
-            print("Resource Properties: {}".format(self.resource))
+            print(f"Resource Properties: {self.resource}")
+
         print("")
 
     def __str__(self):
-        return "name: {} reservation_id: {} slice_id: {} start: {} end: {} requested_end: {} rtype: {} units: {} " \
-               "state: {} pending_state: {} local: {} config: {} request: {} resource: {} notices: {}"\
-            .format(self.name, self.reservation_id, self.slice_id, self.start, self.end, self.requested_end,
-                    self.rtype, self.units, self.state, self.pending_state, self.local, self.config, self.request,
-                    self.resource, self.notices)
+        return f"name: {self.name} reservation_id: {self.reservation_id} slice_id: {self.slice_id} start: " \
+               f"{self.start} end: {self.end} requested_end: {self.requested_end} rtype: {self.rtype} " \
+               f"units: {self.units} state: {self.state} pending_state: {self.pending_state} local: {self.local}" \
+               f" config: {self.config} request: {self.request} resource: {self.resource} notices: {self.notices} "
 
     def get_reservation_id(self) -> str:
         """
@@ -365,6 +365,5 @@ class ReservationMng:
         """
         ret_val = True
         if self.reservation_id is None or self.rtype is None or self.notices is None:
-            print("reservation_id: {} rtype: {} notices: {}".format(self.reservation_id, self.rtype, self.notices))
             ret_val = False
         return ret_val

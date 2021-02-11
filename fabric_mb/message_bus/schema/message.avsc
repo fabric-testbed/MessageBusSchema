@@ -9,6 +9,11 @@
 			{
 				"name": "guid",
 				"type": "string"
+			},
+			{
+				"name": "oidc_sub_claim",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
@@ -86,8 +91,46 @@
 	    "namespace": "fabric.cf.model",
         "name": "UnitRecord",
         "type": "record",
-        "fields": [
-			{
+        "fields": [{
+                "name": "uid",
+                "type": "string"
+            },
+            {
+                "name": "rtype",
+                "type": ["null", "string"],
+                "default": null
+            },
+            {
+                "name": "parent_id",
+                "type": ["null", "string"],
+                "default": null
+            },
+            {
+                "name": "state",
+                "type": ["null", "int"],
+                "default": null
+            },
+            {
+                "name": "sequence",
+                "type": ["null", "int"],
+                "default": null
+            },
+            {
+                "name": "reservation_id",
+                "type": ["null", "string"],
+                "default": null
+            },
+            {
+                "name": "slice_id",
+                "type": ["null", "string"],
+                "default": null
+            },
+            {
+                "name": "actor_id",
+                "type": ["null", "string"],
+                "default": null
+            },
+            {
                 "name": "properties",
                 "type": ["null", {
                     "type": "map",
@@ -246,12 +289,22 @@
 				"default": null
 			},
 			{
+				"name": "state",
+				"type": ["null", "int"],
+				"default": null
+			},
+			{
 				"name": "client_slice",
 				"type": ["null", "boolean"],
 				"default": null
 			},
 			{
 				"name": "broker_client_slice",
+				"type": ["null", "boolean"],
+				"default": null
+			},
+			{
+				"name": "inventory",
 				"type": ["null", "boolean"],
 				"default": null
 			}
@@ -411,6 +464,93 @@
     },
     {
         "namespace": "fabric.cf.model",
+        "type": "record",
+		"name": "TermRecord",
+        "fields": [{
+                "name": "start_time",
+                "type": "long"
+            },
+            {
+                "name": "end_time",
+                "type": "long"
+            },
+            {
+                "name": "ticket_time",
+                "type": ["null", "long"],
+                "default": null
+            },
+            {
+                "name": "new_start_time",
+                "type": ["null", "long"],
+                "default": null
+            }
+        ]
+    },
+    {
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "ResourceDelegationRecord",
+		"fields": [{
+				"name": "guid",
+				"type": "string"
+			},
+			{
+				"name": "term",
+				"type": ["null", "fabric.cf.model.TermRecord"],
+				"default": null
+			},
+			{
+				"name": "units",
+				"type": "int"
+			},
+			{
+                "name": "properties",
+                "type": ["null", {
+                    "type": "map",
+                    "values": "string"
+                }],
+                "default": null
+            },
+            {
+				"name": "type",
+				"type": "string"
+			},
+			{
+				"name": "issuer",
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "holder",
+				"type": ["null", "string"],
+			    "default": null
+			}
+		]
+	},
+    {
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "TicketRecord",
+		"fields": [{
+				"name": "authority",
+				"type": "fabric.cf.model.AuthRecord"
+			},
+		    {
+				"name": "old_units",
+				"type": "int"
+			},
+			{
+				"name": "resource_delegation",
+				"type": "fabric.cf.model.ResourceDelegationRecord"
+			},
+			{
+			    "name": "delegation_id",
+			    "type": "string"
+			}
+		]
+	},
+    {
+        "namespace": "fabric.cf.model",
         "name": "ReservationRecord",
         "type": "record",
         "fields": [
@@ -430,29 +570,7 @@
 			},
             {
                 "name": "term",
-                "type": {
-                    "type": "record",
-                    "name": "term",
-                    "fields": [{
-                            "name": "start_time",
-                            "type": "long"
-                        },
-                        {
-                            "name": "end_time",
-                            "type": "long"
-                        },
-                        {
-                            "name": "ticket_time",
-                            "type": ["null", "long"],
-                            "default": null
-                        },
-                        {
-                            "name": "new_start_time",
-                            "type": ["null", "long"],
-                            "default": null
-                        }
-                    ]
-                }
+                "type": "fabric.cf.model.TermRecord"
             },
             {
                 "name": "resource_set",
@@ -500,8 +618,16 @@
                             }
                         },
                         {
-                            "name": "concrete",
-                            "type": ["null", "bytes"],
+                            "name": "ticket",
+                            "type": ["null", "fabric.cf.model.TicketRecord"],
+                            "default": null
+                        },
+                        {
+                            "name": "unit_set",
+                            "type": ["null", {
+                                "type":"array",
+                                "items" : "fabric.cf.model.UnitRecord"
+                            }],
                             "default": null
                         }
                     ]
@@ -862,6 +988,11 @@
 			},
 			{
 				"name": "slice_id",
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "slice_name",
 				"type": ["null", "string"],
 				"default": null
 			},

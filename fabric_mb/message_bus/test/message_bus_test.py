@@ -62,6 +62,7 @@ from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
+from fabric_mb.message_bus.messages.resource_delegation_avro import ResourceDelegationAvro
 from fabric_mb.message_bus.messages.result_actor_avro import ResultActorAvro
 from fabric_mb.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
 from fabric_mb.message_bus.messages.result_proxy_avro import ResultProxyAvro
@@ -85,6 +86,7 @@ from fabric_mb.message_bus.messages.result_strings_avro import ResultStringsAvro
 from fabric_mb.message_bus.messages.result_units_avro import ResultUnitsAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
 from fabric_mb.message_bus.messages.term_avro import TermAvro
+from fabric_mb.message_bus.messages.ticket import Ticket
 from fabric_mb.message_bus.messages.ticket_avro import TicketAvro
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 from fabric_mb.message_bus.messages.unit_avro import UnitAvro
@@ -152,6 +154,7 @@ class MessageBusTest(unittest.TestCase):
         auth = AuthAvro()
         auth.guid = "testguid"
         auth.name = "testactor"
+        auth.oidc_sub_claim = "test-oidc"
 
         # query
         query = QueryAvro()
@@ -205,10 +208,13 @@ class MessageBusTest(unittest.TestCase):
         reservation.slice.slice_name = "test_slice"
         reservation.slice.description = "test description"
         reservation.slice.owner = auth
-        reservation.term = TermAvro()
-        reservation.term.start_time = 1593854111999
-        reservation.term.end_time = 1593854111999
-        reservation.term.new_start_time = 1593854111999
+        term = TermAvro()
+        term.start_time = 1593854111999
+        term.end_time = 1593854111999
+        term.new_start_time = 1593854111999
+
+        reservation.term = term
+
         reservation.resource_set = ResourceSetAvro()
         reservation.resource_set.units = 0
         reservation.resource_set.type = "type1"
@@ -220,7 +226,32 @@ class MessageBusTest(unittest.TestCase):
                                                                      'resource.class.invfortype.value': 'actor.core.policy.SimplerUnitsInventory.SimplerUnitsInventory',
                                                                      'pool.name': 'Net AM'}
 
-        reservation.resource_set.concrete = b'\x80\x04\x95\xb9\x02\x00\x00\x00\x00\x00\x00\x8c\x16actor.core.core.ticket\x94\x8c\x06Ticket\x94\x93\x94)\x81\x94}\x94(\x8c\tauthority\x94\x8c,actor.core.proxies.kafka.KafkaAuthorityProxy\x94\x8c\x13KafkaAuthorityProxy\x94\x93\x94)\x81\x94}\x94(\x8c\nproxy_type\x94\x8c\x05kafka\x94\x8c\x08callback\x94\x89\x8c\nactor_name\x94\x8c\x0cfabric-vm-am\x94\x8c\nactor_guid\x94\x8c\x12actor.core.util.ID\x94\x8c\x02ID\x94\x93\x94)\x81\x94}\x94\x8c\x02id\x94\x8c\x11fabric-vm-am-guid\x94sb\x8c\x04auth\x94\x8c\x18actor.security.AuthToken\x94\x8c\tAuthToken\x94\x93\x94)\x81\x94}\x94(\x8c\x04name\x94h\x0f\x8c\x04guid\x94h\x14ub\x8c\x0bkafka_topic\x94\x8c\x12fabric-vm-am-topic\x94\x8c\x04type\x94K\x03\x8c\x10bootstrap_server\x94\x8c\x0elocalhost:9092\x94\x8c\x0fschema_registry\x94\x8c\x15http://localhost:8081\x94\x8c\x0fkey_schema_file\x94\x8cK/Users/komalthareja/renci/code/fabric_mb/ActorBase/message_bus/schema/key.avsc\x94\x8c\x11value_schema_file\x94\x8cO/Users/komalthareja/renci/code/fabric_mb/ActorBase/message_bus/schema/message.avsc\x94ub\x8c\x0fresource_ticket\x94N\x8c\told_units\x94K\x0fub.'
+        unit = UnitAvro()
+        unit.properties = {'test': 'value'}
+        unit.uid = "Unit1"
+        unit.rtype = "abc"
+        unit.state = 1
+        unit.sequence = 0
+        unit.reservation_id = 'res_123'
+        unit.actor_id = 'act_1'
+        unit.slice_id = 'slc_2'
+        reservation.resource_set.unit_set = []
+        reservation.resource_set.unit_set.append(unit)
+
+        ticket = Ticket()
+        ticket.authority = auth
+        ticket.old_units = 0
+        ticket.delegation_id = "dlg123"
+        deleg = ResourceDelegationAvro()
+        deleg.units = 1
+        deleg.holder = "ab1"
+        deleg.issuer = "si1"
+        deleg.type = "rty1"
+        deleg.properties = {"foo": "bar"}
+        deleg.guid = "gid"
+        deleg.term = term
+        ticket.resource_delegation = deleg
+        reservation.resource_set.ticket = ticket
 
         delegation = DelegationAvro()
         delegation.delegation_id = "dlg123"
@@ -608,8 +639,6 @@ class MessageBusTest(unittest.TestCase):
         producer.produce_sync("fabric_mb-mb-public-test2", actors_req)
 
         result_unit = ResultUnitsAvro()
-        unit = UnitAvro()
-        unit.properties = {'test':'value'}
         result_unit.message_id = "msg1"
         result_unit.status = result
         result_unit.units = []

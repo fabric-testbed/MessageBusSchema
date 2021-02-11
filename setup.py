@@ -2,10 +2,9 @@
 
 from setuptools import setup, find_packages
 
-from fabric_mb import SCHEMA_DIR, MESSAGE_SCHEMA_FILE, KEY_SCHEMA_FILE
 
 NAME = "fabric-message-bus"
-VERSION = "0.5"
+VERSION = "0.7"
 # To install the library, run the following
 #
 # python setup.py install
@@ -13,8 +12,7 @@ VERSION = "0.5"
 # prerequisite: setuptools
 # http://pypi.python.org/pypi/setuptools
 
-REQUIRES = ["confluent-kafka[avro]",
-            "confluent-kafka"]
+REQUIRES = ["confluent-kafka[avro]"]
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -30,7 +28,6 @@ setup(
     install_requires=REQUIRES,
     packages=find_packages(),
     include_package_data=True,
-    data_files=[(SCHEMA_DIR, [KEY_SCHEMA_FILE, MESSAGE_SCHEMA_FILE])],
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[

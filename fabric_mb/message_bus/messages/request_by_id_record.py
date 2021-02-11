@@ -39,7 +39,8 @@ class RequestByIdRecord(IMessageAvro):
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "callback_topic", "message_id", "guid", "slice_id", "reservation_id", "delegation_id", "type",
-                 "unit_id", "broker_id", "reservation_state", "delegation_state", "auth", "id_token", "id"]
+                 "unit_id", "broker_id", "reservation_state", "delegation_state", "auth", "id_token", "id",
+                 "slice_name"]
 
     def __init__(self):
         self.name = None
@@ -56,6 +57,7 @@ class RequestByIdRecord(IMessageAvro):
         self.delegation_state = None
         self.auth = None
         self.id_token = None
+        self.slice_name = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -78,6 +80,7 @@ class RequestByIdRecord(IMessageAvro):
         self.reservation_state = value.get('reservation_state', None)
         self.delegation_state = value.get('delegation_state', None)
         self.id_token = value.get('id_token', None)
+        self.slice_name = value.get('slice_name', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -115,6 +118,8 @@ class RequestByIdRecord(IMessageAvro):
             result['delegation_state'] = self.delegation_state
         if self.id_token is not None:
             result['id_token'] = self.id_token
+        if self.slice_name is not None:
+            result['slice_name'] = self.slice_name
 
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -199,13 +204,16 @@ class RequestByIdRecord(IMessageAvro):
         """
         return self.id_token
 
+    def get_slice_name(self) -> str:
+        return self.slice_name
+
     def __str__(self):
-        return "name: {} callback_topic: {} message_id: {} guid: {} slice_id: {} reservation_id: {} " \
-               "delegation_id: {} " \
-               "type: {} unit_id:{} broker_id: {} reservation_state: {} delegation_state: {} auth: {} id_token: {}".\
-            format(self.name, self.callback_topic, self.message_id, self.guid, self.slice_id, self.reservation_id,
-                   self.delegation_id, self.type, self.unit_id, self.broker_id, self.reservation_state,
-                   self.delegation_state, self.auth, self.id_token)
+        return f"name: {self.name} callback_topic: {self.callback_topic} message_id: {self.message_id} " \
+               f"guid: {self.guid} slice_id: {self.slice_id} reservation_id: {self.reservation_id} " \
+               f"delegation_id: {self.delegation_id} " \
+               f"type: {self.type} unit_id:{self.unit_id} broker_id: {self.broker_id} " \
+               f"reservation_state: {self.reservation_state} delegation_state: {self.delegation_state} " \
+               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name}"
 
     def validate(self) -> bool:
         """
