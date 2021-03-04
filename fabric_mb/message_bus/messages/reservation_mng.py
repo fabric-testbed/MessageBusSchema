@@ -26,6 +26,7 @@
 """
 Represents Reservation object returned from Management Interface APIs
 """
+import pickle
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -49,6 +50,7 @@ class ReservationMng:
         self.request = None
         self.resource = None
         self.notices = None
+        self.sliver = None
 
     def from_dict(self, value: dict):
         """
@@ -71,6 +73,7 @@ class ReservationMng:
         self.request = value.get('request', None)
         self.resource = value.get('resource', None)
         self.notices = value.get('notices', None)
+        self.sliver = value.get('sliver', None)
 
     def to_dict(self) -> dict:
         """
@@ -118,7 +121,22 @@ class ReservationMng:
         if self.resource is not None:
             result['resource'] = self.resource
 
+        if self.sliver is not None:
+            result['sliver'] = self.sliver
+
         return result
+
+    @staticmethod
+    def sliver_to_bytes(sliver):
+        if sliver is not None:
+            return pickle.dumps(sliver)
+        return None
+
+    @staticmethod
+    def bytes_to_sliver(sliver_bytes):
+        if sliver_bytes is not None:
+            return pickle.loads(sliver_bytes)
+        return sliver_bytes
 
     def print(self):
         """
@@ -150,7 +168,8 @@ class ReservationMng:
         return f"name: {self.name} reservation_id: {self.reservation_id} slice_id: {self.slice_id} start: " \
                f"{self.start} end: {self.end} requested_end: {self.requested_end} rtype: {self.rtype} " \
                f"units: {self.units} state: {self.state} pending_state: {self.pending_state} local: {self.local}" \
-               f" config: {self.config} request: {self.request} resource: {self.resource} notices: {self.notices} "
+               f" config: {self.config} request: {self.request} resource: {self.resource} notices: {self.notices} " \
+               f"sliver: {self.sliver}"
 
     def get_reservation_id(self) -> str:
         """
@@ -348,6 +367,12 @@ class ReservationMng:
         """
         self.notices = value
 
+    def get_sliver(self):
+        return self.bytes_to_sliver(self.sliver)
+
+    def set_sliver(self, sliver):
+        self.sliver = self.sliver_to_bytes(sliver)
+
     def __eq__(self, other):
         if not isinstance(other, ReservationMng):
             return False
@@ -356,7 +381,8 @@ class ReservationMng:
             self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
             self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
             self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
-            self.request == other.request and self.resource == other.resource and self.notices == other.notices
+            self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
+            self.sliver == other.sliver
 
     def validate(self) -> bool:
         """

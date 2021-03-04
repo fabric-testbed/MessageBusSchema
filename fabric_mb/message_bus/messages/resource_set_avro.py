@@ -23,11 +23,9 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Reservation Resource Set
-"""
+import pickle
+
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
-from fabric_mb.message_bus.messages.resource_data_avro import ResourceDataAvro
 from fabric_mb.message_bus.messages.ticket import Ticket
 from fabric_mb.message_bus.messages.unit_avro import UnitAvro
 
@@ -36,13 +34,10 @@ class ResourceSetAvro:
     """
     Implements Avro representation of a Reservation Resource Set
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["units", "type", "resource_data", "ticket", "unit_set"]
-
     def __init__(self):
         self.units = None
         self.type = None
-        self.resource_data = None
+        self.sliver = None
         self.ticket = None
         self.unit_set = None
 
@@ -54,9 +49,7 @@ class ResourceSetAvro:
         """
         self.units = value['units']
         self.type = value['type']
-        if value.get('resource_data', None) is not None:
-            self.resource_data = ResourceDataAvro()
-            self.resource_data.from_dict(value['resource_data'])
+        self.sliver = value.get('sliver', None)
         temp = value.get('ticket', None)
         if temp is not None:
             self.ticket = Ticket()
@@ -83,8 +76,8 @@ class ResourceSetAvro:
             "units": self.units,
             "type": self.type
         }
-        if self.resource_data is not None:
-            result['resource_data'] = self.resource_data.to_dict()
+        if self.sliver is not None:
+            result['sliver'] = self.sliver
         if self.ticket is not None:
             result['ticket'] = self.ticket.to_dict()
         if self.unit_set is not None:
@@ -95,7 +88,7 @@ class ResourceSetAvro:
         return result
 
     def __str__(self):
-        return f"units: {self.units} type: {self.type} resource_data: {self.resource_data} ticket: [{self.ticket}] " \
+        return f"units: {self.units} type: {self.type} sliver: {self.sliver} ticket: [{self.ticket}] " \
                f"unit_set: [{self.unit_set}]"
 
     def __eq__(self, other):
@@ -103,7 +96,7 @@ class ResourceSetAvro:
             return False
 
         ret_val = self.units == other.units and self.type == other.type and \
-                  self.resource_data == other.resource_data and self.ticket == other.ticket
+                  self.sliver == other.sliver and self.ticket == other.ticket
 
         if ret_val and self.unit_set is not None and other.unit_set is not None and \
                 len(self.unit_set) == len(other.unit_set):
@@ -126,3 +119,12 @@ class ResourceSetAvro:
         if self.units is None or self.type is None:
             ret_val = False
         return ret_val
+
+    def set_sliver(self, sliver):
+        if sliver is not None:
+            self.sliver = pickle.dumps(sliver)
+
+    def get_sliver(self):
+        if self.sliver is not None:
+            return pickle.loads(self.sliver)
+        return self.sliver

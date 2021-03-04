@@ -101,6 +101,11 @@
                 "default": null
             },
             {
+                "name": "sliver",
+                "type": ["null", "bytes"],
+                "default": null
+            },
+            {
                 "name": "parent_id",
                 "type": ["null", "string"],
                 "default": null
@@ -459,6 +464,11 @@
 			{
 				"name": "notices",
 				"type": "string"
+			},
+			{
+				"name": "sliver",
+				"type": ["null", "bytes"],
+				"default": null
 			}
         ]
     },
@@ -586,36 +596,9 @@
                             "type": "string"
                         },
                         {
-                            "name": "resource_data",
-                            "type": {
-                                "name": "resource_data",
-                                "type": "record",
-                                "fields": [{
-                                        "name": "request_properties",
-                                        "type": ["null", {
-                                            "type": "map",
-                                            "values": "string"
-                                        }],
-                                        "default": null
-                                    },
-                                    {
-                                        "name": "config_properties",
-                                        "type": ["null", {
-                                            "type": "map",
-                                            "values": "string"
-                                        }],
-                                        "default": null
-                                    },
-                                    {
-                                        "name": "resource_properties",
-                                        "type": ["null", {
-                                            "type": "map",
-                                            "values": "string"
-                                        }],
-                                        "default": null
-                                    }
-                                ]
-                            }
+                            "name": "sliver",
+                            "type": ["null", "bytes"],
+                            "default": null
                         },
                         {
                             "name": "ticket",

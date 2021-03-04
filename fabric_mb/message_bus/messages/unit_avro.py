@@ -23,9 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Unit
-"""
+import pickle
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,10 +31,6 @@ class UnitAvro:
     """
     Implements Avro representation of a Unit
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["uid", "rtype", "parent_id", "state", "sequence", "reservation_id", "slice_id",
-                 "actor_id", "properties"]
-
     def __init__(self):
         self.uid = None
         self.rtype = None
@@ -47,6 +41,7 @@ class UnitAvro:
         self.reservation_id = None
         self.slice_id = None
         self.actor_id = None
+        self.sliver = None
 
     def get_unit_id(self) -> str:
         return self.uid
@@ -124,6 +119,7 @@ class UnitAvro:
         self.slice_id = value.get('slice_id', None)
         self.actor_id = value.get('actor_id', None)
         self.properties = value.get('properties', None)
+        self.sliver = value.get('sliver', None)
 
     def to_dict(self) -> dict:
         """
@@ -158,6 +154,9 @@ class UnitAvro:
 
         if self.actor_id is not None:
             result['actor_id'] = self.actor_id
+
+        if self.sliver is not None:
+            result['sliver'] = self.sliver
         return result
 
     def __eq__(self, other):
@@ -167,7 +166,7 @@ class UnitAvro:
         return self.properties == other.properties and self.uid == other.uid and self.rtype == other.rtype and \
                self.parent_id == other.parent_id and self.state == other.state and self.sequence == other.sequence and \
                self.reservation_id == other.reservation_id and self.slice_id == other.slice_id and \
-               self.actor_id == other.actor_id
+               self.actor_id == other.actor_id and self.sliver == other.sliver
 
     def validate(self) -> bool:
         """
@@ -180,3 +179,12 @@ class UnitAvro:
             ret_val = False
 
         return ret_val
+
+    def set_sliver(self, sliver):
+        if sliver is not None:
+            self.sliver = pickle.dumps(sliver)
+
+    def get_sliver(self):
+        if self.sliver is None:
+            return pickle.loads(self.sliver)
+        return self.sliver

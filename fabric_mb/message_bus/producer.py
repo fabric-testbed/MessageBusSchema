@@ -102,19 +102,22 @@ class AvroProducerApi(Base):
             :param record: record/message to be written
             :return:
         """
-        self.log_debug("Record type={}".format(type(record)))
-        self.log_debug("Producing key {} to topic {}.".format(record.get_id(), topic))
-        self.log_debug("Producing record {} to topic {}.".format(record.to_dict(), topic))
-
         try:
+            self.log_debug("Record type={}".format(type(record)))
+            self.log_debug("Producing key {} to topic {}.".format(record.get_id(), topic))
+            self.log_debug("Producing record {} to topic {}.".format(record.to_dict(), topic))
+
             # Pass the message synchronously
             self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict())
             self.producer.flush()
             return True
         except ValueError as ex:
-            traceback.print_exc()
             self.log_error("Invalid input, discarding record...")
-            self.log_error(str(ex))
+            self.logger.error(f"Exception occurred {ex}")
+            self.logger.error(traceback.format_exc())
+        except Exception as ex:
+            self.logger.error(f"Exception occurred {ex}")
+            self.logger.error(traceback.format_exc())
         return False
 
 

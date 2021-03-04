@@ -78,7 +78,6 @@ from fabric_mb.message_bus.messages.remove_reservation_avro import RemoveReserva
 from fabric_mb.message_bus.messages.remove_slice_avro import RemoveSliceAvro
 from fabric_mb.message_bus.messages.reservation_avro import ReservationAvro
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
-from fabric_mb.message_bus.messages.resource_data_avro import ResourceDataAvro
 from fabric_mb.message_bus.messages.resource_set_avro import ResourceSetAvro
 from fabric_mb.message_bus.messages.result_avro import ResultAvro
 from fabric_mb.message_bus.messages.result_string_avro import ResultStringAvro
@@ -218,13 +217,6 @@ class MessageBusTest(unittest.TestCase):
         reservation.resource_set = ResourceSetAvro()
         reservation.resource_set.units = 0
         reservation.resource_set.type = "type1"
-        reservation.resource_set.resource_data = ResourceDataAvro()
-        reservation.resource_set.resource_data.request_properties = {'type': 'site.vlan', 'label': 'Net AM',
-                                                                     'attributescount': '1',
-                                                                     'attribute.0.key': 'resource.class.invfortype',
-                                                                     'resource.class.invfortype.type': '6',
-                                                                     'resource.class.invfortype.value': 'actor.core.policy.SimplerUnitsInventory.SimplerUnitsInventory',
-                                                                     'pool.name': 'Net AM'}
 
         unit = UnitAvro()
         unit.properties = {'test': 'value'}
