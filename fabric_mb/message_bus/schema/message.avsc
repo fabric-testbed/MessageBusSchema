@@ -251,32 +251,8 @@
 				"type": ["null", "string"],
 				"default": null
 			},
-			{
-                "name": "local_properties",
-                "type": ["null", {
-                    "type": "map",
-                    "values": "string"
-                }],
-                "default": null
-            },
-            {
-                "name": "request_properties",
-                "type": ["null", {
-                    "type": "map",
-                    "values": "string"
-                }],
-                "default": null
-            },
             {
                 "name": "config_properties",
-                "type": ["null", {
-                    "type": "map",
-                    "values": "string"
-                }],
-                "default": null
-            },
-            {
-                "name": "resource_properties",
                 "type": ["null", {
                     "type": "map",
                     "values": "string"
@@ -1022,6 +998,11 @@
 			{
 				"name": "id_token",
 				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "level",
+				"type": ["null", "int"],
 				"default": null
 			}
 		]

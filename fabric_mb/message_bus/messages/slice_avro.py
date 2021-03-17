@@ -34,20 +34,12 @@ class SliceAvro:
     """
     Implements Avro representation of a Slice
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["slice_name", "guid", "owner", "description", "local_properties", "config_properties",
-                 "request_properties", "resource_properties", "resource_type", "client_slice", "broker_client_slice",
-                 "graph_id", "state", "inventory"]
-
     def __init__(self):
         self.slice_name = None
         self.guid = None
         self.owner = None
         self.description = None
-        self.local_properties = None
         self.config_properties = None
-        self.request_properties = None
-        self.resource_properties = None
         self.resource_type = None
         self.client_slice = False
         self.broker_client_slice = False
@@ -68,11 +60,7 @@ class SliceAvro:
             self.owner.from_dict(value['owner'])
 
         self.description = value.get('description', None)
-        self.local_properties = value.get('local_properties', None)
         self.config_properties = value.get('config_properties', None)
-        self.request_properties = value.get('request_properties', None)
-
-        self.resource_properties = value.get('resource_properties', None)
         self.resource_type = value.get('resource_type', None)
         self.client_slice = value.get('client_slice', None)
         self.broker_client_slice = value.get('broker_client_slice', None)
@@ -99,17 +87,8 @@ class SliceAvro:
         if self.description is not None:
             result["description"] = self.description
 
-        if self.local_properties is not None:
-            result["local_properties"] = self.local_properties
-
         if self.config_properties is not None:
             result["config_properties"] = self.config_properties
-
-        if self.request_properties is not None:
-            result["request_properties"] = self.request_properties
-
-        if self.resource_properties is not None:
-            result["resource_properties"] = self.resource_properties
 
         if self.resource_type is not None:
             result["resource_type"] = self.resource_type
@@ -132,8 +111,7 @@ class SliceAvro:
 
     def __str__(self):
         return f"slice_name: {self.slice_name} guid: {self.guid} owner: {self.owner} description: {self.description} " \
-               f"local_properties: {self.local_properties} config_properties: {self.config_properties} " \
-               f"request_properties: {self.request_properties} resource_properties: {self.resource_properties} " \
+               f"config_properties: {self.config_properties} " \
                f"resource_type: {self.resource_type} client_slice: {self.client_slice} " \
                f"broker_client_slice: {self.broker_client_slice} graph_id: {self.graph_id} state: {self.state} " \
                f"inventory: {self.inventory}"
@@ -161,14 +139,8 @@ class SliceAvro:
             if self.inventory is not None:
                 print(f"inventory: {self.inventory}")
 
-            if self.local_properties is not None:
-                print(f"local_properties: {self.local_properties}")
             if self.config_properties is not None:
                 print(f"config_properties: {self.config_properties}")
-            if self.request_properties is not None:
-                print(f"request_properties: {self.request_properties}")
-            if self.resource_properties is not None:
-                print(f"resource_properties: {self.resource_properties}")
         print("")
 
     def set_slice_name(self, value: str):
@@ -213,20 +185,6 @@ class SliceAvro:
         """
         return self.description
 
-    def get_local_properties(self) -> dict:
-        """
-        Get local properties
-        @return local properties
-        """
-        return self.local_properties
-
-    def set_local_properties(self, value: dict):
-        """
-        Set local properties
-        @param value value
-        """
-        self.local_properties = value
-
     def get_config_properties(self) -> dict:
         """
         Get config properties
@@ -240,34 +198,6 @@ class SliceAvro:
         @param value value
         """
         self.config_properties = value
-
-    def get_request_properties(self) -> dict:
-        """
-        Get request properties
-        @return request properties
-        """
-        return self.request_properties
-
-    def set_request_properties(self, value: dict):
-        """
-        Set request properties
-        @param value value
-        """
-        self.request_properties = value
-
-    def get_resource_properties(self) -> dict:
-        """
-        Get resource properties
-        @return resource properties
-        """
-        return self.resource_properties
-
-    def set_resource_properties(self, value: dict):
-        """
-        Set resource properties
-        @param value value
-        """
-        self.resource_properties = value
 
     def get_resource_type(self) -> str:
         """
@@ -328,10 +258,8 @@ class SliceAvro:
             return False
 
         return self.slice_name == other.slice_name and self.guid == other.guid and self.owner == other.owner and \
-            self.description == other.description and self.local_properties == other.local_properties and \
-            self.config_properties == other.config_properties and \
-               self.request_properties == other.request_properties and \
-            self.resource_properties == other.resource_properties and self.resource_type == other.resource_type and \
+            self.description == other.description and self.config_properties == other.config_properties and \
+            self.resource_type == other.resource_type and \
             self.client_slice == other.client_slice and self.broker_client_slice == other.broker_client_slice
 
     def validate(self) -> bool:

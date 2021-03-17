@@ -37,10 +37,6 @@ class RequestByIdRecord(IMessageAvro):
     """
     Implements Avro representation of a Get Request Message
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "callback_topic", "message_id", "guid", "slice_id", "reservation_id", "delegation_id", "type",
-                 "unit_id", "broker_id", "reservation_state", "delegation_state", "auth", "id_token", "id",
-                 "slice_name"]
 
     def __init__(self):
         self.name = None
@@ -58,6 +54,7 @@ class RequestByIdRecord(IMessageAvro):
         self.auth = None
         self.id_token = None
         self.slice_name = None
+        self.level = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -81,6 +78,7 @@ class RequestByIdRecord(IMessageAvro):
         self.delegation_state = value.get('delegation_state', None)
         self.id_token = value.get('id_token', None)
         self.slice_name = value.get('slice_name', None)
+        self.level = value.get('level', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -120,6 +118,8 @@ class RequestByIdRecord(IMessageAvro):
             result['id_token'] = self.id_token
         if self.slice_name is not None:
             result['slice_name'] = self.slice_name
+        if self.level is not None:
+            result['level'] = self.level
 
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -207,13 +207,19 @@ class RequestByIdRecord(IMessageAvro):
     def get_slice_name(self) -> str:
         return self.slice_name
 
+    def get_level(self) -> int:
+        return self.level
+
+    def set_level(self, value):
+        self.level = value
+
     def __str__(self):
         return f"name: {self.name} callback_topic: {self.callback_topic} message_id: {self.message_id} " \
                f"guid: {self.guid} slice_id: {self.slice_id} reservation_id: {self.reservation_id} " \
                f"delegation_id: {self.delegation_id} " \
                f"type: {self.type} unit_id:{self.unit_id} broker_id: {self.broker_id} " \
                f"reservation_state: {self.reservation_state} delegation_state: {self.delegation_state} " \
-               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name}"
+               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name} level: {self.level}"
 
     def validate(self) -> bool:
         """

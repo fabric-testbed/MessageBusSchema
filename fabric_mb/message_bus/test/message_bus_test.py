@@ -110,7 +110,6 @@ class MessageBusTest(unittest.TestCase):
 
         conf = {'metadata.broker.list': 'localhost:19092',
                 'security.protocol': 'SSL',
-                'group.id': 'ssl-host',
                 'ssl.ca.location': '../../../secrets/snakeoil-ca-1.crt',
                 'ssl.key.location': '../../../secrets/kafkacat.client.key',
                 'ssl.key.password': 'confluent',
@@ -816,6 +815,7 @@ class MessageBusTest(unittest.TestCase):
                     self.parent.validate_result_record(message, result_actor)
 
         # create a consumer
+        conf['group.id'] = 'ssl-host'
         consumer = TestConsumer(conf, key_schema, val_schema, topics)
         consumer.set_parent(self)
 
