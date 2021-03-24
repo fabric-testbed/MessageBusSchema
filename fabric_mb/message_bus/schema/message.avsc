@@ -92,7 +92,7 @@
         "name": "UnitRecord",
         "type": "record",
         "fields": [{
-                "name": "uid",
+                "name": "reservation_id",
                 "type": "string"
             },
             {
@@ -118,11 +118,6 @@
             {
                 "name": "sequence",
                 "type": ["null", "int"],
-                "default": null
-            },
-            {
-                "name": "reservation_id",
-                "type": ["null", "string"],
                 "default": null
             },
             {
@@ -475,7 +470,7 @@
     {
 		"namespace": "fabric.cf.model",
 		"type": "record",
-		"name": "ResourceDelegationRecord",
+		"name": "ResourceTicketRecord",
 		"fields": [{
 				"name": "guid",
 				"type": "string"
@@ -526,8 +521,8 @@
 				"type": "int"
 			},
 			{
-				"name": "resource_delegation",
-				"type": "fabric.cf.model.ResourceDelegationRecord"
+				"name": "resource_ticket",
+				"type": "fabric.cf.model.ResourceTicketRecord"
 			},
 			{
 			    "name": "delegation_id",

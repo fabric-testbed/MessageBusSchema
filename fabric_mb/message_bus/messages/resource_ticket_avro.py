@@ -27,7 +27,7 @@ from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.term_avro import TermAvro
 
 
-class ResourceDelegationAvro:
+class ResourceTicketAvro:
     def __init__(self):
         self.guid = None
         self.term = None
@@ -138,7 +138,7 @@ class ResourceDelegationAvro:
         return ret_val
 
     def __eq__(self, other):
-        if not isinstance(other, ResourceDelegationAvro):
+        if not isinstance(other, ResourceTicketAvro):
             return False
 
         return self.guid == other.guid and self.units == other.units and self.term == other.term and \

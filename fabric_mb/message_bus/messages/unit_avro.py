@@ -32,7 +32,6 @@ class UnitAvro:
     Implements Avro representation of a Unit
     """
     def __init__(self):
-        self.uid = None
         self.rtype = None
         self.parent_id = None
         self.state = None
@@ -44,7 +43,7 @@ class UnitAvro:
         self.sliver = None
 
     def get_unit_id(self) -> str:
-        return self.uid
+        return self.reservation_id
 
     def get_properties(self) -> dict:
         """
@@ -110,7 +109,6 @@ class UnitAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.uid = value.get('uid', None)
         self.rtype = value.get('rtype', None)
         self.parent_id = value.get('parent_id', None)
         self.state = value.get('state', None)
@@ -132,7 +130,7 @@ class UnitAvro:
 
         result = {
             "properties": self.properties,
-            "uid": self.uid
+            "reservation_id": self.reservation_id
         }
         if self.rtype is not None:
             result['rtype'] = self.rtype
@@ -145,9 +143,6 @@ class UnitAvro:
 
         if self.sequence is not None:
             result['sequence'] = self.sequence
-
-        if self.reservation_id is not None:
-            result['reservation_id'] = self.reservation_id
 
         if self.slice_id is not None:
             result['slice_id'] = self.slice_id
@@ -163,7 +158,7 @@ class UnitAvro:
         if not isinstance(other, UnitAvro):
             return False
 
-        return self.properties == other.properties and self.uid == other.uid and self.rtype == other.rtype and \
+        return self.properties == other.properties and self.rtype == other.rtype and \
                self.parent_id == other.parent_id and self.state == other.state and self.sequence == other.sequence and \
                self.reservation_id == other.reservation_id and self.slice_id == other.slice_id and \
                self.actor_id == other.actor_id and self.sliver == other.sliver
@@ -175,7 +170,7 @@ class UnitAvro:
         """
         ret_val = True
 
-        if self.properties is None or self.uid is None:
+        if self.properties is None or self.reservation_id is None:
             ret_val = False
 
         return ret_val
@@ -185,6 +180,6 @@ class UnitAvro:
             self.sliver = pickle.dumps(sliver)
 
     def get_sliver(self):
-        if self.sliver is None:
+        if self.sliver is not None:
             return pickle.loads(self.sliver)
         return self.sliver

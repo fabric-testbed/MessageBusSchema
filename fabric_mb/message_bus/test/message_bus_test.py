@@ -62,7 +62,7 @@ from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
-from fabric_mb.message_bus.messages.resource_delegation_avro import ResourceDelegationAvro
+from fabric_mb.message_bus.messages.resource_ticket_avro import ResourceTicketAvro
 from fabric_mb.message_bus.messages.result_actor_avro import ResultActorAvro
 from fabric_mb.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
 from fabric_mb.message_bus.messages.result_proxy_avro import ResultProxyAvro
@@ -219,7 +219,6 @@ class MessageBusTest(unittest.TestCase):
 
         unit = UnitAvro()
         unit.properties = {'test': 'value'}
-        unit.uid = "Unit1"
         unit.rtype = "abc"
         unit.state = 1
         unit.sequence = 0
@@ -233,15 +232,15 @@ class MessageBusTest(unittest.TestCase):
         ticket.authority = auth
         ticket.old_units = 0
         ticket.delegation_id = "dlg123"
-        deleg = ResourceDelegationAvro()
-        deleg.units = 1
-        deleg.holder = "ab1"
-        deleg.issuer = "si1"
-        deleg.type = "rty1"
-        deleg.properties = {"foo": "bar"}
-        deleg.guid = "gid"
-        deleg.term = term
-        ticket.resource_delegation = deleg
+        rt = ResourceTicketAvro()
+        rt.units = 1
+        rt.holder = "ab1"
+        rt.issuer = "si1"
+        rt.type = "rty1"
+        rt.properties = {"foo": "bar"}
+        rt.guid = "gid"
+        rt.term = term
+        ticket.resource_ticket = rt
         reservation.resource_set.ticket = ticket
 
         delegation = DelegationAvro()

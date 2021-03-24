@@ -25,14 +25,14 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
-from fabric_mb.message_bus.messages.resource_delegation_avro import ResourceDelegationAvro
+from fabric_mb.message_bus.messages.resource_ticket_avro import ResourceTicketAvro
 
 
 class Ticket:
     def __init__(self):
         self.authority = None
         self.old_units = 0
-        self.resource_delegation = None
+        self.resource_ticket = None
         self.delegation_id = None
 
     def from_dict(self, value: dict):
@@ -47,10 +47,10 @@ class Ticket:
             self.authority.from_dict(value=temp)
         self.old_units = value.get('old_units', 0)
         self.delegation_id = value.get('delegation_id', 0)
-        temp = value.get('resource_delegation', None)
+        temp = value.get('resource_ticket', None)
         if temp is not None:
-            self.resource_delegation = ResourceDelegationAvro()
-            self.resource_delegation.from_dict(value=temp)
+            self.resource_ticket = ResourceTicketAvro()
+            self.resource_ticket.from_dict(value=temp)
 
     def to_dict(self) -> dict:
         """
@@ -68,16 +68,16 @@ class Ticket:
         if self.authority is not None:
             result["authority"] = self.authority.to_dict()
 
-        if self.resource_delegation is not None:
-            result["resource_delegation"] = self.resource_delegation.to_dict()
+        if self.resource_ticket is not None:
+            result["resource_ticket"] = self.resource_ticket.to_dict()
 
         return result
 
     def get_authority(self) -> AuthAvro:
         return self.authority
 
-    def get_resource_delegation(self) -> ResourceDelegationAvro:
-        return self.resource_delegation
+    def get_resource_ticket(self) -> ResourceTicketAvro:
+        return self.resource_ticket
 
     def get_old_units(self) -> int:
         return self.old_units
@@ -85,8 +85,8 @@ class Ticket:
     def set_authority(self, authority: AuthAvro):
         self.authority = authority
 
-    def set_resource_delegation(self, resource_delegation: ResourceDelegationAvro):
-        self.resource_delegation = resource_delegation
+    def set_resource_ticket(self, resource_ticket: ResourceTicketAvro):
+        self.resource_ticket = resource_ticket
 
     def set_old_units(self, old_units: int):
         self.old_units = old_units
@@ -99,7 +99,7 @@ class Ticket:
 
     def __str__(self):
         return f"old_units: {self.old_units}, authority: {self.authority} " \
-               f"resource_delegation: {self.resource_delegation} delegation_id: {self.delegation_id}"
+               f"resource_ticket: {self.resource_ticket} delegation_id: {self.delegation_id}"
 
     def validate(self) -> bool:
         """
@@ -107,7 +107,7 @@ class Ticket:
         :return True on success; False on failure
         """
         ret_val = True
-        if self.old_units is None or self.resource_delegation is None or self.authority is None or \
+        if self.old_units is None or self.resource_ticket is None or self.authority is None or \
                 self.delegation_id is None:
             ret_val = False
         return ret_val
@@ -117,4 +117,4 @@ class Ticket:
             return False
 
         return self.old_units == other.old_units and self.authority == other.authority and \
-               self.resource_delegation == other.resource_delegation and self.delegation_id == other.delegation_id
+               self.resource_ticket == other.resource_ticket and self.delegation_id == other.delegation_id
