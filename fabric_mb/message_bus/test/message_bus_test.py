@@ -51,20 +51,20 @@ from fabric_mb.message_bus.messages.extend_ticket_avro import ExtendTicketAvro
 from fabric_mb.message_bus.messages.failed_rpc_avro import FailedRpcAvro
 from fabric_mb.message_bus.messages.get_actors_request_avro import GetActorsRequestAvro
 from fabric_mb.message_bus.messages.get_delegations_avro import GetDelegationsAvro
-from fabric_mb.message_bus.messages.get_pool_info_request_avro import GetPoolInfoRequestAvro
+from fabric_mb.message_bus.messages.get_broker_query_model_request_avro import GetBrokerQueryModelRequestAvro
 from fabric_mb.message_bus.messages.get_reservation_units_request_avro import GetReservationUnitsRequestAvro
 from fabric_mb.message_bus.messages.get_reservations_request_avro import GetReservationsRequestAvro
 from fabric_mb.message_bus.messages.get_reservations_state_request_avro import GetReservationsStateRequestAvro
 from fabric_mb.message_bus.messages.get_unit_request_avro import GetUnitRequestAvro
 from fabric_mb.message_bus.messages.modify_lease_avro import ModifyLeaseAvro
-from fabric_mb.message_bus.messages.pool_info_avro import PoolInfoAvro
+from fabric_mb.message_bus.messages.broker_query_model_avro import BrokerQueryModelAvro
 from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
 from fabric_mb.message_bus.messages.resource_ticket_avro import ResourceTicketAvro
 from fabric_mb.message_bus.messages.result_actor_avro import ResultActorAvro
-from fabric_mb.message_bus.messages.result_pool_info_avro import ResultPoolInfoAvro
+from fabric_mb.message_bus.messages.result_broker_query_model_avro import ResultBrokerQueryModelAvro
 from fabric_mb.message_bus.messages.result_proxy_avro import ResultProxyAvro
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
 from fabric_mb.message_bus.messages.result_reservation_avro import ResultReservationAvro
@@ -606,16 +606,16 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric_mb-mb-public-test2", ruu)
 
-        pool_info = GetPoolInfoRequestAvro()
-        pool_info.message_id = "msg1"
-        pool_info.guid = "gud1"
-        pool_info.message_id = "msg1"
-        pool_info.auth = auth
-        pool_info.callback_topic = "test"
-        pool_info.broker_id = "broker11"
-        pool_info.id_token = id_token
+        bqm_query = GetBrokerQueryModelRequestAvro()
+        bqm_query.message_id = "msg1"
+        bqm_query.guid = "gud1"
+        bqm_query.message_id = "msg1"
+        bqm_query.auth = auth
+        bqm_query.callback_topic = "test"
+        bqm_query.broker_id = "broker11"
+        bqm_query.id_token = id_token
 
-        producer.produce_sync("fabric_mb-mb-public-test2", pool_info)
+        producer.produce_sync("fabric_mb-mb-public-test2", bqm_query)
 
         actors_req = GetActorsRequestAvro()
         actors_req.message_id = "msg1"
@@ -650,17 +650,17 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce_sync("fabric_mb-mb-public-test2", result_proxy)
 
-        result_pool = ResultPoolInfoAvro()
-        pool = PoolInfoAvro()
-        pool.name = "abc"
-        pool.type = "typ1"
-        pool.properties = {'test': 'value'}
-        result_pool.message_id = "msg1"
-        result_pool.status = result
-        result_pool.pools = []
-        result_pool.pools.append(pool)
+        result_model = ResultBrokerQueryModelAvro()
+        model = BrokerQueryModelAvro()
+        model.level = 1
+        with open('./abqm.graphml', 'r') as f:
+            model.model = f.read()
+        result_model.message_id = "msg1"
+        result_model.status = result
+        result_model.models = []
+        result_model.models.append(model)
 
-        producer.produce_sync("fabric_mb-mb-public-test2", result_pool)
+        producer.produce_sync("fabric_mb-mb-public-test2", result_model)
 
         result_actor = ResultActorAvro()
         actor = ActorAvro()
@@ -679,7 +679,6 @@ class MessageBusTest(unittest.TestCase):
         result_actor.actors.append(actor)
 
         producer.produce_sync("fabric_mb-mb-public-test2", result_actor)
-
 
         # Fallback to earliest to ensure all messages are consumed
         conf['auto.offset.reset'] = "earliest"
@@ -780,8 +779,8 @@ class MessageBusTest(unittest.TestCase):
                 elif message.get_message_name() == IMessageAvro.get_reservation_units_request:
                     self.parent.validate_request_by_id(message, ru)
 
-                elif message.get_message_name() == IMessageAvro.get_pool_info_request:
-                    self.parent.validate_request_by_id(message, pool_info)
+                elif message.get_message_name() == IMessageAvro.get_broker_query_model_request:
+                    self.parent.validate_request_by_id(message, bqm_query)
 
                 elif message.get_message_name() == IMessageAvro.get_actors_request:
                     self.parent.validate_request_by_id(message, actors_req)
@@ -807,8 +806,8 @@ class MessageBusTest(unittest.TestCase):
                 elif message.get_message_name() == IMessageAvro.result_proxy:
                     self.parent.validate_result_record(message, result_proxy)
 
-                elif message.get_message_name() == IMessageAvro.result_pool_info:
-                    self.parent.validate_result_record(message, result_pool)
+                elif message.get_message_name() == IMessageAvro.result_broker_query_model:
+                    self.parent.validate_result_record(message, result_model)
 
                 elif message.get_message_name() == IMessageAvro.result_actor:
                     self.parent.validate_result_record(message, result_actor)
@@ -896,7 +895,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.reservation_states, outgoing.reservation_states)
         self.assertEqual(incoming.units, outgoing.units)
         self.assertEqual(incoming.proxies, outgoing.proxies)
-        self.assertEqual(incoming.pools, outgoing.pools)
+        self.assertEqual(incoming.models, outgoing.models)
         self.assertEqual(incoming.actors, outgoing.actors)
         self.assertEqual(incoming.delegations, outgoing.delegations)
 
