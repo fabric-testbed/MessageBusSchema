@@ -651,14 +651,12 @@ class MessageBusTest(unittest.TestCase):
         producer.produce_sync("fabric_mb-mb-public-test2", result_proxy)
 
         result_model = ResultBrokerQueryModelAvro()
-        model = BrokerQueryModelAvro()
-        model.level = 1
+        result_model.model = BrokerQueryModelAvro()
+        result_model.model.level = 1
         with open('./abqm.graphml', 'r') as f:
-            model.model = f.read()
+            result_model.model.model = f.read()
         result_model.message_id = "msg1"
         result_model.status = result
-        result_model.models = []
-        result_model.models.append(model)
 
         producer.produce_sync("fabric_mb-mb-public-test2", result_model)
 
@@ -895,7 +893,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.reservation_states, outgoing.reservation_states)
         self.assertEqual(incoming.units, outgoing.units)
         self.assertEqual(incoming.proxies, outgoing.proxies)
-        self.assertEqual(incoming.models, outgoing.models)
+        self.assertEqual(incoming.model, outgoing.model)
         self.assertEqual(incoming.actors, outgoing.actors)
         self.assertEqual(incoming.delegations, outgoing.delegations)
 
