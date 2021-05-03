@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 
 NAME = "fabric-message-bus"
-VERSION = "0.9"
+VERSION = "0.11"
 # To install the library, run the following
 #
 # python setup.py install

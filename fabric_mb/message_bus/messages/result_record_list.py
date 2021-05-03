@@ -34,7 +34,7 @@ from fabric_mb.message_bus.messages.actor_avro import ActorAvro
 from fabric_mb.message_bus.messages.delegation_avro import DelegationAvro
 from fabric_mb.message_bus.messages.lease_reservation_avro import LeaseReservationAvro
 from fabric_mb.message_bus.messages.lease_reservation_state_avro import LeaseReservationStateAvro
-from fabric_mb.message_bus.messages.pool_info_avro import PoolInfoAvro
+from fabric_mb.message_bus.messages.broker_query_model_avro import BrokerQueryModelAvro
 from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
@@ -51,7 +51,7 @@ class ResultRecordList(IMessageAvro):
     """
     # Use __slots__ to explicitly declare all data members.
     __slots__ = ["name", "message_id", "status", "slices", "reservations", "reservation_states", "units",
-                 "proxies", "pools", "actors", "delegations", "id"]
+                 "proxies", "model", "actors", "delegations", "id"]
 
     def __init__(self):
         self.name = None
@@ -62,7 +62,7 @@ class ResultRecordList(IMessageAvro):
         self.reservation_states = None
         self.units = None
         self.proxies = None
-        self.pools = None
+        self.model = None
         self.actors = None
         self.delegations = None
         # Unique id used to track produce request success/failures.
@@ -147,19 +147,15 @@ class ResultRecordList(IMessageAvro):
                     self.proxies = []
                 self.proxies.append(proxy_obj)
 
-    def from_dict_pools(self, value: list):
+    def from_dict_model(self, value: dict):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
         if value is not None:
-            for p in value:
-                pool_obj = PoolInfoAvro()
-                pool_obj.from_dict(p)
-                if self.pools is None:
-                    self.pools = []
-                self.pools.append(pool_obj)
+            self.model = BrokerQueryModelAvro()
+            self.model.from_dict(value)
 
     def from_dict_actors(self, value: list):
         """
@@ -213,8 +209,8 @@ class ResultRecordList(IMessageAvro):
         proxies_list = value.get('proxies', None)
         self.from_dict_proxies(proxies_list)
 
-        pools_list = value.get('pools', None)
-        self.from_dict_pools(pools_list)
+        model = value.get('model', None)
+        self.from_dict_model(model)
 
         actors_list = value.get('actors', None)
         self.from_dict_actors(actors_list)
@@ -265,11 +261,9 @@ class ResultRecordList(IMessageAvro):
             result["proxies"] = temp
         return result
 
-    def to_dict_pools(self, result: dict):
-        if self.pools is not None:
-            result["pools"] = []
-            for p in self.pools:
-                result["pools"].append(p.to_dict())
+    def to_dict_model(self, result: dict):
+        if self.model is not None:
+            result["model"] = self.model.to_dict()
 
         return result
 
@@ -308,7 +302,7 @@ class ResultRecordList(IMessageAvro):
         result = self.to_dict_reservation_states(result)
         result = self.to_dict_units(result)
         result = self.to_dict_proxies(result)
-        result = self.to_dict_pools(result)
+        result = self.to_dict_model(result)
         result = self.to_dict_actors(result)
         result = self.to_dict_delegations(result)
         return result
@@ -324,9 +318,9 @@ class ResultRecordList(IMessageAvro):
 
     def __str__(self):
         return "name: {} message_id: {} status: {} slices: {} reservations: {} reservation_states: {} units: {} " \
-               "proxies: {} pools: {} actors: {} delegations: {}".\
+               "proxies: {} model: {} actors: {} delegations: {}".\
             format(self.name, self.message_id, self.status, self.slices, self.reservations, self.reservation_states,
-                   self.units, self.proxies, self.pools, self.actors, self.delegations)
+                   self.units, self.proxies, self.model, self.actors, self.delegations)
 
     def get_id(self) -> str:
         return self.id.__str__()
@@ -376,11 +370,11 @@ class ResultRecordList(IMessageAvro):
         """
         return self.proxies
 
-    def get_pools(self) -> List[PoolInfoAvro]:
+    def get_model(self) -> BrokerQueryModelAvro:
         """
-        Return pools
+        Return model
         """
-        return self.pools
+        return self.model
 
     def get_actors(self) -> List[ActorAvro]:
         """

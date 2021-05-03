@@ -73,7 +73,7 @@ class IMessageAvro:
     get_delegations = "GetDelegations"
     get_reservation_units_request = "GetReservationUnitsRequest"
     get_unit_request = "GetUnitRequest"
-    get_pool_info_request = "GetPoolInfoRequest"
+    get_broker_query_model_request = "GetBrokerQueryModelRequest"
     get_actors_request = "GetActorsRequest"
 
     result_slice = "ResultSlice"
@@ -84,7 +84,7 @@ class IMessageAvro:
     result_string = "ResultString"
     result_units = "ResultUnits"
     result_proxy = "ResultProxy"
-    result_pool_info = "ResultPoolInfo"
+    result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
 
     def to_dict(self) -> dict:
