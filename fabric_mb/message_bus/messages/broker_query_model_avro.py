@@ -29,14 +29,13 @@ Implements Avro representation of a Pool Info
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
-class PoolInfoAvro:
+class BrokerQueryModelAvro:
     """
-    Implements Avro representation of a Pool Info
+    Implements Avro representation of a Broker Query Model
     """
     def __init__(self):
-        self.name = None
-        self.type = None
-        self.properties = None
+        self.level = None
+        self.model = None
 
     def from_dict(self, value: dict):
         """
@@ -44,9 +43,8 @@ class PoolInfoAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.name = value.get('name', None)
-        self.type = value.get('type', None)
-        self.properties = value.get('properties', None)
+        self.level = value.get('level', None)
+        self.model = value.get('model', None)
 
     def to_dict(self) -> dict:
         """
@@ -58,62 +56,47 @@ class PoolInfoAvro:
             raise MessageBusException("Invalid arguments")
 
         result = {
-            "name": self.name,
-            "type": self.type,
-            "properties": self.properties
+            "level": self.level,
+            "model": self.model
         }
         return result
 
     def __str__(self):
-        return "name: {} type: {} properties: {}".format(self.name, self.type, self.properties)
+        return "level: {} model: {}".format(self.level, self.model)
 
-    def get_properties(self) -> dict:
+    def set_level(self, level: str):
         """
-        Return properties
-        @return properties
+        Set level
+        @param level level
         """
-        return self.properties
+        self.level = level
 
-    def set_properties(self, value: dict):
+    def get_level(self) -> str:
         """
-        Set properties
-        @param value value
+        Return level
+        @return level
         """
-        self.properties = value
+        return self.level
 
-    def set_name(self, name: str):
+    def set_model(self, model: str):
         """
-        Set name
-        @param name name
+        Set model
+        @param model model
         """
-        self.name = name
+        self.model = model
 
-    def get_name(self) -> str:
+    def get_model(self) -> str:
         """
-        Return name
-        @return name
+        Return model
+        @return model
         """
-        return self.name
-
-    def set_type(self, type: str):
-        """
-        Set type
-        @param type type
-        """
-        self.type = type
-
-    def get_type(self) -> str:
-        """
-        Return type
-        @return type
-        """
-        return self.type
+        return self.model
 
     def __eq__(self, other):
-        if not isinstance(other, PoolInfoAvro):
+        if not isinstance(other, BrokerQueryModelAvro):
             return False
 
-        return self.name == other.name and self.type == other.type and self.properties == other.properties
+        return self.level == other.level and self.model == other.model
 
     def validate(self) -> bool:
         """
@@ -121,6 +104,6 @@ class PoolInfoAvro:
         :return True on success; False on failure
         """
         ret_val = True
-        if self.name is None or self.type is None or self.properties is None:
+        if self.level is None or self.model is None:
             ret_val = False
         return ret_val
