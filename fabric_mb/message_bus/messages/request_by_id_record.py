@@ -55,6 +55,7 @@ class RequestByIdRecord(IMessageAvro):
         self.id_token = None
         self.slice_name = None
         self.level = None
+        self.email = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -79,6 +80,7 @@ class RequestByIdRecord(IMessageAvro):
         self.id_token = value.get('id_token', None)
         self.slice_name = value.get('slice_name', None)
         self.level = value.get('level', None)
+        self.email = value.get('email', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -120,6 +122,8 @@ class RequestByIdRecord(IMessageAvro):
             result['slice_name'] = self.slice_name
         if self.level is not None:
             result['level'] = self.level
+        if self.email is not None:
+            result['email'] = self.email
 
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
@@ -213,13 +217,20 @@ class RequestByIdRecord(IMessageAvro):
     def set_level(self, value):
         self.level = value
 
+    def set_email(self, email: str):
+        self.email = email
+
+    def get_email(self) -> str:
+        return self.email
+
     def __str__(self):
         return f"name: {self.name} callback_topic: {self.callback_topic} message_id: {self.message_id} " \
                f"guid: {self.guid} slice_id: {self.slice_id} reservation_id: {self.reservation_id} " \
                f"delegation_id: {self.delegation_id} " \
                f"type: {self.type} unit_id:{self.unit_id} broker_id: {self.broker_id} " \
                f"reservation_state: {self.reservation_state} delegation_state: {self.delegation_state} " \
-               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name} level: {self.level}"
+               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name} level: {self.level} " \
+               f"email: {self.email}"
 
     def validate(self) -> bool:
         """

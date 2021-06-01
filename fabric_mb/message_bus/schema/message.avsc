@@ -999,6 +999,11 @@
 				"name": "level",
 				"type": ["null", "int"],
 				"default": null
+			},
+            {
+				"name": "email",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
