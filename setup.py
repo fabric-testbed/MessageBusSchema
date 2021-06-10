@@ -1,10 +1,10 @@
 # coding: utf-8
 
 from setuptools import setup, find_packages
-
+from fabric_mb import __VERSION__
 
 NAME = "fabric-message-bus"
-VERSION = "0.13"
+VERSION = __VERSION__
 # To install the library, run the following
 #
 # python setup.py install

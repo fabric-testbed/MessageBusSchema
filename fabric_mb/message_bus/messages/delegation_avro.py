@@ -34,14 +34,12 @@ class DelegationAvro:
     """
     Implements Avro representation of a Delegation
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["delegation_id", "slice", "graph", "sequence"]
-
     def __init__(self):
         self.delegation_id = None
         self.slice = None
         self.graph = None
         self.sequence = 0
+        self.state = None
 
     def from_dict(self, value: dict):
         """
@@ -54,6 +52,7 @@ class DelegationAvro:
         self.slice = SliceAvro()
         self.slice.from_dict(value['slice'])
         self.graph = value.get('graph', None)
+        self.state = value.get('state', None)
 
     def to_dict(self) -> dict:
         """
@@ -71,16 +70,20 @@ class DelegationAvro:
         }
         if self.graph is not None:
             result['graph'] = self.graph
+
+        if self.state is not None:
+            result['state'] = self.state
         return result
 
     def __str__(self):
-        return "delegation_id: {} slice: {} sequence: {} ".format(self.delegation_id, self.slice, self.sequence)
+        return "delegation_id: {} slice: {} sequence: {} state: {}".format(self.delegation_id, self.slice,
+                                                                           self.sequence, self.state)
 
     def __eq__(self, other):
         if not isinstance(other, DelegationAvro):
             return False
         return self.delegation_id == other.delegation_id and self.slice == other.slice and \
-               self.sequence == other.sequence and self.graph == other.graph
+               self.sequence == other.sequence and self.graph == other.graph and self.state == other.state
 
     def validate(self) -> bool:
         """
@@ -116,6 +119,9 @@ class DelegationAvro:
         """
         return self.sequence
 
+    def get_state(self) -> int:
+        return self.state
+
     def print(self):
         """
         Print on console
@@ -124,6 +130,8 @@ class DelegationAvro:
         print("Delegation ID: {} Slice ID: {}".format(self.delegation_id, self.slice.get_slice_id()))
         if self.sequence is not None:
             print("Sequence: {}".format(self.sequence))
+        if self.state is not None:
+            print(f"State: {self.state}")
         if self.graph is not None:
             print("Graph: {}".format(self.graph))
         print("")
