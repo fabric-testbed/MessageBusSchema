@@ -602,6 +602,11 @@
                 "default": null
             },
             {
+                "name": "state",
+                "type": ["null", "int"],
+                "default": null
+            },
+            {
 				"name": "slice",
 				"type": ["null", "fabric.cf.model.SliceRecord"],
 				"default": null
