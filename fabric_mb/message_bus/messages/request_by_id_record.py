@@ -56,6 +56,7 @@ class RequestByIdRecord(IMessageAvro):
         self.slice_name = None
         self.level = None
         self.email = None
+        self.graph_format = None
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
@@ -81,6 +82,7 @@ class RequestByIdRecord(IMessageAvro):
         self.slice_name = value.get('slice_name', None)
         self.level = value.get('level', None)
         self.email = value.get('email', None)
+        self.graph_format = value.get('graph_format', None)
 
         if value.get('auth', None) is not None:
             self.auth = AuthAvro()
@@ -124,7 +126,8 @@ class RequestByIdRecord(IMessageAvro):
             result['level'] = self.level
         if self.email is not None:
             result['email'] = self.email
-
+        if self.graph_format is not None:
+            result['graph_format'] = self.graph_format
         if self.auth is not None:
             result['auth'] = self.auth.to_dict()
 
@@ -223,6 +226,12 @@ class RequestByIdRecord(IMessageAvro):
     def get_email(self) -> str:
         return self.email
 
+    def get_graph_format(self) -> int:
+        return self.graph_format
+
+    def set_graph_format(self, graph_format):
+        self.graph_format = graph_format
+
     def __str__(self):
         return f"name: {self.name} callback_topic: {self.callback_topic} message_id: {self.message_id} " \
                f"guid: {self.guid} slice_id: {self.slice_id} reservation_id: {self.reservation_id} " \
@@ -230,7 +239,7 @@ class RequestByIdRecord(IMessageAvro):
                f"type: {self.type} unit_id:{self.unit_id} broker_id: {self.broker_id} " \
                f"reservation_state: {self.reservation_state} delegation_state: {self.delegation_state} " \
                f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name} level: {self.level} " \
-               f"email: {self.email}"
+               f"email: {self.email} graph_format: {self.graph_format}"
 
     def validate(self) -> bool:
         """
