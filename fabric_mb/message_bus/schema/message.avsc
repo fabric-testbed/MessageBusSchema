@@ -1004,6 +1004,11 @@
 				"name": "email",
 				"type": ["null", "string"],
 				"default": null
+			},
+            {
+				"name": "graph_format",
+				"type": ["null", "int"],
+				"default": null
 			}
 		]
 	},
