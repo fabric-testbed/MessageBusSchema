@@ -26,6 +26,8 @@
 """
 Implements Avro representation of a Slice
 """
+from datetime import datetime
+
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 
@@ -46,6 +48,8 @@ class SliceAvro:
         self.graph_id = None
         self.state = None
         self.inventory = False
+        self.lease_start = None
+        self.lease_end = None
 
     def from_dict(self, value: dict):
         """
@@ -67,6 +71,8 @@ class SliceAvro:
         self.graph_id = value.get('graph_id', None)
         self.state = value.get('state', None)
         self.inventory = value.get('inventory', None)
+        self.lease_end = value.get('lease_end', None)
+        self.lease_start = value.get('lease_start', None)
 
     def to_dict(self) -> dict:
         """
@@ -107,6 +113,12 @@ class SliceAvro:
 
         if self.inventory is not None:
             result["inventory"] = self.inventory
+
+        if self.lease_end is not None:
+            result["lease_end"] = self.lease_end
+
+        if self.lease_start is not None:
+            result["lease_start"] = self.lease_start
         return result
 
     def __str__(self):
@@ -114,7 +126,7 @@ class SliceAvro:
                f"config_properties: {self.config_properties} " \
                f"resource_type: {self.resource_type} client_slice: {self.client_slice} " \
                f"broker_client_slice: {self.broker_client_slice} graph_id: {self.graph_id} state: {self.state} " \
-               f"inventory: {self.inventory}"
+               f"inventory: {self.inventory} lease_start: {self.lease_start} lease_end: {self.lease_end}"
 
     def print(self, all: bool = False):
         """
@@ -138,7 +150,6 @@ class SliceAvro:
                 print(f"broker_client_slice: {self.broker_client_slice}")
             if self.inventory is not None:
                 print(f"inventory: {self.inventory}")
-
             if self.config_properties is not None:
                 print(f"config_properties: {self.config_properties}")
         print("")
@@ -291,3 +302,21 @@ class SliceAvro:
 
     def get_inventory(self) -> bool:
         return self.inventory
+
+    def set_lease_end(self, lease_end: datetime):
+        if lease_end is not None:
+            self.lease_end = int(lease_end.timestamp())
+
+    def set_lease_start(self, lease_start: datetime):
+        if lease_start is not None:
+            self.lease_start = int(lease_start.timestamp())
+
+    def get_lease_end(self) -> datetime or None:
+        if self.lease_end is not None:
+            return datetime.fromtimestamp(self.lease_end)
+        return self.lease_end
+
+    def get_lease_start(self) -> datetime or None:
+        if self.lease_start is not None:
+            return datetime.fromtimestamp(self.lease_start)
+        return self.lease_start

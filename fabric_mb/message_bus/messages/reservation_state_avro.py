@@ -35,8 +35,15 @@ class ReservationStateAvro:
     """
     def __init__(self):
         self.name = self.__class__.__name__
+        self.rid = None
         self.state = None
         self.pending_state = None
+
+    def set_reservation_id(self, rid: str):
+        self.rid = rid
+
+    def get_reservation_id(self) -> str:
+        return self.rid
 
     def get_state(self) -> int:
         """
@@ -70,6 +77,7 @@ class ReservationStateAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
+        self.rid = values.get('rid', None)
         self.name = values.get('name', None)
         self.state = values.get('state', None)
         self.pending_state = values.get('pending_state', None)
@@ -84,18 +92,19 @@ class ReservationStateAvro:
             raise MessageBusException("Invalid arguments")
 
         return {
+            'rid': self.rid,
             'name':self.name,
             'state':self.state,
             'pending_state': self.pending_state}
 
     def __str__(self):
-        return "state: {} pending_state: {}".format(self.state, self.pending_state)
+        return f"rid: {self.rid} state: {self.state} pending_state: {self.pending_state}"
 
     def __eq__(self, other):
         if not isinstance(other, ReservationStateAvro):
             return False
 
-        return self.state == other.state and self.pending_state == other.pending_state
+        return self.rid == other.rid and self.state == other.state and self.pending_state == other.pending_state
 
     def validate(self) -> bool:
         """
@@ -103,6 +112,6 @@ class ReservationStateAvro:
         :return True on success; False on failure
         """
         ret_val = True
-        if self.state is None or self.pending_state is None:
+        if self.rid is None or self.state is None or self.pending_state is None:
             ret_val = False
         return ret_val
