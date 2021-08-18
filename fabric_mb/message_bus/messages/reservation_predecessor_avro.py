@@ -35,7 +35,6 @@ class ReservationPredecessorAvro:
     """
     def __init__(self):
         self.reservation_id = None
-        self.filter = None
 
     def from_dict(self, value: dict):
         """
@@ -44,7 +43,6 @@ class ReservationPredecessorAvro:
         :param value: incoming message dictionary
         """
         self.reservation_id = value.get('reservation_id', None)
-        self.filter = value.get('filter', None)
 
     def to_dict(self) -> dict:
         """
@@ -55,12 +53,11 @@ class ReservationPredecessorAvro:
         if not self.validate():
             raise MessageBusException("Invalid arguments")
 
-        result = {'reservation_id': self.reservation_id,
-                  'filter': self.filter}
+        result = {'reservation_id': self.reservation_id}
         return result
 
     def __str__(self):
-        return "reservation_id: {} filter: {}".format(self.reservation_id, self.filter)
+        return "reservation_id: {}".format(self.reservation_id)
 
     def get_reservation_id(self) -> str:
         """
@@ -76,25 +73,11 @@ class ReservationPredecessorAvro:
         """
         self.reservation_id = value
 
-    def get_filter_properties(self) -> dict:
-        """
-        Get filter properties
-        @return filter
-        """
-        return self.filter
-
-    def set_filter_properties(self, value: dict):
-        """
-        Set filter properties
-        @param value value
-        """
-        self.filter = value
-
     def __eq__(self, other):
         if not isinstance(other, ReservationPredecessorAvro):
             return False
 
-        return self.reservation_id == other.reservation_id and self.filter == other.filter
+        return self.reservation_id == other.reservation_id
 
     def validate(self) -> bool:
         """
@@ -102,6 +85,6 @@ class ReservationPredecessorAvro:
         :return True on success; False on failure
         """
         ret_val = True
-        if self.reservation_id is None or self.filter is None:
+        if self.reservation_id is None:
             ret_val = False
         return ret_val

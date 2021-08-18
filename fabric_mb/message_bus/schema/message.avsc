@@ -305,14 +305,7 @@
         "fields": [{
 				"name": "reservation_id",
 				"type": "string"
-			},
-			{
-                "name": "filter",
-                "type": {
-                    "type": "map",
-                    "values": "string"
-                }
-            }
+			}
         ]
     },
     {
