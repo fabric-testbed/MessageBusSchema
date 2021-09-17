@@ -93,8 +93,8 @@ class ReservationStateAvro:
 
         return {
             'rid': self.rid,
-            'name':self.name,
-            'state':self.state,
+            'name': self.name,
+            'state': self.state,
             'pending_state': self.pending_state}
 
     def __str__(self):

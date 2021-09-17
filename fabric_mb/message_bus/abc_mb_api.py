@@ -23,42 +23,26 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+import logging
+import traceback
+from abc import ABC
 
-"""
-Base class
-"""
 
+class ABCMbApi(ABC):
+    def __init__(self, *, logger: logging.Logger = None):
+        if logger is None:
+            self.logger = logging.getLogger(__name__)
+            logging.basicConfig(level=logging.DEBUG,
+                                format="%(asctime)s [%(filename)s:%(lineno)d] [%(levelname)s] %(message)s",
+                                handlers=[logging.StreamHandler()])
 
-class Base:
-    """
-    Base class
-    """
-    def __init__(self, logger=None):
-        self.logger = logger
-
-    def log_debug(self, message: str):
-        """
-        Log a debug message
-        """
-        if self.logger is None:
-            print(message)
-        else:
-            self.logger.debug(message)
-
-    def log_error(self, message: str):
-        """
-        Log an error message
-        """
-        if self.logger is None:
-            print(message)
-        else:
-            self.logger.error(message)
-
-    def log_info(self, message: str):
-        """
-        Log an info message
-        """
-        if self.logger is None:
-            print(message)
-        else:
-            self.logger.info(message)
+    def load_schema(self, schema_file: str):
+        try:
+            from confluent_kafka import avro
+            file = open(schema_file, "r")
+            schema_bytes = file.read()
+            file.close()
+            return avro.loads(schema_bytes)
+        except Exception as e:
+            self.logger.error(f"Exception occurred while loading the schema: {schema_file}: {e}")
+            self.logger.error(traceback.format_exc())
