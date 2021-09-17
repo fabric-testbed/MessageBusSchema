@@ -30,6 +30,7 @@ from abc import ABC
 
 class ABCMbApi(ABC):
     def __init__(self, *, logger: logging.Logger = None):
+        self.logger = logger
         if logger is None:
             self.logger = logging.getLogger(__name__)
             logging.basicConfig(level=logging.DEBUG,
