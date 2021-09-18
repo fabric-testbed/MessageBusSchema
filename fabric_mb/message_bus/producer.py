@@ -27,6 +27,7 @@
 Defines AvroProducer API class which exposes interface for various producer functions
 """
 import logging
+import threading
 import traceback
 
 from confluent_kafka.avro import AvroProducer
@@ -55,6 +56,7 @@ class AvroProducerApi(ABCMbApi):
             :param value_schema_location: AVRO schema location for the value
         """
         super().__init__(logger=logger)
+        self.lock = threading.Lock()
         self.key_schema = self.load_schema(schema_file=key_schema_location)
         self.value_schema = self.load_schema(schema_file=value_schema_location)
         self.producer = AvroProducer(producer_conf, default_key_schema=self.key_schema,
@@ -98,6 +100,7 @@ class AvroProducerApi(ABCMbApi):
             :return:
         """
         try:
+            self.lock.acquire()
             self.logger.debug(f"KAFKA: Record type={type(record)}")
             self.logger.debug(f"KAFKA: Producing key {record.get_id()} to topic {topic}.")
             self.logger.debug(f"KAFKA: Producing record {record.to_dict()} to topic {topic}.")
@@ -115,12 +118,12 @@ class AvroProducerApi(ABCMbApi):
         except Exception as ex:
             self.logger.error(f"KAFKA: Exception occurred {ex}")
             self.logger.error(traceback.format_exc())
+        finally:
+            self.lock.release()
         return False
 
 
 if __name__ == '__main__':
-    from confluent_kafka import avro, SerializingProducer
-
     # Create Admin API object
     conf = {'metadata.broker.list': 'localhost:19092',
             'security.protocol': 'SSL',
