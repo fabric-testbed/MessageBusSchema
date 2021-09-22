@@ -26,20 +26,20 @@
 """
 Defines Admin API class which exposes interface for various admin client functions
 """
+import logging
 import time
 
-from confluent_kafka.admin import AdminClient, NewTopic, NewPartitions, ConfigResource, ConfigSource
-from confluent_kafka import KafkaException
+from confluent_kafka.admin import AdminClient, NewTopic, NewPartitions
 
-from fabric_mb.message_bus.base import Base
+from fabric_mb.message_bus.abc_mb_api import ABCMbApi
 
 
-class AdminApi(Base):
+class AdminApi(ABCMbApi):
     """
     Implements interface for Admin APIs
     """
-    def __init__(self, conf, logger=None):
-        super().__init__(logger)
+    def __init__(self, *, conf: dict, logger: logging.Logger = None):
+        super().__init__(logger=logger)
         self.admin_client = AdminClient(conf)
 
     def create_topics(self, topics, num_partitions: int = 3, replication_factor: int = 1):
@@ -65,9 +65,9 @@ class AdminApi(Base):
         for topic, f in fs.items():
             try:
                 f.result()  # The result itself is None
-                self.log_debug("Topic {} created".format(topic))
+                self.logger.debug(f"Topic {topic} created")
             except Exception as e:
-                self.log_error("Failed to create topic {}: {}".format(topic, e))
+                self.logger.error(f"Failed to create topic {topic}: {e}")
 
     def delete_topics(self, topics):
         """
@@ -88,9 +88,9 @@ class AdminApi(Base):
         for topic, f in fs.items():
             try:
                 f.result()  # The result itself is None
-                self.log_debug("Topic {} deleted".format(topic))
+                self.logger.debug(f"Topic {topic} deleted".format(topic))
             except Exception as e:
-                self.log_error("Failed to delete topic {}: {}".format(topic, e))
+                self.logger.error(f"Failed to delete topic {topic}: {e}")
 
     def create_partitions(self, topic_partitions):
         """
@@ -110,9 +110,9 @@ class AdminApi(Base):
         for topic, f in fs.items():
             try:
                 f.result()  # The result itself is None
-                self.log_debug("Additional partitions created for topic {}".format(topic))
+                self.logger.debug(f"Additional partitions created for topic {topic}")
             except Exception as e:
-                self.log_error("Failed to add partitions to topic {}: {}".format(topic, e))
+                self.logger.error(f"Failed to add partitions to topic {topic}: {e}")
 
     def list_topics(self, timeout: int = 10) -> list:
         """
@@ -133,7 +133,13 @@ class AdminApi(Base):
 if __name__ == '__main__':
 
     # create admin client
-    api = AdminApi("localhost:9092")
+    conf = {'metadata.broker.list': 'localhost:19092',
+            'security.protocol': 'SSL',
+            'ssl.ca.location': '../../secrets/snakeoil-ca-1.crt',
+            'ssl.key.location': '../../secrets/kafkacat.client.key',
+            'ssl.key.password': 'confluent',
+            'ssl.certificate.location': '../../secrets/kafkacat-ca1-signed.pem'}
+    api = AdminApi(conf=conf)
     test_topics = ['topic1', "topic2"]
 
     # create topics

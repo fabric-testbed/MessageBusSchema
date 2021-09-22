@@ -26,33 +26,52 @@
 """
 Defines AvroProducer API class which exposes interface for various producer functions
 """
+import logging
+import threading
 import traceback
 
 from confluent_kafka.avro import AvroProducer
 
+from fabric_mb.message_bus.abc_mb_api import ABCMbApi
 from fabric_mb.message_bus.admin import AdminApi
-from fabric_mb.message_bus.base import Base
+from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.query_avro import QueryAvro
 from fabric_mb.message_bus.messages.query_result_avro import QueryResultAvro
 from fabric_mb.message_bus.messages.message import IMessageAvro
 
 
-class AvroProducerApi(Base):
+class AvroProducerApi(ABCMbApi):
     """
         This class implements the Interface for Kafka producer carrying Avro messages.
         It is expected that the users would extend this class and override on_delivery function.
     """
-    def __init__(self, conf, key_schema, record_schema, logger=None):
+    def __init__(self, *, producer_conf: dict, key_schema_location, value_schema_location: str,
+                 logger: logging.Logger = None):
         """
             Initialize the Producer API
-            :param conf: configuration e.g:
+            :param producer_conf: configuration e.g:
                         {'bootstrap.servers': localhost:9092,
                         'schema.registry.url': http://localhost:8083}
-            :param key_schema: loaded AVRO schema for the key
-            :param record_schema: loaded AVRO schema for the value
+            :param key_schema_location: AVRO schema location for the key
+            :param value_schema_location: AVRO schema location for the value
         """
-        super().__init__(logger)
-        self.producer = AvroProducer(conf, default_key_schema=key_schema, default_value_schema=record_schema)
+        super().__init__(logger=logger)
+        self.lock = threading.Lock()
+        self.key_schema = self.load_schema(schema_file=key_schema_location)
+        self.value_schema = self.load_schema(schema_file=value_schema_location)
+        self.producer = AvroProducer(producer_conf, default_key_schema=self.key_schema,
+                                     default_value_schema=self.value_schema)
+
+    def load_schema(self, schema_file: str):
+        try:
+            from confluent_kafka import avro
+            file = open(schema_file, "r")
+            schema_bytes = file.read()
+            file.close()
+            return avro.loads(schema_bytes)
+        except Exception as e:
+            self.logger.error(f"Exception occurred while loading the schema: {schema_file}: {e}")
+            self.logger.error(traceback.format_exc())
 
     def set_logger(self, logger):
         """
@@ -68,34 +87,12 @@ class AvroProducerApi(Base):
             This allows the original contents to be included for debugging purposes.
         """
         if err is not None:
-            self.log_error('Message {} delivery failed for user {} with error {}'.format(
-                obj.id, obj.name, err))
+            self.logger.error(f"KAFKA: Message {obj.id} delivery failed for {obj.name} with error {err}")
         else:
-            self.log_debug('Message {} successfully produced to {} [{}] at offset {}'.format(
-                obj.id, msg.topic(), msg.partition(), msg.offset()))
+            self.logger.debug(f"KAFKA: Message {obj.id} key {msg.key()} successfully produced to {msg.topic()} "
+                              f"[{msg.partition()}] at offset {msg.offset()}")
 
-    def produce_async(self, topic, record: IMessageAvro) -> bool:
-        """
-            Produce records for a specific topic
-            :param topic: topic to which messages are written to
-            :param record: record/message to be written
-            :return:
-        """
-        self.log_debug("Producing records to topic {}.".format(topic))
-        try:
-            # The message passed to the delivery callback will already be serialized.
-            # To aid in debugging we provide the original object to the delivery callback.
-            self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
-                                  callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
-            # Serve on_delivery callbacks from previous asynchronous produce()
-            self.producer.poll(0)
-            return True
-        except ValueError as ex:
-            traceback.print_exc()
-            self.log_error("Invalid input, discarding record...{}".format(ex))
-        return False
-
-    def produce_sync(self, topic, record: IMessageAvro) -> bool:
+    def produce(self, topic, record: IMessageAvro) -> bool:
         """
             Produce records for a specific topic
             :param topic: topic to which messages are written to
@@ -103,54 +100,76 @@ class AvroProducerApi(Base):
             :return:
         """
         try:
-            self.log_debug("Record type={}".format(type(record)))
-            self.log_debug("Producing key {} to topic {}.".format(record.get_id(), topic))
-            self.log_debug("Producing record {} to topic {}.".format(record.to_dict(), topic))
+            self.lock.acquire()
+            self.logger.debug(f"KAFKA: Record type={type(record)}")
+            self.logger.debug(f"KAFKA: Producing key {record.get_id()} to topic {topic}.")
+            self.logger.debug(f"KAFKA: Producing record {record.to_dict()} to topic {topic}.")
 
             # Pass the message synchronously
-            self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict())
+            self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
+                                  callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
+            self.producer.poll(0.0)
             self.producer.flush()
             return True
         except ValueError as ex:
-            self.log_error("Invalid input, discarding record...")
-            self.logger.error(f"Exception occurred {ex}")
+            self.logger.error("KAFKA: Invalid input, discarding record...")
+            self.logger.error(f"KAFKA: Exception occurred {ex}")
             self.logger.error(traceback.format_exc())
         except Exception as ex:
-            self.logger.error(f"Exception occurred {ex}")
+            self.logger.error(f"KAFKA: Exception occurred {ex}")
             self.logger.error(traceback.format_exc())
+        finally:
+            self.lock.release()
         return False
 
 
 if __name__ == '__main__':
-    from confluent_kafka import avro
-
     # Create Admin API object
-    api = AdminApi("localhost:9092")
+    conf = {'metadata.broker.list': 'localhost:19092',
+            'security.protocol': 'SSL',
+            'ssl.ca.location': '../../secrets/snakeoil-ca-1.crt',
+            'ssl.key.location': '../../secrets/kafkacat.client.key',
+            'ssl.key.password': 'confluent',
+            'ssl.certificate.location': '../../secrets/kafkacat-ca1-signed.pem'}
+
+    api = AdminApi(conf=conf)
     topics = ['topic1']
 
     # create topics
     api.create_topics(topics)
 
-    test_conf = {'bootstrap.servers': "localhost:9092",
-                 'schema.registry.url': "http://localhost:8081"}
+    test_key_schema = "schema/key.avsc"
+    test_val_schema = "schema/message.avsc"
 
-    # load AVRO schema
-    test_key_schema = avro.loads(open('schema/key.avsc', "r").read())
-    test_val_schema = avro.loads(open('schema/message.avsc', "r").read())
+    producer_conf = conf.copy()
+    producer_conf['schema.registry.url'] = "http://localhost:8081"
 
     # create a producer
-    producer = AvroProducerApi(test_conf, test_key_schema, test_val_schema)
+    producer = AvroProducerApi(producer_conf=producer_conf, key_schema_location=test_key_schema,
+                               value_schema_location=test_val_schema)
 
     # produce message to topics
-    message = QueryAvro()
-    message.message_id = "msg1"
-    message.properties = {"abc": "def"}
-    producer.produce_sync("topic1", message)
+    id_token = 'id_token'
 
-    message = QueryResultAvro()
-    message.message_id = "msg2"
-    message.properties = {"abc": "def"}
-    producer.produce_sync("topic1", message)
+    auth = AuthAvro()
+    auth.guid = "testguid"
+    auth.name = "testactor"
+    auth.oidc_sub_claim = "test-oidc"
+
+    query = QueryAvro()
+    query.message_id = "msg1"
+    query.callback_topic = "topic"
+    query.properties = {"abc": "def"}
+    query.auth = auth
+    query.id_token = id_token
+    producer.produce("topic1", query)
+
+    query_result = QueryResultAvro()
+    query_result.message_id = "msg2"
+    query_result.request_id = "req2"
+    query_result.properties = {"abc": "def"}
+    query_result.auth = auth
+    producer.produce("topic1", query_result)
 
     # delete topics
     api.delete_topics(topics)

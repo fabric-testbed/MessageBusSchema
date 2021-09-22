@@ -28,33 +28,42 @@
 Defines AvroConsumer API class which exposes interface for various consumer functions
 """
 import importlib
+import logging
 import re
+from typing import List
 
 from confluent_kafka.avro import AvroConsumer, SerializerError
 from confluent_kafka.cimpl import KafkaError
 
-from fabric_mb.message_bus.base import Base
+from fabric_mb.message_bus.abc_mb_api import ABCMbApi
 from fabric_mb.message_bus.messages.message import IMessageAvro
 
 
-class AvroConsumerApi(Base):
+class AvroConsumerApi(ABCMbApi):
     """
     This class implements the Interface for Kafka consumer carrying Avro messages.
     It is expected that the users would extend this class and override handle_message function.
     """
-    def __init__(self, conf, key_schema, record_schema, topics, batch_size=5, logger=None):
-        super().__init__(logger)
-        self.consumer = AvroConsumer(conf, reader_key_schema=key_schema, reader_value_schema=record_schema)
+    def __init__(self, *, consumer_conf: dict, key_schema_location, value_schema_location: str,
+                 topics: List[str], batch_size: int = 5, logger: logging.Logger = None, sync: bool = False):
+        super().__init__(logger=logger)
+
+        self.key_schema = self.load_schema(schema_file=key_schema_location)
+        self.value_schema = self.load_schema(schema_file=value_schema_location)
+
+        self.consumer = AvroConsumer(consumer_conf, reader_key_schema=self.key_schema,
+                                     reader_value_schema=self.value_schema)
         self.running = True
         self.topics = topics
         self.batch_size = batch_size
+        self.sync = sync
 
     def shutdown(self):
         """
         Shutdown the consumer
         :return:
         """
-        self.log_debug("Trigger shutdown")
+        self.logger.debug("Trigger shutdown")
         self.running = False
 
     @staticmethod
@@ -77,13 +86,13 @@ class AvroConsumerApi(Base):
         :param value: incoming message value
         :return:
         """
-        self.log_debug("Message received for topic " + topic)
-        self.log_debug("Key = {}".format(key))
-        self.log_debug("Value = {}".format(value))
+        self.logger.debug("KAFKA: Message received for topic " + topic)
+        self.logger.debug("KAFKA: Key = {}".format(key))
+        self.logger.debug("KAFKA: Value = {}".format(value))
         class_name = value.get('name', None) + 'Avro'
-        self.log_debug("class_name = {}".format(class_name))
-        module_name = 'fabric_mb.message_bus.messages.' + re.sub(r'(?<!^)(?=[A-Z])', '_', class_name).lower()
-        self.log_debug("module_name = {}".format(module_name))
+        self.logger.debug("KAFKA: class_name = {}".format(class_name))
+        module_name = f"fabric_mb.message_bus.messages.{re.sub(r'(?<!^)(?=[A-Z])', '_', class_name).lower()}"
+        self.logger.debug(f"KAFKA: module_name = {module_name}")
 
         message = self._create_instance(module_name=module_name, class_name=class_name)
         message.from_dict(value)
@@ -97,42 +106,7 @@ class AvroConsumerApi(Base):
         """
         print(message)
 
-    def consume_auto(self):
-        """
-            Consume records unless shutdown triggered. Uses Kafka's auto commit.
-        """
-        self.consumer.subscribe(self.topics)
-
-        while self.running:
-            try:
-                msg = self.consumer.poll(1)
-
-                # There were no messages on the queue, continue polling
-                if msg is None:
-                    continue
-
-                if msg.error():
-                    self.log_error("Consumer error: {}".format(msg.error()))
-                    if msg.error().code() == KafkaError._PARTITION_EOF:
-                        # End of partition event
-                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(),
-                                                                                  msg.partition(), msg.offset()))
-                    elif msg.error():
-                        self.log_error("Consumer error: {}".format(msg.error()))
-                        continue
-
-                self.process_message(msg.topic(), msg.key(), msg.value())
-            except SerializerError as e:
-                # Report malformed record, discard results, continue polling
-                self.log_error("Message deserialization failed {}".format(e))
-                continue
-            except KeyboardInterrupt:
-                break
-
-        self.log_debug("Shutting down consumer..")
-        self.consumer.close()
-
-    def consume_sync(self):
+    def consume(self):
         """
             Consume records unless shutdown triggered. Using synchronous commit after a message batch.
         """
@@ -148,26 +122,27 @@ class AvroConsumerApi(Base):
                     continue
 
                 if msg.error():
-                    self.log_error("Consumer error: {}".format(msg.error()))
+                    self.logger.error(f"KAFKA: Consumer error: {msg.error()}")
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         # End of partition event
-                        self.log_error('%% %s [%d] reached end at offset %d\n' % (msg.topic(),
-                                                                                  msg.partition(), msg.offset()))
+                        self.logger.error(f"KAFKA: {msg.topic()} {msg.partition} reached end at offset [{msg.offset()}]")
                     elif msg.error():
-                        self.log_error("Consumer error: {}".format(msg.error()))
+                        self.logger.error(f"KAFKA: Consumer error: {msg.error()}")
                         continue
 
                 self.process_message(msg.topic(), msg.key(), msg.value())
-                msg_count += 1
-                if msg_count % self.batch_size == 0:
-                    self.consumer.commit(asynchronous=False)
+
+                if self.sync:
+                    msg_count += 1
+                    if msg_count % self.batch_size == 0:
+                        self.consumer.commit(asynchronous=False)
 
             except SerializerError as e:
                 # Report malformed record, discard results, continue polling
-                self.log_error("Message deserialization failed {}".format(e))
+                self.logger.error(f"KAFKA: Message deserialization failed {e}")
                 continue
             except KeyboardInterrupt:
                 break
 
-        self.log_debug("Shutting down consumer..")
+        self.logger.debug("KAFKA: Shutting down consumer..")
         self.consumer.close()
