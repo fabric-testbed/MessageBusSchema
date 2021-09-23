@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Lease Reservation State
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
 
@@ -35,7 +32,7 @@ class LeaseReservationStateAvro(ReservationStateAvro):
     Implements Avro representation of a Lease Reservation State
     """
     def __init__(self):
-        super().__init__()
+        super(LeaseReservationStateAvro, self).__init__()
         self.name = self.__class__.__name__
         self.joining = None
 

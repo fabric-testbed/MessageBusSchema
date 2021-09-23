@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Claim Resources Message
-"""
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class ClaimResourcesAvro(RequestByIdRecord):
@@ -35,8 +32,8 @@ class ClaimResourcesAvro(RequestByIdRecord):
     Implements Avro representation of an Claim Resources Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.claim_resources
+        super(ClaimResourcesAvro, self).__init__()
+        self.name = AbcMessageAvro.claim_resources
 
     def validate(self) -> bool:
         """

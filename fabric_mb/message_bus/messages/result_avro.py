@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Message Status
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,9 +30,6 @@ class ResultAvro:
     """
     Implements Avro representation of a Result Message Status
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["code", "message", "details"]
-
     def __init__(self):
         self.code = 0
         self.message = ""

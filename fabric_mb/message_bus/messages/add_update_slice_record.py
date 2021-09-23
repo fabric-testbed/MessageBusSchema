@@ -23,35 +23,22 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Add Slice Message
-"""
-from uuid import uuid4
-
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
-class AddUpdateSliceRecord(IMessageAvro):
+class AddUpdateSliceRecord(AbcMessageAvro):
     """
     Implements Avro representation of an Add Slice Message
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "guid", "slice_obj", "auth", "id_token", "id"]
-
     def __init__(self):
-        self.name = None
-        self.message_id = None
+        super(AddUpdateSliceRecord, self).__init__()
         self.guid = None
         self.slice_obj = None
-        self.callback_topic = None
         self.auth = None
         self.id_token = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -95,30 +82,15 @@ class AddUpdateSliceRecord(IMessageAvro):
             result['auth'] = self.auth.to_dict()
         return result
 
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
     def __str__(self):
         return "name: {} message_id: {} callback_topic: {} guid: {} slice_obj: {} auth: {} id_token: {}".format(
             self.name, self.message_id, self.callback_topic, self.guid, self.slice_obj, self.auth, self.id_token)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
 
     def get_slice_obj(self) -> SliceAvro:
         """
         Return slice object
         """
         return self.slice_obj
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
 
     def get_id_token(self) -> str:
         """

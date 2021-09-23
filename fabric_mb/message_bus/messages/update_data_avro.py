@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements UpdateDataAvro class
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,9 +30,6 @@ class UpdateDataAvro:
     """
     Represents the Update Data sent from one actor to another
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["failed", "message"]
-
     def __init__(self):
         self.failed = False
         self.message = ""

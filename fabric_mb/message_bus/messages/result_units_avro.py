@@ -26,7 +26,7 @@
 """
 Implements Avro representation of a Result Message containing Units
 """
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
 
 
@@ -35,5 +35,5 @@ class ResultUnitsAvro(ResultRecordList):
     Implements Avro representation of a Result Message containing Units
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.result_units
+        super(ResultUnitsAvro, self).__init__()
+        self.name = AbcMessageAvro.result_units

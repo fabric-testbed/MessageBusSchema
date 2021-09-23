@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Auth Token
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,9 +30,6 @@ class AuthAvro:
     """
     Implements Avro representation of an Auth Token
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "guid", "oidc_sub_claim", "email"]
-
     def __init__(self):
         self.name = None
         self.guid = None

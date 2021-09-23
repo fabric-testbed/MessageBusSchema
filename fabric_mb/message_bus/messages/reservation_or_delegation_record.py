@@ -23,39 +23,25 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of Messages containing Reservation or Delegation
-"""
-from uuid import uuid4
-
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.delegation_avro import DelegationAvro
 from fabric_mb.message_bus.messages.reservation_avro import ReservationAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.update_data_avro import UpdateDataAvro
 
 
-class ReservationOrDelegationRecord(IMessageAvro):
+class ReservationOrDelegationRecord(AbcMessageAvro):
     """
     Implements Avro representation of Messages containing Reservation or Delegation
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "update_data", "reservation", "delegation", "auth",
-                 "id_token", "id"]
-
     def __init__(self):
-        self.name = None
-        self.message_id = None
-        self.callback_topic = None
+        super(ReservationOrDelegationRecord, self).__init__()
         self.update_data = None
         self.reservation = None
         self.delegation = None
         self.auth = None
         self.id_token = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -109,15 +95,6 @@ class ReservationOrDelegationRecord(IMessageAvro):
             result['id_token'] = self.id_token
         return result
 
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
     def __str__(self):
         self.name = None
         self.message_id = None
@@ -132,9 +109,3 @@ class ReservationOrDelegationRecord(IMessageAvro):
                "delegation: {} auth: {} id_token: {}".\
             format(self.name, self.message_id, self.callback_topic, self.update_data, self.reservation,
                    self.delegation, self.auth, self.id_token)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic

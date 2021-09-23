@@ -23,10 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Remove Reservation Message
-"""
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 
 
@@ -35,8 +32,8 @@ class RemoveReservationAvro(RequestByIdRecord):
     Implements Avro representation of a Remove Reservation Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.remove_reservation
+        super(RemoveReservationAvro, self).__init__()
+        self.name = AbcMessageAvro.remove_reservation
 
     def validate(self) -> bool:
         """

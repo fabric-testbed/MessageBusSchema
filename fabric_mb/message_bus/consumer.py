@@ -36,7 +36,7 @@ from confluent_kafka.avro import AvroConsumer, SerializerError
 from confluent_kafka.cimpl import KafkaError
 
 from fabric_mb.message_bus.abc_mb_api import ABCMbApi
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class AvroConsumerApi(ABCMbApi):
@@ -46,7 +46,7 @@ class AvroConsumerApi(ABCMbApi):
     """
     def __init__(self, *, consumer_conf: dict, key_schema_location, value_schema_location: str,
                  topics: List[str], batch_size: int = 5, logger: logging.Logger = None, sync: bool = False):
-        super().__init__(logger=logger)
+        super(AvroConsumerApi, self).__init__(logger=logger)
 
         self.key_schema = self.load_schema(schema_file=key_schema_location)
         self.value_schema = self.load_schema(schema_file=value_schema_location)
@@ -99,7 +99,7 @@ class AvroConsumerApi(ABCMbApi):
 
         self.handle_message(message=message)
 
-    def handle_message(self, message: IMessageAvro):
+    def handle_message(self, message: AbcMessageAvro):
         """
         Handle incoming message; must be overridden by the derived class
         :param message: incoming message

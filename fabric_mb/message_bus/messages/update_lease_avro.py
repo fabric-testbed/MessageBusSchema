@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Update Lease Message
-"""
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class UpdateLeaseAvro(ReservationOrDelegationRecord):
@@ -36,8 +33,8 @@ class UpdateLeaseAvro(ReservationOrDelegationRecord):
     """
 
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.update_lease
+        super(UpdateLeaseAvro, self).__init__()
+        self.name = AbcMessageAvro.update_lease
 
     def validate(self) -> bool:
         """

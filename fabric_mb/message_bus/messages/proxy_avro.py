@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Proxy
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,9 +30,6 @@ class ProxyAvro:
     """
     Implements Avro representation of a Proxy
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["protocol", "name", "guid", "type", "kafka_topic"]
-
     def __init__(self):
         self.protocol = None
         self.name = None

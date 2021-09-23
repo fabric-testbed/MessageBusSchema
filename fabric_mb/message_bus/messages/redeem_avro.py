@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a redeem Message
-"""
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class RedeemAvro(ReservationOrDelegationRecord):
@@ -35,8 +32,8 @@ class RedeemAvro(ReservationOrDelegationRecord):
     Implements Avro representation of a redeem Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.redeem
+        super(RedeemAvro, self).__init__()
+        self.name = AbcMessageAvro.redeem
 
     def validate(self) -> bool:
         """

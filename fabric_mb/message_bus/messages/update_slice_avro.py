@@ -23,12 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Update Slice Message
-"""
-
 from fabric_mb.message_bus.messages.add_update_slice_record import AddUpdateSliceRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class UpdateSliceAvro(AddUpdateSliceRecord):
@@ -36,5 +32,5 @@ class UpdateSliceAvro(AddUpdateSliceRecord):
     Implements Avro representation of a Update Slice Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.update_slice
+        super(UpdateSliceAvro, self).__init__()
+        self.name = AbcMessageAvro.update_slice

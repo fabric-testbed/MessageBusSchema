@@ -23,10 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Message containing Delegations
-"""
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
 
 
@@ -35,5 +32,5 @@ class ResultDelegationAvro(ResultRecordList):
     Implements Avro representation of a Result Message containing Delegations
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.result_delegation
+        super(ResultDelegationAvro, self).__init__()
+        self.name = AbcMessageAvro.result_delegation

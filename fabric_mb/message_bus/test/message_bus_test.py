@@ -95,7 +95,7 @@ from fabric_mb.message_bus.messages.update_lease_avro import UpdateLeaseAvro
 from fabric_mb.message_bus.messages.update_reservation_avro import UpdateReservationAvro
 from fabric_mb.message_bus.messages.update_slice_avro import UpdateSliceAvro
 from fabric_mb.message_bus.messages.update_ticket_avro import UpdateTicketAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.producer import AvroProducerApi
 
 
@@ -685,125 +685,125 @@ class MessageBusTest(unittest.TestCase):
             def set_parent(self, parent):
                 self.parent = parent
 
-            def handle_message(self, message: IMessageAvro):
-                if message.get_message_name() == IMessageAvro.claim_delegation:
+            def handle_message(self, message: AbcMessageAvro):
+                if message.get_message_name() == AbcMessageAvro.claim_delegation:
                     self.parent.validate_reservation_or_delegation_record(message, claimd)
 
-                elif message.get_message_name() == IMessageAvro.close:
+                elif message.get_message_name() == AbcMessageAvro.close:
                     self.parent.validate_reservation_or_delegation_record(message, close)
 
-                elif message.get_message_name() == IMessageAvro.extend_lease:
+                elif message.get_message_name() == AbcMessageAvro.extend_lease:
                     self.parent.validate_reservation_or_delegation_record(message, extend_lease)
 
-                elif message.get_message_name() == IMessageAvro.extend_ticket:
+                elif message.get_message_name() == AbcMessageAvro.extend_ticket:
                     self.parent.validate_reservation_or_delegation_record(message, extend_ticket)
 
-                elif message.get_message_name() == IMessageAvro.failed_rpc:
+                elif message.get_message_name() == AbcMessageAvro.failed_rpc:
                     self.parent.validate_failed_rpc(message, failed_rpc)
 
-                elif message.get_message_name() == IMessageAvro.modify_lease:
+                elif message.get_message_name() == AbcMessageAvro.modify_lease:
                     self.parent.validate_reservation_or_delegation_record(message, modify_lease)
 
-                elif message.get_message_name() == IMessageAvro.query:
+                elif message.get_message_name() == AbcMessageAvro.query:
                     self.parent.validate_query(message, query)
 
-                elif message.get_message_name() == IMessageAvro.query_result:
+                elif message.get_message_name() == AbcMessageAvro.query_result:
                     self.parent.validate_query_result(message, query_result)
 
-                elif message.get_message_name() == IMessageAvro.redeem:
+                elif message.get_message_name() == AbcMessageAvro.redeem:
                     self.parent.validate_reservation_or_delegation_record(message, redeem)
 
-                elif message.get_message_name() == IMessageAvro.update_lease:
+                elif message.get_message_name() == AbcMessageAvro.update_lease:
                     self.parent.validate_reservation_or_delegation_record(message, update_lease)
 
-                elif message.get_message_name() == IMessageAvro.update_ticket:
+                elif message.get_message_name() == AbcMessageAvro.update_ticket:
                     self.parent.validate_reservation_or_delegation_record(message, update_ticket)
 
-                elif message.get_message_name() == IMessageAvro.ticket:
+                elif message.get_message_name() == AbcMessageAvro.ticket:
                     self.parent.validate_ticket(message, ticket)
 
-                elif message.get_message_name() == IMessageAvro.claim_resources:
+                elif message.get_message_name() == AbcMessageAvro.claim_resources:
                     self.parent.validate_request_by_id(message, claim_req)
 
-                elif message.get_message_name() == IMessageAvro.add_slice:
+                elif message.get_message_name() == AbcMessageAvro.add_slice:
                     self.parent.validate_add_update_slice(message, add_slice)
 
-                elif message.get_message_name() == IMessageAvro.update_slice:
+                elif message.get_message_name() == AbcMessageAvro.update_slice:
                     self.parent.validate_add_update_slice(message, update_slice)
 
-                elif message.get_message_name() == IMessageAvro.remove_slice:
+                elif message.get_message_name() == AbcMessageAvro.remove_slice:
                     self.parent.validate_request_by_id(message, remove_slice)
 
-                elif message.get_message_name() == IMessageAvro.remove_reservation:
+                elif message.get_message_name() == AbcMessageAvro.remove_reservation:
                     self.parent.validate_request_by_id(message, remove_res)
 
-                elif message.get_message_name() == IMessageAvro.close_reservations:
+                elif message.get_message_name() == AbcMessageAvro.close_reservations:
                     self.parent.validate_request_by_id(message, close_res)
 
-                elif message.get_message_name() == IMessageAvro.update_reservation:
+                elif message.get_message_name() == AbcMessageAvro.update_reservation:
                     self.parent.validate_add_update_reservation_record(message, update_res)
 
-                elif message.get_message_name() == IMessageAvro.add_reservation:
+                elif message.get_message_name() == AbcMessageAvro.add_reservation:
                     self.parent.validate_add_update_reservation_record(message, add_res)
 
-                elif message.get_message_name() == IMessageAvro.add_reservations:
+                elif message.get_message_name() == AbcMessageAvro.add_reservations:
                     self.parent.validate_add_reservations(message, add_ress)
 
-                elif message.get_message_name() == IMessageAvro.demand_reservation:
+                elif message.get_message_name() == AbcMessageAvro.demand_reservation:
                     self.parent.validate_add_update_reservation_record(message, demand_res)
 
-                elif message.get_message_name() == IMessageAvro.extend_reservation:
+                elif message.get_message_name() == AbcMessageAvro.extend_reservation:
                     self.parent.validate_extend_reservation(message, extend_res)
 
-                elif message.get_message_name() == IMessageAvro.get_slices_request:
+                elif message.get_message_name() == AbcMessageAvro.get_slices_request:
                     self.parent.validate_request_by_id(message, get_slice)
 
-                elif message.get_message_name() == IMessageAvro.get_reservations_request:
+                elif message.get_message_name() == AbcMessageAvro.get_reservations_request:
                     self.parent.validate_request_by_id(message, res_req)
 
-                elif message.get_message_name() == IMessageAvro.get_delegations:
+                elif message.get_message_name() == AbcMessageAvro.get_delegations:
                     self.parent.validate_request_by_id(message, del_req)
 
-                elif message.get_message_name() == IMessageAvro.get_reservations_state_request:
+                elif message.get_message_name() == AbcMessageAvro.get_reservations_state_request:
                     self.parent.validate_get_reservations_state_request(message, res_state_req)
 
-                elif message.get_message_name() == IMessageAvro.get_unit_request:
+                elif message.get_message_name() == AbcMessageAvro.get_unit_request:
                     self.parent.validate_request_by_id(message, ruu)
 
-                elif message.get_message_name() == IMessageAvro.get_reservation_units_request:
+                elif message.get_message_name() == AbcMessageAvro.get_reservation_units_request:
                     self.parent.validate_request_by_id(message, ru)
 
-                elif message.get_message_name() == IMessageAvro.get_broker_query_model_request:
+                elif message.get_message_name() == AbcMessageAvro.get_broker_query_model_request:
                     self.parent.validate_request_by_id(message, bqm_query)
 
-                elif message.get_message_name() == IMessageAvro.get_actors_request:
+                elif message.get_message_name() == AbcMessageAvro.get_actors_request:
                     self.parent.validate_request_by_id(message, actors_req)
 
-                elif message.get_message_name() == IMessageAvro.result_slice:
+                elif message.get_message_name() == AbcMessageAvro.result_slice:
                     self.parent.validate_result_record(message, slice_res)
 
-                elif message.get_message_name() == IMessageAvro.result_reservation:
+                elif message.get_message_name() == AbcMessageAvro.result_reservation:
                     self.parent.validate_result_record(message, res_res)
 
-                elif message.get_message_name() == IMessageAvro.result_string:
+                elif message.get_message_name() == AbcMessageAvro.result_string:
                     self.parent.validate_result_string(message, status_resp)
 
-                elif message.get_message_name() == IMessageAvro.result_strings:
+                elif message.get_message_name() == AbcMessageAvro.result_strings:
                     self.parent.validate_result_strings(message, res_strings)
 
-                elif message.get_message_name() == IMessageAvro.result_reservation_state:
+                elif message.get_message_name() == AbcMessageAvro.result_reservation_state:
                     self.parent.validate_result_record(message, res_state)
 
-                elif message.get_message_name() == IMessageAvro.result_units:
+                elif message.get_message_name() == AbcMessageAvro.result_units:
                     self.parent.validate_result_record(message, result_unit)
 
-                elif message.get_message_name() == IMessageAvro.result_proxy:
+                elif message.get_message_name() == AbcMessageAvro.result_proxy:
                     self.parent.validate_result_record(message, result_proxy)
 
-                elif message.get_message_name() == IMessageAvro.result_broker_query_model:
+                elif message.get_message_name() == AbcMessageAvro.result_broker_query_model:
                     self.parent.validate_result_record(message, result_model)
 
-                elif message.get_message_name() == IMessageAvro.result_actor:
+                elif message.get_message_name() == AbcMessageAvro.result_actor:
                     self.parent.validate_result_record(message, result_actor)
 
         # create a consumer

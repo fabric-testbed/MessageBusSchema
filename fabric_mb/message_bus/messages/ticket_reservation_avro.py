@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a ticket Reservation from Management Interface
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 
@@ -35,7 +32,7 @@ class TicketReservationAvro(ReservationMng):
     Implements Avro representation of a ticket Reservation from Management Interface
     """
     def __init__(self):
-        super().__init__()
+        super(TicketReservationAvro, self).__init__()
         self.broker = None
         self.ticket = None
         self.renewable = None

@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Get Actors Message
-"""
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class GetActorsRequestAvro(RequestByIdRecord):
@@ -35,5 +32,5 @@ class GetActorsRequestAvro(RequestByIdRecord):
     Implements Avro representation of a Get Actors Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.get_actors_request
+        super(GetActorsRequestAvro, self).__init__()
+        self.name = AbcMessageAvro.get_actors_request

@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Term
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 
 
@@ -33,9 +30,6 @@ class TermAvro:
     """
     Implements Avro representation of a Term
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["start_time", "end_time", "ticket_time", "new_start_time"]
-
     def __init__(self):
         self.start_time = None
         self.end_time = None

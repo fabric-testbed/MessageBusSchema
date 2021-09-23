@@ -23,13 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Remove Slice Message
-"""
-from uuid import uuid4
-
-from fabric_mb.message_bus.messages.auth_avro import AuthAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 
 
@@ -38,8 +32,8 @@ class RemoveSliceAvro(RequestByIdRecord):
     Implements Avro representation of a Remove Slice Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.remove_slice
+        super(RemoveSliceAvro, self).__init__()
+        self.name = AbcMessageAvro.remove_slice
 
     def validate(self) -> bool:
         """

@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Reservation
-"""
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.resource_set_avro import ResourceSetAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
@@ -36,9 +33,6 @@ class ReservationAvro:
     """
     Implements Avro representation of a Reservation
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["reservation_id", "slice", "resource_set", "term", "sequence"]
-
     def __init__(self):
         self.reservation_id = None
         self.slice = None

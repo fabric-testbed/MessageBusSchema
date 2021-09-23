@@ -23,25 +23,18 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Get Request Message
-"""
-from uuid import uuid4
-
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
-class RequestByIdRecord(IMessageAvro):
+class RequestByIdRecord(AbcMessageAvro):
     """
     Implements Avro representation of a Get Request Message
     """
 
     def __init__(self):
-        self.name = None
-        self.callback_topic = None
-        self.message_id = None
+        super(RequestByIdRecord, self).__init__()
         self.guid = None
         self.slice_id = None
         self.reservation_id = None
@@ -57,9 +50,6 @@ class RequestByIdRecord(IMessageAvro):
         self.level = None
         self.email = None
         self.graph_format = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -132,30 +122,6 @@ class RequestByIdRecord(IMessageAvro):
             result['auth'] = self.auth.to_dict()
 
         return result
-
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        """
-        Returns the message name
-        """
-        return self.name
-
-    def get_callback_topic(self) -> str:
-        """
-        Returns the callback topic
-        """
-        return self.callback_topic
-
-    def get_id(self) -> str:
-        """
-        Returns the id
-        """
-        return self.id.__str__()
 
     def get_slice_id(self) -> str:
         """

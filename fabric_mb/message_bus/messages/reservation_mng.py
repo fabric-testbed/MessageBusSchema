@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Represents Reservation object returned from Management Interface APIs
-"""
 import pickle
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 

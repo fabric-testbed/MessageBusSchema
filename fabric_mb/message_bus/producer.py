@@ -37,7 +37,7 @@ from fabric_mb.message_bus.admin import AdminApi
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.query_avro import QueryAvro
 from fabric_mb.message_bus.messages.query_result_avro import QueryResultAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class AvroProducerApi(ABCMbApi):
@@ -46,7 +46,7 @@ class AvroProducerApi(ABCMbApi):
         It is expected that the users would extend this class and override on_delivery function.
     """
     def __init__(self, *, producer_conf: dict, key_schema_location, value_schema_location: str,
-                 logger: logging.Logger = None):
+                 logger: logging.Logger = None, retries: int = 3):
         """
             Initialize the Producer API
             :param producer_conf: configuration e.g:
@@ -55,12 +55,13 @@ class AvroProducerApi(ABCMbApi):
             :param key_schema_location: AVRO schema location for the key
             :param value_schema_location: AVRO schema location for the value
         """
-        super().__init__(logger=logger)
+        super(AvroProducerApi, self).__init__(logger=logger)
         self.lock = threading.Lock()
         self.key_schema = self.load_schema(schema_file=key_schema_location)
         self.value_schema = self.load_schema(schema_file=value_schema_location)
         self.producer = AvroProducer(producer_conf, default_key_schema=self.key_schema,
                                      default_value_schema=self.value_schema)
+        self.retry_attempts = retries
 
     def load_schema(self, schema_file: str):
         try:
@@ -80,19 +81,21 @@ class AvroProducerApi(ABCMbApi):
         """
         self.logger = logger
 
-    def delivery_report(self, err, msg, obj):
+    def delivery_report(self, err, msg, obj: AbcMessageAvro):
         """
             Handle delivery reports served from producer.poll.
             This callback takes an extra argument, obj.
             This allows the original contents to be included for debugging purposes.
         """
         if err is not None:
-            self.logger.error(f"KAFKA: Message {obj.id} delivery failed for {obj.name} with error {err}")
+            self.logger.error(f"KAFKA: Message Delivery Failure! Error [{err}] MsgId: [{obj.id}] "
+                              f"Msg Name: [{obj.name}]")
+            obj.set_kafka_error(kafka_error=err)
         else:
-            self.logger.debug(f"KAFKA: Message {obj.id} key {msg.key()} successfully produced to {msg.topic()} "
-                              f"[{msg.partition()}] at offset {msg.offset()}")
+            self.logger.debug(f"KAFKA: Message Delivery Successful! MsgId: [{obj.id}] Msg Name: [{obj.name}] "
+                              f"Topic: [{msg.topic()}] Partition [{msg.partition()}] Offset [{msg.offset()}]")
 
-    def produce(self, topic, record: IMessageAvro) -> bool:
+    def __produce(self, topic, record: AbcMessageAvro) -> bool:
         """
             Produce records for a specific topic
             :param topic: topic to which messages are written to
@@ -100,11 +103,11 @@ class AvroProducerApi(ABCMbApi):
             :return:
         """
         try:
-            self.lock.acquire()
             self.logger.debug(f"KAFKA: Record type={type(record)}")
             self.logger.debug(f"KAFKA: Producing key {record.get_id()} to topic {topic}.")
             self.logger.debug(f"KAFKA: Producing record {record.to_dict()} to topic {topic}.")
 
+            self.lock.acquire()
             # Pass the message synchronously
             self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
                                   callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
@@ -119,8 +122,28 @@ class AvroProducerApi(ABCMbApi):
             self.logger.error(f"KAFKA: Exception occurred {ex}")
             self.logger.error(traceback.format_exc())
         finally:
-            self.lock.release()
+            if self.lock.locked():
+                self.lock.release()
         return False
+
+    def produce(self, topic, record: AbcMessageAvro) -> bool:
+        """
+            Produce records for a specific topic and retry in case of failure
+            :param topic: topic to which messages are written to
+            :param record: record/message to be written
+            :return:
+        """
+        ret_val = False
+        attempt = 0
+        while attempt < self.retry_attempts:
+            ret_val = self.__produce(topic=topic, record=record)
+            attempt += 1
+            if record.get_kafka_error() is None:
+                break
+            else:
+                self.logger.info(f"KAFKA: Retrying message: {record.get_message_name()} {record.get_message_name()}")
+                ret_val = False
+        return ret_val
 
 
 if __name__ == '__main__':
@@ -130,7 +153,8 @@ if __name__ == '__main__':
             'ssl.ca.location': '../../secrets/snakeoil-ca-1.crt',
             'ssl.key.location': '../../secrets/kafkacat.client.key',
             'ssl.key.password': 'confluent',
-            'ssl.certificate.location': '../../secrets/kafkacat-ca1-signed.pem'}
+            'ssl.certificate.location': '../../secrets/kafkacat-ca1-signed.pem',
+            'request.timeout.ms': 120}
 
     api = AdminApi(conf=conf)
     topics = ['topic1']
