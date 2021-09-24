@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Reclaim Resources Message
-"""
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class ReclaimResourcesAvro(RequestByIdRecord):
@@ -35,8 +32,8 @@ class ReclaimResourcesAvro(RequestByIdRecord):
     Implements Avro representation of a Reclaim Resources Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.reclaim_resources
+        super(ReclaimResourcesAvro, self).__init__()
+        self.name = AbcMessageAvro.reclaim_resources
 
     def validate(self) -> bool:
         """

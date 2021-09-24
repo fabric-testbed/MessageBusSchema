@@ -23,10 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Message containing Pool Info
-"""
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
 
 
@@ -35,5 +32,5 @@ class ResultBrokerQueryModelAvro(ResultRecordList):
     Implements Avro representation of a Result Message containing Pool Info
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.result_broker_query_model
+        super(ResultBrokerQueryModelAvro, self).__init__()
+        self.name = AbcMessageAvro.result_broker_query_model

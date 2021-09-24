@@ -23,12 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Add Slice Message
-"""
-
 from fabric_mb.message_bus.messages.add_update_slice_record import AddUpdateSliceRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class AddSliceAvro(AddUpdateSliceRecord):
@@ -37,5 +33,5 @@ class AddSliceAvro(AddUpdateSliceRecord):
     """
 
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.add_slice
+        super(AddSliceAvro, self).__init__()
+        self.name = AbcMessageAvro.add_slice

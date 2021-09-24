@@ -26,9 +26,11 @@
 """
 Implements Avro Message Base class
 """
+from abc import ABC, abstractmethod
+from uuid import uuid4
 
 
-class IMessageAvro:
+class AbcMessageAvro(ABC):
     """
         Implements the base class for storing the deserialized Avro record. Each message is uniquely identified by
         a globally unique identifier. It must be inherited to include Actor specific fields and to_dict implementation.
@@ -87,45 +89,54 @@ class IMessageAvro:
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
 
+    def __init__(self):
+        # Unique id used to track produce request success/failures.
+        # Do *not* include in the serialized object.
+        self.id = uuid4()
+        self.message_id = None
+        self.name = None
+        self.callback_topic = None
+        self.kafka_error = None
+
+    @abstractmethod
     def to_dict(self) -> dict:
         """
         The Avro Python library does not support code generation.
         For this reason we must provide a dict representation of our class for serialization.
         :return dict representing the class
         """
-        raise NotImplementedError
 
+    @abstractmethod
     def from_dict(self, value: dict):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        raise NotImplementedError
 
     def get_message_id(self) -> str:
         """
         Returns the message_id
         """
-        raise NotImplementedError
+        return self.message_id
 
     def get_message_name(self) -> str:
         """
         Returns the message name
         """
-        raise NotImplementedError
+        return self.name
 
     def get_callback_topic(self) -> str:
         """
         Returns the callback topic
         """
-        raise NotImplementedError
+        return self.callback_topic
 
     def get_id(self) -> str:
         """
         Returns the id
         """
-        raise NotImplementedError
+        return self.id.__str__()
 
     def validate(self) -> bool:
         """
@@ -136,3 +147,9 @@ class IMessageAvro:
         if self.get_message_name() is None or self.get_message_id() is None or self.get_id() is None:
             ret_val = False
         return ret_val
+
+    def set_kafka_error(self, kafka_error):
+        self.kafka_error = kafka_error
+
+    def get_kafka_error(self):
+        return self.kafka_error

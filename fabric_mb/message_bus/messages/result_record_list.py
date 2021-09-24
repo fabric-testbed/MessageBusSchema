@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Record List
-"""
 from typing import List
 from uuid import uuid4
 
@@ -39,23 +36,18 @@ from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
 from fabric_mb.message_bus.messages.result_avro import ResultAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 from fabric_mb.message_bus.messages.unit_avro import UnitAvro
 
 
-class ResultRecordList(IMessageAvro):
+class ResultRecordList(AbcMessageAvro):
     """
     Implements Avro representation of a Result Record List
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "status", "slices", "reservations", "reservation_states", "units",
-                 "proxies", "model", "actors", "delegations", "id"]
-
     def __init__(self):
-        self.name = None
-        self.message_id = None
+        super(ResultRecordList, self).__init__()
         self.status = None
         self.slices = None
         self.reservations = None
@@ -65,9 +57,6 @@ class ResultRecordList(IMessageAvro):
         self.model = None
         self.actors = None
         self.delegations = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict_slices(self, value: list):
         """
@@ -307,32 +296,17 @@ class ResultRecordList(IMessageAvro):
         result = self.to_dict_delegations(result)
         return result
 
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        return self.name
-
     def __str__(self):
         return "name: {} message_id: {} status: {} slices: {} reservations: {} reservation_states: {} units: {} " \
                "proxies: {} model: {} actors: {} delegations: {}".\
             format(self.name, self.message_id, self.status, self.slices, self.reservations, self.reservation_states,
                    self.units, self.proxies, self.model, self.actors, self.delegations)
 
-    def get_id(self) -> str:
-        return self.id.__str__()
-
     def set_status(self, status: ResultAvro):
         """
         Set status
         """
         self.status = status
-
-    def get_callback_topic(self) -> str:
-        return None
 
     def get_status(self) -> ResultAvro:
         """

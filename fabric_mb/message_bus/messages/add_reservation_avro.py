@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Add Reservation Message
-"""
 from fabric_mb.message_bus.messages.add_update_reservation_record import AddUpdateReservationRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class AddReservationAvro(AddUpdateReservationRecord):
@@ -36,5 +33,5 @@ class AddReservationAvro(AddUpdateReservationRecord):
     """
 
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.add_reservation
+        super(AddReservationAvro, self).__init__()
+        self.name = AbcMessageAvro.add_reservation

@@ -23,33 +23,21 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Tickets
-"""
-from uuid import uuid4
-
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.reservation_avro import ReservationAvro
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
-class TicketAvro(IMessageAvro):
+class TicketAvro(AbcMessageAvro):
     """
     Implements Avro representation of a ticket
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "callback_topic", "reservation", "auth", "id"]
-
     def __init__(self):
-        self.name = IMessageAvro.ticket
-        self.message_id = None
+        super(TicketAvro, self).__init__()
+        self.name = AbcMessageAvro.ticket
         self.reservation = None
-        self.callback_topic = None
         self.auth = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -57,7 +45,7 @@ class TicketAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.ticket:
+        if value['name'] != AbcMessageAvro.ticket:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.callback_topic = value['callback_topic']
@@ -87,24 +75,9 @@ class TicketAvro(IMessageAvro):
             result['auth'] = self.auth.to_dict()
         return result
 
-    def get_message_id(self):
-        """
-        Returns the slice id
-        """
-        return self.message_id
-
     def __str__(self):
         return "name: {} message_id: {} callback_topic: {} reservation: {}".format(
             self.name, self.message_id, self.callback_topic, self.reservation)
-
-    def get_id(self) -> str:
-        return self.id.__str__()
-
-    def get_message_name(self) -> str:
-        return self.name
-
-    def get_callback_topic(self) -> str:
-        return self.callback_topic
 
     def validate(self) -> bool:
         """

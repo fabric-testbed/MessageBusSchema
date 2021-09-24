@@ -23,9 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Slice
-"""
 from datetime import datetime
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException

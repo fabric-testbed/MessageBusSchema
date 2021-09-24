@@ -23,10 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Lease Reservation
-"""
-
 from __future__ import annotations
 
 from typing import List
@@ -41,7 +37,7 @@ class LeaseReservationAvro(TicketReservationAvro):
     Implements Avro representation of a Lease Reservation
     """
     def __init__(self):
-        super().__init__()
+        super(LeaseReservationAvro, self).__init__()
         self.authority = None
         self.join_state = None
         self.leased_units = None

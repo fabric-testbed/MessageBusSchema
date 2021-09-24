@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Get Unit Message
-"""
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class GetUnitRequestAvro(RequestByIdRecord):
@@ -35,8 +32,8 @@ class GetUnitRequestAvro(RequestByIdRecord):
     Implements Avro representation of a Get Unit Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.get_unit_request
+        super(GetUnitRequestAvro, self).__init__()
+        self.name = AbcMessageAvro.get_unit_request
 
     def validate(self) -> bool:
         """

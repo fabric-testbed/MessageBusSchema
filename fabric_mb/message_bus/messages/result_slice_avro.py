@@ -23,11 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Message containing Slices
-"""
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
 class ResultSliceAvro(ResultRecordList):
@@ -35,5 +32,5 @@ class ResultSliceAvro(ResultRecordList):
     Implements Avro representation of a Result Message containing Slices
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.result_slice
+        super(ResultSliceAvro, self).__init__()
+        self.name = AbcMessageAvro.result_slice

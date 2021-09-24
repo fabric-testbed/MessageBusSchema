@@ -23,10 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of an Claim Delegation Message
-"""
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
@@ -35,8 +32,8 @@ class ClaimDelegationAvro(ReservationOrDelegationRecord):
     Implements Avro representation of an Claim Delegation Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.claim_delegation
+        super(ClaimDelegationAvro, self).__init__()
+        self.name = AbcMessageAvro.claim_delegation
 
     def validate(self) -> bool:
         """

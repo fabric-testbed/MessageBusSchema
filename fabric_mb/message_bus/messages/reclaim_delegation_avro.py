@@ -23,11 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Reclaim Delegation Message
-"""
-
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
 
 
@@ -36,8 +32,8 @@ class ReclaimDelegationAvro(ReservationOrDelegationRecord):
     Implements Avro representation of a Reclaim Delegation Message
     """
     def __init__(self):
-        super().__init__()
-        self.name = IMessageAvro.reclaim_delegation
+        super(ReclaimDelegationAvro, self).__init__()
+        self.name = AbcMessageAvro.reclaim_delegation
 
     def validate(self) -> bool:
         """

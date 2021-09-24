@@ -23,34 +23,25 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro representation of a Result Message containing Strings
-"""
 from __future__ import annotations
 
 from typing import List
-from uuid import uuid4
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
-from fabric_mb.message_bus.messages.message import IMessageAvro
+from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.result_avro import ResultAvro
 
 
-class ResultStringsAvro(IMessageAvro):
+class ResultStringsAvro(AbcMessageAvro):
     """
     Implements Avro representation of a Result Message containing Strings
     """
-    # Use __slots__ to explicitly declare all data members.
-    __slots__ = ["name", "message_id", "result", "callback_topic", "id"]
 
     def __init__(self):
-        self.name = IMessageAvro.result_strings
-        self.message_id = None
+        super(ResultStringsAvro, self).__init__()
+        self.name = AbcMessageAvro.result_strings
         self.status = None
         self.result = None
-        # Unique id used to track produce request success/failures.
-        # Do *not* include in the serialized object.
-        self.id = uuid4()
 
     def from_dict(self, value: dict):
         """
@@ -58,7 +49,7 @@ class ResultStringsAvro(IMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != IMessageAvro.result_strings:
+        if value['name'] != AbcMessageAvro.result_strings:
             raise MessageBusException("Invalid message")
         self.message_id = value['message_id']
         self.status = ResultAvro()
@@ -83,18 +74,6 @@ class ResultStringsAvro(IMessageAvro):
             result["result"] = self.result
         return result
 
-    def get_message_id(self) -> str:
-        """
-        Returns the message_id
-        """
-        return self.message_id
-
-    def get_message_name(self) -> str:
-        """
-        Returns the message name
-        """
-        return self.name
-
     def __str__(self):
         return "name: {} message_id: {} status: {} result: {}".format(
             self.name, self.message_id, self.status, self.result)
@@ -112,20 +91,11 @@ class ResultStringsAvro(IMessageAvro):
         """
         self.status = value
 
-    def get_id(self) -> str:
-        """
-        Returns the id
-        """
-        return self.id.__str__()
-
     def get_result(self) -> List[str]:
         """
         Returns the result
         """
         return self.result
-
-    def get_callback_topic(self) -> str:
-        return None
 
     def validate(self) -> bool:
         """
