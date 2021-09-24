@@ -95,7 +95,7 @@ class AvroProducerApi(ABCMbApi):
             self.logger.debug(f"KAFKA: Message Delivery Successful! MsgId: [{obj.id}] Msg Name: [{obj.name}] "
                               f"Topic: [{msg.topic()}] Partition [{msg.partition()}] Offset [{msg.offset()}]")
 
-    def __produce(self, topic, record: AbcMessageAvro) -> bool:
+    def produce(self, topic, record: AbcMessageAvro) -> bool:
         """
             Produce records for a specific topic
             :param topic: topic to which messages are written to
@@ -108,11 +108,9 @@ class AvroProducerApi(ABCMbApi):
             self.logger.debug(f"KAFKA: Producing record {record.to_dict()} to topic {topic}.")
 
             self.lock.acquire()
-            # Pass the message synchronously
+            # Pass the message asynchronously
             self.producer.produce(topic=topic, key=record.get_id(), value=record.to_dict(),
                                   callback=lambda err, msg, obj=record: self.delivery_report(err, msg, obj))
-            self.producer.poll(0.0)
-            self.producer.flush()
             return True
         except ValueError as ex:
             self.logger.error("KAFKA: Invalid input, discarding record...")
@@ -126,24 +124,29 @@ class AvroProducerApi(ABCMbApi):
                 self.lock.release()
         return False
 
-    def produce(self, topic, record: AbcMessageAvro) -> bool:
+    def poll(self, timeout: float = 0.0):
         """
-            Produce records for a specific topic and retry in case of failure
-            :param topic: topic to which messages are written to
-            :param record: record/message to be written
+            Poll for delivery callbacks
+            :param timeout: timeout
             :return:
         """
-        ret_val = False
-        attempt = 0
-        while attempt < self.retry_attempts:
-            ret_val = self.__produce(topic=topic, record=record)
-            attempt += 1
-            if record.get_kafka_error() is None:
-                break
-            else:
-                self.logger.info(f"KAFKA: Retrying message: {record.get_message_name()} {record.get_message_name()}")
-                ret_val = False
-        return ret_val
+        try:
+            self.lock.acquire()
+            self.producer.poll(timeout=timeout)
+        finally:
+            self.lock.release()
+
+    def flush(self, timeout: float = None):
+        """
+            Flush all pending writes
+            :param timeout: timeout
+            :return:
+        """
+        try:
+            self.lock.acquire()
+            self.producer.flush()
+        finally:
+            self.lock.release()
 
 
 if __name__ == '__main__':
