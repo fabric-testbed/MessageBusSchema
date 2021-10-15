@@ -132,7 +132,7 @@ class AvroProducerApi(ABCMbApi):
         """
         try:
             self.lock.acquire()
-            self.producer.poll(timeout=timeout)
+            return self.producer.poll(timeout=timeout)
         finally:
             self.lock.release()
 
