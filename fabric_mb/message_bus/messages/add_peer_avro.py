@@ -23,32 +23,29 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
+from fabric_mb.message_bus.messages.constants import Constants
+from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 
 
-class QueryAvro(AbcMessageAvro):
+class AddPeerAvro(AbcMessageAvro):
     """
-    Implements Avro representation of a query Message
+    Implements Avro representation of an Add Peer Message
     """
-    def __init__(self):
-        super(QueryAvro, self).__init__()
-        self.name = AbcMessageAvro.query
-        self.properties = None
-        self.auth = None
-        self.id_token = None
 
-    def get_id_token(self) -> str:
-        """
-        Return id token
-        """
-        return self.id_token
+    def __init__(self, *, peer: ProxyAvro = None, callback_topic: str = None, id_token: str = None,
+                 message_id: str = None):
+        super(AddPeerAvro, self).__init__(name=AbcMessageAvro.add_peer, callback_topic=callback_topic,
+                                          id_token=id_token, message_id=message_id)
+        self.name = AbcMessageAvro.add_peer
+        self.peer = peer
 
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.auth is None or self.callback_topic is None or self.properties is None:
-            ret_val = False
-        return ret_val
+    def from_dict(self, value: dict):
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.PEER:
+                    self.__dict__[k] = ProxyAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v

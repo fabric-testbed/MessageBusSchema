@@ -23,10 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class ResultAvro:
+class ResultAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Result Message Status
     """
@@ -34,37 +34,6 @@ class ResultAvro:
         self.code = 0
         self.message = ""
         self.details = ""
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.code = value.get("code", None)
-        self.message = value.get("message", None)
-        self.details = value.get("details", None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "code": self.code
-        }
-        if self.message is not None:
-            result["message"] = self.message
-        if self.details is not None:
-            result["details"] = self.details
-        return result
-
-    def __str__(self):
-        return "code: {} message: {} details: {}".format(self.code, self.message, self.details)
 
     def get_code(self) -> int:
         """
@@ -106,12 +75,6 @@ class ResultAvro:
         @param value value
         """
         self.details = value
-
-    def __eq__(self, other):
-        if not isinstance(other, ResultAvro):
-            return False
-
-        return self.code == other.code and self.message == other.message and self.details == other.details
 
     def validate(self) -> bool:
         """

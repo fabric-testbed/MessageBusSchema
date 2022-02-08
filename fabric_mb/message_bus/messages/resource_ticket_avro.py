@@ -23,11 +23,12 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.term_avro import TermAvro
 
 
-class ResourceTicketAvro:
+class ResourceTicketAvro(AbcObjectAvro):
     def __init__(self):
         self.guid = None
         self.term = None
@@ -43,43 +44,13 @@ class ResourceTicketAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.guid = value.get('guid', None)
-        temp = value.get('term', None)
-        if temp is not None:
-            self.term = TermAvro()
-            self.term.from_dict(value=temp)
-        self.units = value.get('units', 0)
-        self.properties = value.get('properties', None)
-        self.type = value.get('type', None)
-        self.issuer = value.get('issuer', None)
-        self.holder = value.get('holder', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {"guid": self.guid, "units": self.units}
-        if self.term is not None:
-            result["term"] = self.term.to_dict()
-
-        if self.properties is not None:
-            result["properties"] = self.properties
-
-        if self.type is not None:
-            result["type"] = self.type
-
-        if self.issuer is not None:
-            result["issuer"] = self.issuer
-
-        if self.holder is not None:
-            result["holder"] = self.holder
-
-        return result
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.TERM:
+                    self.__dict__[k] = TermAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_guid(self) -> str:
         return self.guid
@@ -123,10 +94,6 @@ class ResourceTicketAvro:
     def set_holder(self, holder: str):
         self.holder = holder
 
-    def __str__(self):
-        return f"guid: {self.guid} units: {self.units} term: {self.term} properties: {self.properties} " \
-               f"type: {self.type} issuer: {self.issuer} holder: {self.holder}"
-
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
@@ -136,11 +103,3 @@ class ResourceTicketAvro:
         if self.guid is None or self.units is None or self.type is None:
             ret_val = False
         return ret_val
-
-    def __eq__(self, other):
-        if not isinstance(other, ResourceTicketAvro):
-            return False
-
-        return self.guid == other.guid and self.units == other.units and self.term == other.term and \
-               self.properties == other.properties and self.type == other.type and self.issuer == other.issuer and \
-               self.holder == other.holder

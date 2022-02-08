@@ -25,12 +25,13 @@
 # Author: Komal Thareja (kthare10@renci.org)
 import pickle
 
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.ticket import Ticket
 from fabric_mb.message_bus.messages.unit_avro import UnitAvro
 
 
-class ResourceSetAvro:
+class ResourceSetAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Reservation Resource Set
     """
@@ -47,68 +48,19 @@ class ResourceSetAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.units = value['units']
-        self.type = value['type']
-        self.sliver = value.get('sliver', None)
-        temp = value.get('ticket', None)
-        if temp is not None:
-            self.ticket = Ticket()
-            self.ticket.from_dict(value=temp)
-
-        temp = value.get('unit_set', None)
-        if temp is not None:
-            self.unit_set = []
-            for t in temp:
-                u = UnitAvro()
-                u.from_dict(value=t)
-                self.unit_set.append(u)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "units": self.units,
-            "type": self.type
-        }
-        if self.sliver is not None:
-            result['sliver'] = self.sliver
-        if self.ticket is not None:
-            result['ticket'] = self.ticket.to_dict()
-        if self.unit_set is not None:
-            value = []
-            for u in self.unit_set:
-                value.append(u.to_dict())
-            result['unit_set'] = value
-        return result
-
-    def __str__(self):
-        return f"units: {self.units} type: {self.type} sliver: {self.sliver} ticket: [{self.ticket}] " \
-               f"unit_set: [{self.unit_set}]"
-
-    def __eq__(self, other):
-        if not isinstance(other, ResourceSetAvro):
-            return False
-
-        ret_val = self.units == other.units and self.type == other.type and \
-                  self.sliver == other.sliver and self.ticket == other.ticket
-
-        if ret_val and self.unit_set is not None and other.unit_set is not None and \
-                len(self.unit_set) == len(other.unit_set):
-            count = 0
-            length = len(self.unit_set)
-            for i in range(length):
-                if self.unit_set[i] == other.unit_set[i]:
-                    count += 1
-            if length == count:
-                ret_val = True
-
-        return ret_val
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.TICKET:
+                    self.__dict__[k] = Ticket()
+                    self.__dict__[k].from_dict(value=v)
+                elif k == Constants.UNIT_SET:
+                    self.__dict__[k] = []
+                    for u in v:
+                        uu = UnitAvro()
+                        uu.from_dict(value=u)
+                        self.__dict__[k].append(uu)
+                else:
+                    self.__dict__[k] = v
 
     def validate(self) -> bool:
         """

@@ -23,23 +23,35 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from abc import ABC, abstractmethod
+from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.constants import Constants
-from fabric_mb.message_bus.messages.resource_set_avro import ResourceSetAvro
-from fabric_mb.message_bus.messages.slice_avro import SliceAvro
-from fabric_mb.message_bus.messages.term_avro import TermAvro
 
 
-class ReservationAvro(AbcObjectAvro):
-    """
-    Implements Avro representation of a Reservation
-    """
-    def __init__(self):
-        self.reservation_id = None
-        self.slice = None
-        self.resource_set = None
-        self.term = None
-        self.sequence = None
+class AbcObjectAvro(ABC):
+    def to_dict(self) -> dict:
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide a dict representation of our class for serialization.
+        :return dict representing the class
+        """
+        if not self.validate():
+            raise MessageBusException(Constants.ERROR_INVALID_ARGUMENTS)
+
+        result = self.__dict__.copy()
+
+        for k in self.__dict__:
+            if result[k] is None:
+                result.pop(k)
+            elif isinstance(result[k], AbcObjectAvro):
+                result[k] = result[k].to_dict()
+            elif isinstance(result[k], list):
+                temp = []
+                for elem in result[k]:
+                    temp.append(elem.to_dict())
+                result[k] = temp
+
+        return result
 
     def from_dict(self, value: dict):
         """
@@ -48,25 +60,31 @@ class ReservationAvro(AbcObjectAvro):
         :param value: incoming message dictionary
         """
         for k, v in value.items():
-            if k in self.__dict__ and v is not None:
-                if k == Constants.SLICE:
-                    self.__dict__[k] = SliceAvro()
-                    self.__dict__[k].from_dict(value=v)
-                elif k == Constants.TERM:
-                    self.__dict__[k] = TermAvro()
-                    self.__dict__[k].from_dict(value=v)
-                elif k == Constants.RESOURCE_SET:
-                    self.__dict__[k] = ResourceSetAvro()
-                    self.__dict__[k].from_dict(value=v)
-                else:
-                    self.__dict__[k] = v
+            if k in self.__dict__:
+                self.__dict__[k] = v
 
+    def __str__(self):
+        d = self.__dict__.copy()
+        for k in self.__dict__:
+            if d[k] is None:
+                d.pop(k)
+        if len(d) == 0:
+            return ''
+        ret = "{ "
+        for i, v in d.items():
+            ret = f"{ret} {i}: {v},"
+        return ret[:-1] + "}"
+
+    @abstractmethod
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
         :return True on success; False on failure
         """
-        ret_val = True
-        if self.reservation_id is None or self.slice is None or self.term is None:
-            ret_val = False
-        return ret_val
+
+    def __eq__(self, other):
+        assert isinstance(other, AbcObjectAvro)
+        for f, v in self.__dict__.items():
+            if v != other.__dict__[f]:
+                return False
+        return True

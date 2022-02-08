@@ -29,6 +29,7 @@ from typing import List
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.result_avro import ResultAvro
 
 
@@ -49,34 +50,15 @@ class ResultStringsAvro(AbcMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != AbcMessageAvro.result_strings:
-            raise MessageBusException("Invalid message")
-        self.message_id = value['message_id']
-        self.status = ResultAvro()
-        self.status.from_dict(value['status'])
-        self.result = value.get('result', None)
+        if value[Constants.NAME] != AbcMessageAvro.result_strings:
+            raise MessageBusException(Constants.ERROR_INVALID_MESSAGE)
 
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "status": self.status.to_dict()
-        }
-        if self.result is not None:
-            result["result"] = self.result
-        return result
-
-    def __str__(self):
-        return "name: {} message_id: {} status: {} result: {}".format(
-            self.name, self.message_id, self.status, self.result)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                self.__dict__[k] = v
+                if k == Constants.STATUS:
+                    self.status = ResultAvro()
+                    self.status.from_dict(value=v)
 
     def get_status(self) -> ResultAvro:
         """

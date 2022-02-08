@@ -1144,6 +1144,59 @@
 			}
 		]
 	},
+	{
+	    "namespace": "fabric.cf.model",
+		"name": "AddPeer",
+		"type": "record",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "callback_topic",
+				"type": "string"
+			},
+			{
+				"name": "message_id",
+				"type": "string"
+			},
+			{
+				"name": "peer",
+				"type": "fabric.cf.model.ProxyRecord"
+			}
+		]
+	},
+	{
+	    "namespace": "fabric.cf.model",
+		"name": "MaintenanceRequest",
+		"type": "record",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "callback_topic",
+				"type": "string"
+			},
+			{
+				"name": "message_id",
+				"type": "string"
+			},
+			{
+				"name": "actor_guid",
+				"type": "string"
+			},
+			{
+				"name": "mode",
+				"type": "boolean"
+			},
+			{
+				"name": "id_token",
+				"type": ["null", "string"],
+				"default": null
+			}
+		]
+	},
     {
 	    "namespace": "fabric.cf.model",
 		"name": "AddUpdateReservation",

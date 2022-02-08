@@ -23,11 +23,13 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-"""
-Implements Avro Message Base class
-"""
-from abc import ABC, abstractmethod
+from abc import ABC
 from uuid import uuid4
+
+from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+from fabric_mb.message_bus.messages.constants import Constants
 
 
 class AbcMessageAvro(ABC):
@@ -68,6 +70,8 @@ class AbcMessageAvro(ABC):
     add_reservations = "AddReservations"
     demand_reservation = "DemandReservation"
     extend_reservation = "ExtendReservation"
+    add_peer = "AddPeer"
+    maintenance_request = "MaintenanceRequest"
 
     get_reservations_state_request = "GetReservationsStateRequest"
     get_slices_request = "GetSlicesRequest"
@@ -89,30 +93,59 @@ class AbcMessageAvro(ABC):
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
 
-    def __init__(self):
+    def __init__(self, *, message_id: str = None, name: str = None, callback_topic: str = None, kafka_error: str = None,
+                 id_token: str = None):
         # Unique id used to track produce request success/failures.
         # Do *not* include in the serialized object.
         self.id = uuid4()
-        self.message_id = None
-        self.name = None
-        self.callback_topic = None
-        self.kafka_error = None
+        self.message_id = message_id
+        if message_id is None:
+            self.message_id = uuid4().__str__()
+        self.name = name
+        self.callback_topic = callback_topic
+        self.kafka_error = kafka_error
+        self.id_token = id_token
 
-    @abstractmethod
     def to_dict(self) -> dict:
         """
         The Avro Python library does not support code generation.
         For this reason we must provide a dict representation of our class for serialization.
         :return dict representing the class
         """
+        if not self.validate():
+            raise MessageBusException(Constants.ERROR_INVALID_ARGUMENTS)
 
-    @abstractmethod
+        result = self.__dict__.copy()
+
+        for k in self.__dict__:
+            if result[k] is None or k == Constants.ID:
+                result.pop(k)
+            elif isinstance(result[k], AbcObjectAvro):
+                result[k] = result[k].to_dict()
+            elif isinstance(result[k], list):
+                temp = []
+                for elem in result[k]:
+                    if isinstance(elem, AbcObjectAvro):
+                        temp.append(elem.to_dict())
+                    else:
+                        temp.append(elem)
+                result[k] = temp
+
+        return result
+
     def from_dict(self, value: dict):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.AUTH:
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_message_id(self) -> str:
         """
@@ -138,6 +171,12 @@ class AbcMessageAvro(ABC):
         """
         return self.id.__str__()
 
+    def get_id_token(self) -> str:
+        """
+        Returns id token
+        """
+        return self.id_token
+
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
@@ -153,3 +192,24 @@ class AbcMessageAvro(ABC):
 
     def get_kafka_error(self):
         return self.kafka_error
+
+    def __str__(self):
+        d = self.__dict__.copy()
+        for k in self.__dict__:
+            if d[k] is None or k == "id":
+                d.pop(k)
+        if len(d) == 0:
+            return ''
+        ret = "{ "
+        for i, v in d.items():
+            ret = f"{ret} {i}: {v},"
+        return ret[:-1] + "}"
+
+    def __eq__(self, other):
+        assert isinstance(other, AbcMessageAvro)
+        for f, v in self.__dict__.items():
+            if f == Constants.ID:
+                continue
+            if v != other.__dict__[f]:
+                return False
+        return True

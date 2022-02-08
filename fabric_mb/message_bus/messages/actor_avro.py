@@ -23,11 +23,12 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+from fabric_mb.message_bus.messages.constants import Constants
 
 
-class ActorAvro:
+class ActorAvro(AbcObjectAvro):
     """
     Implements Avro representation of an Actor
     """
@@ -46,81 +47,19 @@ class ActorAvro:
         self.id = None
         self.policy_guid = None
 
-    def __eq__(self, other):
-        if not isinstance(other, ActorAvro):
-            return False
-
-        return self.name == other.name and self.type == other.type and self.description == other.description and \
-               self.policy_class == other.policy_class and self.policy_module == other.policy_module and \
-               self.actor_class == other.actor_class and self.actor_module == other.actor_module and \
-               self.online == other.online and self.management_module == other.management_module and \
-               self.management_class == other.management_class and self.id == other.id and \
-               self.policy_guid == other.policy_guid
-
     def from_dict(self, value: dict):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.name = value.get('name', None)
-        self.type = value.get('type', None)
-        self.owner = value.get('owner', None)
-        self.description = value.get('description', None)
-        self.policy_class = value.get('policy_class', None)
-        self.policy_module = value.get('policy_module', None)
-        self.actor_class = value.get('actor_class', None)
-        self.actor_module = value.get('actor_module', None)
-        self.online = value.get('online', None)
-        self.management_class = value.get('management_class', None)
-        self.management_module = value.get('management_module', None)
-        self.id = value.get('id', None)
-        self.policy_guid = value.get('policy_guid', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name
-        }
-        if self.type is not None:
-            result['type'] = self.type
-        if self.owner is not None:
-            result['owner'] = self.owner.to_dict()
-        if self.description is not None:
-            result['description'] = self.description
-        if self.policy_class is not None:
-            result['policy_class'] = self.policy_class
-        if self.policy_module is not None:
-            result['policy_module'] = self.policy_module
-        if self.actor_class is not None:
-            result['actor_class'] = self.actor_class
-        if self.actor_module is not None:
-            result['actor_module'] = self.actor_module
-        if self.online is not None:
-            result['online'] = self.online
-        if self.management_class is not None:
-            result['management_class'] = self.management_class
-        if self.management_module is not None:
-            result['management_module'] = self.management_module
-        if self.id is not None:
-            result['id'] = self.id
-        if self.policy_guid is not None:
-            result['policy_guid'] = self.policy_guid
-        return result
-
-    def __str__(self):
-        return "name: {} type: {} owner: {} description: {} policy_class: {} policy_module: {} actor_class: {}" \
-               " actor_module: {} online: {} management_class: {} management_module: {} id: {} policy_guid: {}".\
-            format(self.name, self.type, self.owner, self.description, self.policy_class, self.policy_module,
-                   self.actor_class, self.actor_module, self.online, self.management_class, self.management_module,
-                   self.id, self.policy_guid)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.OWNER:
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_name(self) -> str:
         """

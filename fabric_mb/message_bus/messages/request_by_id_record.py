@@ -23,8 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
-from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
@@ -50,78 +48,6 @@ class RequestByIdRecord(AbcMessageAvro):
         self.level = None
         self.email = None
         self.graph_format = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.callback_topic = value.get('callback_topic', None)
-        self.message_id = value.get('message_id', None)
-        self.guid = value.get('guid', None)
-        self.slice_id = value.get('slice_id', None)
-        self.reservation_id = value.get('reservation_id', None)
-        self.delegation_id = value.get('delegation_id', None)
-        self.type = value.get('type', None)
-        self.unit_id = value.get('unit_id', None)
-        self.broker_id = value.get('broker_id', None)
-        self.reservation_state = value.get('reservation_state', None)
-        self.delegation_state = value.get('delegation_state', None)
-        self.id_token = value.get('id_token', None)
-        self.slice_name = value.get('slice_name', None)
-        self.level = value.get('level', None)
-        self.email = value.get('email', None)
-        self.graph_format = value.get('graph_format', None)
-
-        if value.get('auth', None) is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-        result = {
-            "name": self.name,
-            "callback_topic": self.callback_topic,
-            "message_id": self.message_id,
-            "guid": self.guid
-        }
-        if self.slice_id is not None:
-            result['slice_id'] = self.slice_id
-        if self.reservation_id is not None:
-            result['reservation_id'] = self.reservation_id
-        if self.delegation_id is not None:
-            result['delegation_id'] = self.delegation_id
-        if self.type is not None:
-            result['type'] = self.type
-        if self.unit_id is not None:
-            result['unit_id'] = self.unit_id
-        if self.broker_id is not None:
-            result['broker_id'] = self.broker_id
-        if self.reservation_state is not None:
-            result['reservation_state'] = self.reservation_state
-        if self.delegation_state is not None:
-            result['delegation_state'] = self.delegation_state
-        if self.id_token is not None:
-            result['id_token'] = self.id_token
-        if self.slice_name is not None:
-            result['slice_name'] = self.slice_name
-        if self.level is not None:
-            result['level'] = self.level
-        if self.email is not None:
-            result['email'] = self.email
-        if self.graph_format is not None:
-            result['graph_format'] = self.graph_format
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-
-        return result
 
     def get_slice_id(self) -> str:
         """
@@ -197,15 +123,6 @@ class RequestByIdRecord(AbcMessageAvro):
 
     def set_graph_format(self, graph_format):
         self.graph_format = graph_format
-
-    def __str__(self):
-        return f"name: {self.name} callback_topic: {self.callback_topic} message_id: {self.message_id} " \
-               f"guid: {self.guid} slice_id: {self.slice_id} reservation_id: {self.reservation_id} " \
-               f"delegation_id: {self.delegation_id} " \
-               f"type: {self.type} unit_id:{self.unit_id} broker_id: {self.broker_id} " \
-               f"reservation_state: {self.reservation_state} delegation_state: {self.delegation_state} " \
-               f"auth: {self.auth} id_token: {self.id_token} slice_name: {self.slice_name} level: {self.level} " \
-               f"email: {self.email} graph_format: {self.graph_format}"
 
     def validate(self) -> bool:
         """

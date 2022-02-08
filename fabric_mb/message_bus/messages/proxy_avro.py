@@ -23,10 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class ProxyAvro:
+class ProxyAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Proxy
     """
@@ -36,36 +36,6 @@ class ProxyAvro:
         self.guid = None
         self.type = None
         self.kafka_topic = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.protocol = value.get('protocol', None)
-        self.name = value.get('name', None)
-        self.guid = value.get('guid', None)
-        self.type = value.get('type', None)
-        self.kafka_topic = value.get('kafka_topic', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "protocol": self.protocol,
-            "name": self.name,
-            "guid": self.guid,
-            "type": self.type,
-            "kafka_topic": self.kafka_topic
-        }
-        return result
 
     def set_name(self, name: str):
         """
@@ -131,13 +101,6 @@ class ProxyAvro:
         Return kafka topic
         """
         return self.kafka_topic
-
-    def __eq__(self, other):
-        if not isinstance(other, ProxyAvro):
-            return False
-
-        return self.name == other.name and self.type == other.type and self.guid == other.guid and \
-               self.kafka_topic == other.kafka_topic and self.protocol == other.protocol
 
     def validate(self) -> bool:
         """

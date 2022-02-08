@@ -24,10 +24,10 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 import pickle
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class ReservationMng:
+class ReservationMng(AbcObjectAvro):
     """
     Implements Avro representation of a Reservation returned from Management Interface
     """
@@ -48,80 +48,6 @@ class ReservationMng:
         self.resource = None
         self.notices = None
         self.sliver = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.name = value.get('name', None)
-        self.reservation_id = value.get('reservation_id', None)
-        self.slice_id = value.get('slice_id', None)
-        self.start = value.get('start', None)
-        self.end = value.get('end', None)
-        self.requested_end = value.get('requested_end', None)
-        self.rtype = value.get('rtype', None)
-        self.units = value.get('units', None)
-        self.state = value.get('state', None)
-        self.pending_state = value.get('pending_state', None)
-        self.local = value.get('local', None)
-        self.config = value.get('config', None)
-        self.request = value.get('request', None)
-        self.resource = value.get('resource', None)
-        self.notices = value.get('notices', None)
-        self.sliver = value.get('sliver', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {'name': self.name,
-                  'reservation_id': self.reservation_id,
-                  'rtype': self.rtype,
-                  'notices': self.notices}
-        if self.slice_id is not None:
-            result['slice_id'] = self.slice_id
-
-        if self.start is not None:
-            result['start'] = self.start
-
-        if self.end is not None:
-            result['end'] = self.end
-
-        if self.requested_end is not None:
-            result['requested_end'] = self.requested_end
-
-        if self.units is not None:
-            result['units'] = self.units
-
-        if self.state is not None:
-            result['state'] = self.state
-
-        if self.pending_state is not None:
-            result['pending_state'] = self.pending_state
-
-        if self.local is not None:
-            result['local'] = self.local
-
-        if self.config is not None:
-            result['config'] = self.config
-
-        if self.request is not None:
-            result['request'] = self.request
-
-        if self.resource is not None:
-            result['resource'] = self.resource
-
-        if self.sliver is not None:
-            result['sliver'] = self.sliver
-
-        return result
 
     @staticmethod
     def sliver_to_bytes(sliver):
@@ -160,13 +86,6 @@ class ReservationMng:
             print(f"Resource Properties: {self.resource}")
 
         print("")
-
-    def __str__(self):
-        return f"name: {self.name} reservation_id: {self.reservation_id} slice_id: {self.slice_id} start: " \
-               f"{self.start} end: {self.end} requested_end: {self.requested_end} rtype: {self.rtype} " \
-               f"units: {self.units} state: {self.state} pending_state: {self.pending_state} local: {self.local}" \
-               f" config: {self.config} request: {self.request} resource: {self.resource} notices: {self.notices} " \
-               f"sliver: {self.sliver}"
 
     def get_reservation_id(self) -> str:
         """
@@ -369,17 +288,6 @@ class ReservationMng:
 
     def set_sliver(self, sliver):
         self.sliver = self.sliver_to_bytes(sliver)
-
-    def __eq__(self, other):
-        if not isinstance(other, ReservationMng):
-            return False
-
-        return self.name == other.name and self.reservation_id == other.reservation_id and \
-            self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
-            self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
-            self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
-            self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
-            self.sliver == other.sliver
 
     def validate(self) -> bool:
         """

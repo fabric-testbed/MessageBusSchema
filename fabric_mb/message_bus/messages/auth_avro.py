@@ -23,10 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class AuthAvro:
+class AuthAvro(AbcObjectAvro):
     """
     Implements Avro representation of an Auth Token
     """
@@ -35,48 +35,6 @@ class AuthAvro:
         self.guid = None
         self.oidc_sub_claim = None
         self.email = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.name = value.get('name', None)
-        self.guid = value.get('guid', None)
-        self.oidc_sub_claim = value.get('oidc_sub_claim', None)
-        self.email = value.get('email', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name
-        }
-        if self.guid is not None:
-            result['guid'] = self.guid
-
-        if self.oidc_sub_claim is not None:
-            result['oidc_sub_claim'] = self.oidc_sub_claim
-
-        if self.email is not None:
-            result['email'] = self.email
-        return result
-
-    def __str__(self):
-        return f"name: {self.name} guid: {self.guid} oidc_sub_claim: {self.oidc_sub_claim} email: {self.email}"
-
-    def __eq__(self, other):
-        if not isinstance(other, AuthAvro):
-            return False
-        return self.name == other.name and self.guid == other.guid and self.oidc_sub_claim == other.oidc_sub_claim and \
-               self.email == self.email
 
     def validate(self) -> bool:
         """

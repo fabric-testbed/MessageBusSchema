@@ -23,8 +23,6 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
-from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
@@ -38,45 +36,6 @@ class QueryResultAvro(AbcMessageAvro):
         self.properties = None
         self.request_id = None
         self.auth = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != AbcMessageAvro.query_result:
-            raise MessageBusException("Invalid message")
-        self.message_id = value['message_id']
-        self.properties = value['properties']
-        self.request_id = value['request_id']
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "request_id": self.request_id,
-            "properties": self.properties
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        return result
-
-    def __str__(self):
-        return "name: {} message_id: {} request_id: {} properties: {}"\
-            .format(self.name, self.message_id, self.request_id, self.properties)
 
     def validate(self) -> bool:
         """

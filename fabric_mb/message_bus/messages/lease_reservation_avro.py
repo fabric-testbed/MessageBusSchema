@@ -28,6 +28,7 @@ from __future__ import annotations
 from typing import List
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.reservation_predecessor_avro import ReservationPredecessorAvro
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
@@ -50,50 +51,15 @@ class LeaseReservationAvro(TicketReservationAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        super().from_dict(value)
-        self.authority = value.get('authority', None)
-        self.join_state = value.get('join_state', None)
-        self.leased_units = value.get('leased_units', None)
-        temp_redeem = value.get('redeem_processors', None)
-        if temp_redeem is not None:
-            for p in temp_redeem:
-                predecessor = ReservationPredecessorAvro()
-                predecessor.from_dict(p)
-                self.redeem_processors.append(predecessor)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = super().to_dict()
-        if result is None:
-            result = {}
-        result['authority'] = self.authority
-        if self.join_state is not None:
-            result['join_state'] = self.join_state
-
-        if self.leased_units is not None:
-            result['leased_units'] = self.leased_units
-
-        if self.redeem_processors is not None and len(self.redeem_processors) > 0:
-            temp = []
-            for p in self.redeem_processors:
-                temp.append(p.to_dict())
-            result['redeem_processors'] = temp
-
-        return result
-
-    def __str__(self):
-        return "{} authority: {} join_state: {} leased_units: {} redeem_processors: {}".format(super().__str__(),
-                                                                                               self.authority,
-                                                                                               self.join_state,
-                                                                                               self.leased_units,
-                                                                                               self.redeem_processors)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.REDEEM_PREDECESSORS:
+                    for pred in v:
+                        predecessor = ReservationPredecessorAvro()
+                        predecessor.from_dict(value=pred)
+                        self.redeem_processors.append(predecessor)
+                else:
+                    self.__dict__[k] = v
 
     def print(self):
         """
@@ -194,21 +160,3 @@ class LeaseReservationAvro(TicketReservationAvro):
         @return redeem processors
         """
         return self.redeem_processors
-
-    def __eq__(self, other):
-        if not isinstance(other, LeaseReservationAvro):
-            return False
-
-        return self.name == other.name and self.reservation_id == other.reservation_id and \
-                self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
-                self.requested_end == other.requested_end and self.rtype == other.rtype and \
-               self.units == other.units and \
-                self.state == other.state and self.pending_state == other.pending_state and \
-               self.local == other.local and \
-                self.request == other.request and self.resource == other.resource and \
-               self.notices == other.notices and \
-                self.broker == other.broker and self.ticket == other.ticket and \
-               self.renewable == other.renewable and \
-                self.renewable == other.renew_time and \
-                self.authority == other.authority and self.join_state == other.join_state and \
-                self.leased_units == other.leased_units and self.redeem_processors == other.redeem_processors

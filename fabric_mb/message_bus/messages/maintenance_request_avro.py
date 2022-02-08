@@ -26,29 +26,14 @@
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
-class QueryAvro(AbcMessageAvro):
+class MaintenanceRequestAvro(AbcMessageAvro):
     """
-    Implements Avro representation of a query Message
+    Implements Avro representation of an Maintenance Request Message
     """
-    def __init__(self):
-        super(QueryAvro, self).__init__()
-        self.name = AbcMessageAvro.query
-        self.properties = None
-        self.auth = None
-        self.id_token = None
 
-    def get_id_token(self) -> str:
-        """
-        Return id token
-        """
-        return self.id_token
-
-    def validate(self) -> bool:
-        """
-        Check if the object is valid and contains all mandatory fields
-        :return True on success; False on failure
-        """
-        ret_val = super().validate()
-        if self.auth is None or self.callback_topic is None or self.properties is None:
-            ret_val = False
-        return ret_val
+    def __init__(self, *, mode: bool = False, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
+                 message_id: str = None):
+        super(MaintenanceRequestAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
+                                                     name=AbcMessageAvro.maintenance_request, message_id=message_id)
+        self.actor_guid = actor_guid
+        self.mode = mode
