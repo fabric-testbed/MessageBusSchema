@@ -31,9 +31,15 @@ class MaintenanceRequestAvro(AbcMessageAvro):
     Implements Avro representation of an Maintenance Request Message
     """
 
-    def __init__(self, *, mode: bool = False, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
+    def __init__(self, *, properties: dict = None, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
                  message_id: str = None):
         super(MaintenanceRequestAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                                      name=AbcMessageAvro.maintenance_request, message_id=message_id)
         self.actor_guid = actor_guid
-        self.mode = mode
+        self.properties = properties
+
+    def set_properties(self, properties: dict):
+        self.properties = properties
+
+    def get_properties(self) -> dict:
+        return self.properties

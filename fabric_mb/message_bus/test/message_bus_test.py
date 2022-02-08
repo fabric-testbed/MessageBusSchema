@@ -676,7 +676,8 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce("fabric_mb-mb-public-test2", result_actor)
 
-        maint_req = MaintenanceRequestAvro(mode=True, actor_guid="am", callback_topic="test", id_token="id_token",
+        props = {"mode": "True"}
+        maint_req = MaintenanceRequestAvro(properties=props, actor_guid="am", callback_topic="test", id_token="id_token",
                                            message_id="mesg-id-1")
         producer.produce("fabric_mb-mb-public-test2", maint_req)
 

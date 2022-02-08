@@ -1187,9 +1187,12 @@
 				"type": "string"
 			},
 			{
-				"name": "mode",
-				"type": "boolean"
-			},
+                "name": "properties",
+                "type": {
+                    "type": "map",
+                    "values": "string"
+                }
+            },
 			{
 				"name": "id_token",
 				"type": ["null", "string"],
