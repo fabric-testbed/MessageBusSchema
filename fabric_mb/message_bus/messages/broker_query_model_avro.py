@@ -23,43 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class BrokerQueryModelAvro:
+class BrokerQueryModelAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Broker Query Model
     """
     def __init__(self):
         self.level = None
         self.model = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.level = value.get('level', None)
-        self.model = value.get('model', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "level": self.level,
-            "model": self.model
-        }
-        return result
-
-    def __str__(self):
-        return "level: {} model: {}".format(self.level, self.model)
 
     def set_level(self, level: str):
         """
@@ -88,12 +61,6 @@ class BrokerQueryModelAvro:
         @return model
         """
         return self.model
-
-    def __eq__(self, other):
-        if not isinstance(other, BrokerQueryModelAvro):
-            return False
-
-        return self.level == other.level and self.model == other.model
 
     def validate(self) -> bool:
         """

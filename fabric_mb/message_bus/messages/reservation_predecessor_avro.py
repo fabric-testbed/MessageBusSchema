@@ -23,38 +23,15 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class ReservationPredecessorAvro:
+class ReservationPredecessorAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Reservation Predecessor
     """
     def __init__(self):
         self.reservation_id = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.reservation_id = value.get('reservation_id', None)
-
-    def to_dict(self) -> dict:
-        """
-                The Avro Python library does not support code generation.
-                For this reason we must provide a dict representation of our class for serialization.
-                :return dict representing the class
-                """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {'reservation_id': self.reservation_id}
-        return result
-
-    def __str__(self):
-        return "reservation_id: {}".format(self.reservation_id)
 
     def get_reservation_id(self) -> str:
         """
@@ -69,12 +46,6 @@ class ReservationPredecessorAvro:
         @param value value
         """
         self.reservation_id = value
-
-    def __eq__(self, other):
-        if not isinstance(other, ReservationPredecessorAvro):
-            return False
-
-        return self.reservation_id == other.reservation_id
 
     def validate(self) -> bool:
         """

@@ -26,6 +26,7 @@
 from typing import List
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
@@ -51,52 +52,21 @@ class AddReservationsAvro(AbcMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        if value['name'] != AbcMessageAvro.add_reservations:
-            raise MessageBusException("Invalid message")
-        self.message_id = value.get('message_id', None)
-        self.guid = value.get('guid', None)
-        self.callback_topic = value.get('callback_topic', None)
-        self.id_token = value.get('id_token', None)
-
-        if value.get("reservation_list", None) is not None:
-            res_list = value.get("reservation_list", None)
-            self.reservation_list = []
-            for r in res_list:
-                res = TicketReservationAvro()
-                res.from_dict(r)
-                self.reservation_list.append(res)
-
-        if value.get('auth', None) is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "guid": self.guid,
-            "callback_topic": self.callback_topic
-        }
-        if self.id_token is not None:
-            result['id_token'] = self.id_token
-
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-
-        if self.reservation_list is not None:
-            temp = []
-            for r in self.reservation_list:
-                temp.append(r.to_dict())
-            result['reservation_list'] = temp
-
-        return result
+        if value[Constants.NAME] != AbcMessageAvro.add_reservations:
+            raise MessageBusException(Constants.ERROR_INVALID_MESSAGE)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.RESERVATION_LIST:
+                    self.reservation_list = []
+                    for r in v:
+                        res = TicketReservationAvro()
+                        res.from_dict(value=r)
+                        self.reservation_list.append(res)
+                elif k == Constants.AUTH:
+                    self.auth = AuthAvro()
+                    self.auth.from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_id_token(self) -> str:
         """
@@ -111,17 +81,13 @@ class AddReservationsAvro(AbcMessageAvro):
         """
         return self.reservation_list
 
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} reservation_list: {} callback_topic: {} id_token: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.reservation_list, self.callback_topic, self.id_token)
-
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
         :return True on success; False on failure
         """
         ret_val = True
-        if not super().validate() or self.guid is None or self.auth is None or self.callback_topic is None or \
-                self.reservation_list is None:
+        if not super().validate() or self.guid is None or self.auth is None or \
+                self.callback_topic is None or self.reservation_list is None:
             ret_val = False
         return ret_val

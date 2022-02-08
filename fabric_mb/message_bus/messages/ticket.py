@@ -23,12 +23,13 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.resource_ticket_avro import ResourceTicketAvro
 
 
-class Ticket:
+class Ticket(AbcObjectAvro):
     def __init__(self):
         self.authority = None
         self.old_units = 0
@@ -41,37 +42,16 @@ class Ticket:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        temp = value.get('authority', None)
-        if temp is not None:
-            self.authority = AuthAvro()
-            self.authority.from_dict(value=temp)
-        self.old_units = value.get('old_units', 0)
-        self.delegation_id = value.get('delegation_id', 0)
-        temp = value.get('resource_ticket', None)
-        if temp is not None:
-            self.resource_ticket = ResourceTicketAvro()
-            self.resource_ticket.from_dict(value=temp)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "old_units": self.old_units,
-            "delegation_id": self.delegation_id
-        }
-        if self.authority is not None:
-            result["authority"] = self.authority.to_dict()
-
-        if self.resource_ticket is not None:
-            result["resource_ticket"] = self.resource_ticket.to_dict()
-
-        return result
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.AUTHORITY:
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
+                elif k == Constants.RESOURCE_TICKET:
+                    self.__dict__[k] = ResourceTicketAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_authority(self) -> AuthAvro:
         return self.authority
@@ -97,10 +77,6 @@ class Ticket:
     def set_delegation_id(self, delegation_id: str):
         self.delegation_id = delegation_id
 
-    def __str__(self):
-        return f"old_units: {self.old_units}, authority: {self.authority} " \
-               f"resource_ticket: {self.resource_ticket} delegation_id: {self.delegation_id}"
-
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
@@ -111,10 +87,3 @@ class Ticket:
                 self.delegation_id is None:
             ret_val = False
         return ret_val
-
-    def __eq__(self, other):
-        if not isinstance(other, Ticket):
-            return False
-
-        return self.old_units == other.old_units and self.authority == other.authority and \
-               self.resource_ticket == other.resource_ticket and self.delegation_id == other.delegation_id

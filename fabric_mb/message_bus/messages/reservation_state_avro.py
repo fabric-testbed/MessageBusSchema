@@ -23,10 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class ReservationStateAvro:
+class ReservationStateAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Reservation State
     """
@@ -67,41 +67,6 @@ class ReservationStateAvro:
         @param value value
         """
         self.pending_state = value
-
-    def from_dict(self, values: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.rid = values.get('rid', None)
-        self.name = values.get('name', None)
-        self.state = values.get('state', None)
-        self.pending_state = values.get('pending_state', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        return {
-            'rid': self.rid,
-            'name': self.name,
-            'state': self.state,
-            'pending_state': self.pending_state}
-
-    def __str__(self):
-        return f"rid: {self.rid} state: {self.state} pending_state: {self.pending_state}"
-
-    def __eq__(self, other):
-        if not isinstance(other, ReservationStateAvro):
-            return False
-
-        return self.rid == other.rid and self.state == other.state and self.pending_state == other.pending_state
 
     def validate(self) -> bool:
         """

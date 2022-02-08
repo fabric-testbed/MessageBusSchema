@@ -23,49 +23,16 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class UpdateDataAvro:
+class UpdateDataAvro(AbcObjectAvro):
     """
     Represents the Update Data sent from one actor to another
     """
     def __init__(self):
         self.failed = False
         self.message = ""
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.failed = value.get('failed', None)
-        self.message = value.get('message', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "failed": self.failed,
-            "message": self.message
-        }
-        return result
-
-    def __str__(self):
-        return "failed: {} message: {} ".format(self.failed, self.message)
-
-    def __eq__(self, other):
-        if not isinstance(other, UpdateDataAvro):
-            return False
-
-        return self.failed == other.failed and self.message == other.message
 
     def validate(self) -> bool:
         """

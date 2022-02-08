@@ -23,10 +23,10 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 
 
-class TermAvro:
+class TermAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Term
     """
@@ -35,48 +35,6 @@ class TermAvro:
         self.end_time = None
         self.ticket_time = None
         self.new_start_time = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        self.start_time = value.get('start_time', None)
-        self.end_time = value.get('end_time', None)
-        self.ticket_time = value.get('ticket_time', None)
-        self.new_start_time = value.get('new_start_time', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "start_time": self.start_time,
-            "end_time": self.end_time
-        }
-        if self.ticket_time is not None:
-            result["ticket_time"] = self.ticket_time
-
-        if self.new_start_time is not None:
-            result["new_start_time"] = self.new_start_time
-        return result
-
-    def __str__(self):
-        return "start_time: {} end_time: {} ticket_time: {} new_start_time: {}"\
-            .format(self.start_time, self.end_time, self.ticket_time, self.new_start_time)
-
-    def __eq__(self, other):
-        if not isinstance(other, TermAvro):
-            return False
-
-        return self.start_time == other.start_time and self.ticket_time == other.ticket_time and \
-               self.end_time == other.end_time and self.new_start_time == other.new_start_time
 
     def validate(self) -> bool:
         """

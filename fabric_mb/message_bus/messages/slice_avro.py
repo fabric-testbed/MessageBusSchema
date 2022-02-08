@@ -25,11 +25,12 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from datetime import datetime
 
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+from fabric_mb.message_bus.messages.constants import Constants
 
 
-class SliceAvro:
+class SliceAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Slice
     """
@@ -54,76 +55,13 @@ class SliceAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.slice_name = value['slice_name']
-        self.guid = value['guid']
-        if value.get('owner', None) is not None:
-            self.owner = AuthAvro()
-            self.owner.from_dict(value['owner'])
-
-        self.description = value.get('description', None)
-        self.config_properties = value.get('config_properties', None)
-        self.resource_type = value.get('resource_type', None)
-        self.client_slice = value.get('client_slice', None)
-        self.broker_client_slice = value.get('broker_client_slice', None)
-        self.graph_id = value.get('graph_id', None)
-        self.state = value.get('state', None)
-        self.inventory = value.get('inventory', None)
-        self.lease_end = value.get('lease_end', None)
-        self.lease_start = value.get('lease_start', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "slice_name": self.slice_name,
-            "guid": self.guid
-        }
-        if self.owner is not None:
-            result["owner"] = self.owner.to_dict()
-
-        if self.description is not None:
-            result["description"] = self.description
-
-        if self.config_properties is not None:
-            result["config_properties"] = self.config_properties
-
-        if self.resource_type is not None:
-            result["resource_type"] = self.resource_type
-
-        if self.client_slice is not None:
-            result["client_slice"] = self.client_slice
-
-        if self.broker_client_slice is not None:
-            result["broker_client_slice"] = self.broker_client_slice
-
-        if self.graph_id is not None:
-            result["graph_id"] = self.graph_id
-
-        if self.state is not None:
-            result['state'] = self.state
-
-        if self.inventory is not None:
-            result["inventory"] = self.inventory
-
-        if self.lease_end is not None:
-            result["lease_end"] = self.lease_end
-
-        if self.lease_start is not None:
-            result["lease_start"] = self.lease_start
-        return result
-
-    def __str__(self):
-        return f"slice_name: {self.slice_name} guid: {self.guid} owner: {self.owner} description: {self.description} " \
-               f"config_properties: {self.config_properties} " \
-               f"resource_type: {self.resource_type} client_slice: {self.client_slice} " \
-               f"broker_client_slice: {self.broker_client_slice} graph_id: {self.graph_id} state: {self.state} " \
-               f"inventory: {self.inventory} lease_start: {self.lease_start} lease_end: {self.lease_end}"
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.OWNER:
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def print(self, all: bool = False):
         """
@@ -257,18 +195,9 @@ class SliceAvro:
     def set_slice_id(self, slice_id: str):
         """
         Set slice id
-        @param value value
+        @param slice_id slice_id
         """
         self.guid = slice_id
-
-    def __eq__(self, other):
-        if not isinstance(other, SliceAvro):
-            return False
-
-        return self.slice_name == other.slice_name and self.guid == other.guid and self.owner == other.owner and \
-            self.description == other.description and self.config_properties == other.config_properties and \
-            self.resource_type == other.resource_type and \
-            self.client_slice == other.client_slice and self.broker_client_slice == other.broker_client_slice
 
     def validate(self) -> bool:
         """

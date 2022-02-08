@@ -24,6 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 
 
@@ -38,50 +39,6 @@ class TicketReservationAvro(ReservationMng):
         self.renewable = None
         self.renew_time = None
         self.name = self.__class__.__name__
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        super().from_dict(value)
-        self.broker = value.get('broker', None)
-        self.ticket = value.get('ticket', None)
-        self.renewable = value.get('renewable', None)
-        self.renew_time = value.get('renew_time', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = super().to_dict()
-        if result is None:
-            result = {}
-
-        if self.broker is not None:
-            result['broker'] = self.broker
-
-        if self.ticket is not None:
-            result['ticket'] = self.ticket
-
-        if self.renewable is not None:
-            result['renewable'] = self.renewable
-
-        if self.renew_time is not None:
-            result['renew_time'] = self.renew_time
-
-        return result
-
-    def __str__(self):
-        prev_result = super().__str__()
-        return "{} broker: {} ticket: {} renewable: {} renew_time: {}".format(prev_result, self.broker, self.ticket,
-                                                                              self.renewable, self.renew_time)
 
     def print(self):
         print("")
@@ -171,15 +128,3 @@ class TicketReservationAvro(ReservationMng):
         @param value value
         """
         self.renew_time = value
-
-    def __eq__(self, other):
-        if not isinstance(other, TicketReservationAvro):
-            return False
-
-        return self.name == other.name and self.reservation_id == other.reservation_id and \
-            self.slice_id == other.slice_id and self.start == other.start and self.end == other.end and \
-            self.requested_end == other.requested_end and self.rtype == other.rtype and self.units == other.units and \
-            self.state == other.state and self.pending_state == other.pending_state and self.local == other.local and \
-            self.request == other.request and self.resource == other.resource and self.notices == other.notices and \
-            self.broker == other.broker and self.ticket == other.ticket and self.renewable == other.renewable and \
-            self.renewable == other.renew_time

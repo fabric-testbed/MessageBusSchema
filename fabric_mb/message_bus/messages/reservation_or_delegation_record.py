@@ -25,6 +25,7 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.delegation_avro import DelegationAvro
 from fabric_mb.message_bus.messages.reservation_avro import ReservationAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
@@ -49,63 +50,19 @@ class ReservationOrDelegationRecord(AbcMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.message_id = value.get('message_id', None)
-        self.callback_topic = value.get('callback_topic', None)
-        udd = value.get('update_data', None)
-        if udd is not None:
-            self.update_data = UpdateDataAvro()
-            self.update_data.from_dict(udd)
-        res_dict = value.get('reservation', None)
-        if res_dict is not None:
-            self.reservation = ReservationAvro()
-            self.reservation.from_dict(res_dict)
-        del_dict = value.get('delegation', None)
-        if del_dict is not None:
-            self.delegation = DelegationAvro()
-            self.delegation.from_dict(del_dict)
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-        self.id_token = value.get('id_token', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "callback_topic": self.callback_topic
-        }
-        if self.update_data is not None:
-            result['update_data'] = self.update_data.to_dict()
-        if self.reservation is not None:
-            result['reservation'] = self.reservation.to_dict()
-        if self.delegation is not None:
-            result['delegation'] = self.delegation.to_dict()
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        if self.id_token is not None:
-            result['id_token'] = self.id_token
-        return result
-
-    def __str__(self):
-        self.name = None
-        self.message_id = None
-        self.callback_topic = None
-        self.update_data = None
-        self.reservation = None
-        self.delegation = None
-        self.auth = None
-        self.id_token = None
-
-        return "name: {} message_id: {} callback_topic: {} update_data: {} reservation: {} " \
-               "delegation: {} auth: {} id_token: {}".\
-            format(self.name, self.message_id, self.callback_topic, self.update_data, self.reservation,
-                   self.delegation, self.auth, self.id_token)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.UPDATE_DATA:
+                    self.__dict__[k] = UpdateDataAvro()
+                    self.__dict__[k].from_dict(value=v)
+                elif k == Constants.RESERVATION:
+                    self.__dict__[k] = ReservationAvro()
+                    self.__dict__[k].from_dict(value=v)
+                elif k == Constants.DELEGATION:
+                    self.__dict__[k] = DelegationAvro()
+                    self.__dict__[k].from_dict(value=v)
+                elif k == Constants.AUTH:
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v

@@ -23,7 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 
@@ -50,55 +50,21 @@ class AddUpdateReservationRecord(AbcMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.message_id = value.get('message_id', None)
-        self.guid = value.get('guid', None)
-        self.callback_topic = value.get('callback_topic', None)
-        self.reservation_id = value.get('reservation_id', None)
-
-        if value.get("reservation_obj", None) is not None:
-            res_value = value.get("reservation_obj", None)
-            class_name = res_value.get('name', None)
-            if class_name == TicketReservationAvro.__name__:
-                self.reservation_obj = TicketReservationAvro()
-                self.reservation_obj.from_dict(res_value)
-            elif class_name == ReservationMng.__name__:
-                self.reservation_obj = ReservationMng()
-                self.reservation_obj.from_dict(res_value)
-
-        if value.get('auth', None) is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-        self.id_token = value.get('id_token')
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "guid": self.guid,
-            "callback_topic": self.callback_topic
-        }
-
-        if self.reservation_id is not None:
-            result['reservation_id'] = self.reservation_id
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-
-        if self.reservation_obj is not None:
-            result['reservation_obj'] = self.reservation_obj.to_dict()
-
-        if self.id_token is not None:
-            result['id_token'] = self.id_token
-
-        return result
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.RESERVATION_OBJ:
+                    class_name = v.get(Constants.NAME, None)
+                    if class_name == TicketReservationAvro.__name__:
+                        self.reservation_obj = TicketReservationAvro()
+                        self.reservation_obj.from_dict(value=v)
+                    elif class_name == ReservationMng.__name__:
+                        self.reservation_obj = ReservationMng()
+                        self.reservation_obj.from_dict(value=v)
+                elif k == Constants.AUTH:
+                    self.auth = AuthAvro()
+                    self.auth.from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def get_reservation(self) -> ReservationMng:
         """
@@ -119,18 +85,13 @@ class AddUpdateReservationRecord(AbcMessageAvro):
         """
         return self.id_token
 
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} reservation_obj: {} reservation_id: {} callback_topic: {}" \
-               " id_token: {}".format(self.name, self.message_id, self.guid, self.auth, self.reservation_obj,
-                                      self.reservation_id, self.callback_topic, self.id_token)
-
     def validate(self) -> bool:
         """
         Check if the object is valid and contains all mandatory fields
         :return True on success; False on failure
         """
         ret_val = True
-        if not super().validate() or self.guid is None or self.auth is None or self.callback_topic is None or \
-                self.reservation_obj is None:
+        if not super().validate() or self.guid is None or self.auth is None or \
+                self.callback_topic is None or self.reservation_obj is None:
             ret_val = False
         return ret_val

@@ -26,6 +26,7 @@
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
+from fabric_mb.message_bus.messages.constants import Constants
 
 
 class FailedRpcAvro(AbcMessageAvro):
@@ -40,52 +41,6 @@ class FailedRpcAvro(AbcMessageAvro):
         self.reservation_id = None
         self.error_details = None
         self.auth = None
-
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != AbcMessageAvro.failed_rpc:
-            raise MessageBusException("Invalid message")
-        self.message_id = value['message_id']
-        self.request_type = value['request_type']
-        self.request_id = value.get('request_id', None)
-        self.reservation_id = value.get('reservation_id', None)
-        self.error_details = value["error_details"]
-        auth_temp = value.get('auth', None)
-        if auth_temp is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "error_details": self.error_details,
-            "request_type": self.request_type
-        }
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-        if self.reservation_id is not None:
-            result["reservation_id"] = self.reservation_id
-        if self.request_id is not None:
-            result["request_id"] = self.request_id
-        return result
-
-    def __str__(self):
-        return "name: {} message_id: {} request_id: {} request_type: {} reservation_id:{} error_details:{}"\
-            .format(self.name, self.message_id, self.request_id, self.request_type, self.reservation_id,
-                    self.error_details)
 
     def validate(self) -> bool:
         """

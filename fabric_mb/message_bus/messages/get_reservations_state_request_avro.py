@@ -28,6 +28,7 @@ from typing import List
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
+from fabric_mb.message_bus.messages.constants import Constants
 
 
 class GetReservationsStateRequestAvro(AbcMessageAvro):
@@ -42,49 +43,6 @@ class GetReservationsStateRequestAvro(AbcMessageAvro):
         self.reservation_ids = None
         self.id_token = None
 
-    def from_dict(self, value: dict):
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide conversion from dict to our class for de-serialization
-        :param value: incoming message dictionary
-        """
-        if value['name'] != AbcMessageAvro.get_reservations_state_request:
-            raise MessageBusException("Invalid message")
-        self.message_id = value['message_id']
-        self.guid = value['guid']
-        self.callback_topic = value['callback_topic']
-        self.reservation_ids = value.get("reservation_ids", None)
-        self.id_token = value.get("id_token", None)
-
-        if value.get('auth', None) is not None:
-            self.auth = AuthAvro()
-            self.auth.from_dict(value['auth'])
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "guid": self.guid,
-            "callback_topic": self.callback_topic
-        }
-        if self.id_token is not None:
-            result["id_token"] = self.id_token
-
-        if self.auth is not None:
-            result['auth'] = self.auth.to_dict()
-
-        if self.reservation_ids is not None:
-            result['reservation_ids'] = self.reservation_ids
-
-        return result
-
     def get_reservation_ids(self) -> List[str]:
         """
         Return list of reservation ids
@@ -96,10 +54,6 @@ class GetReservationsStateRequestAvro(AbcMessageAvro):
         Return identity token
         """
         return self.id_token
-
-    def __str__(self):
-        return "name: {} message_id: {} guid: {} auth: {} reservation_ids: {} callback_topic: {} id_token: {}".format(
-            self.name, self.message_id, self.guid, self.auth, self.reservation_ids, self.callback_topic, self.id_token)
 
     def validate(self) -> bool:
         """

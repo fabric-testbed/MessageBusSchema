@@ -23,11 +23,12 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from fabric_mb.message_bus.message_bus_exception import MessageBusException
+from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
 
 
-class DelegationAvro:
+class DelegationAvro(AbcObjectAvro):
     """
     Implements Avro representation of a Delegation
     """
@@ -44,43 +45,13 @@ class DelegationAvro:
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.delegation_id = value['delegation_id']
-        self.sequence = value.get('sequence', None)
-        self.slice = SliceAvro()
-        self.slice.from_dict(value['slice'])
-        self.graph = value.get('graph', None)
-        self.state = value.get('state', None)
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "delegation_id": self.delegation_id,
-            "slice": self.slice.to_dict(),
-            "sequence": self.sequence
-        }
-        if self.graph is not None:
-            result['graph'] = self.graph
-
-        if self.state is not None:
-            result['state'] = self.state
-        return result
-
-    def __str__(self):
-        return "delegation_id: {} slice: {} sequence: {} state: {}".format(self.delegation_id, self.slice,
-                                                                           self.sequence, self.state)
-
-    def __eq__(self, other):
-        if not isinstance(other, DelegationAvro):
-            return False
-        return self.delegation_id == other.delegation_id and self.slice == other.slice and \
-               self.sequence == other.sequence and self.graph == other.graph and self.state == other.state
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.SLICE:
+                    self.__dict__[k] = SliceAvro()
+                    self.__dict__[k].from_dict(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def validate(self) -> bool:
         """

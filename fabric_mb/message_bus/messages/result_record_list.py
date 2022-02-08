@@ -28,6 +28,7 @@ from uuid import uuid4
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.actor_avro import ActorAvro
+from fabric_mb.message_bus.messages.constants import Constants
 from fabric_mb.message_bus.messages.delegation_avro import DelegationAvro
 from fabric_mb.message_bus.messages.lease_reservation_avro import LeaseReservationAvro
 from fabric_mb.message_bus.messages.lease_reservation_state_avro import LeaseReservationStateAvro
@@ -81,9 +82,9 @@ class ResultRecordList(AbcMessageAvro):
         if value is not None:
             for s in value:
                 res_obj = None
-                if s.get('name') == LeaseReservationAvro.__name__:
+                if s.get(Constants.NAME) == LeaseReservationAvro.__name__:
                     res_obj = LeaseReservationAvro()
-                elif s.get('name') == TicketReservationAvro.__name__:
+                elif s.get(Constants.NAME) == TicketReservationAvro.__name__:
                     res_obj = TicketReservationAvro()
                 else:
                     res_obj = ReservationMng()
@@ -102,7 +103,7 @@ class ResultRecordList(AbcMessageAvro):
             self.reservation_states = []
             for rs in value:
                 rs_state = None
-                if rs.get('name') == LeaseReservationStateAvro.__name__:
+                if rs.get(Constants.NAME) == LeaseReservationStateAvro.__name__:
                     rs_state = LeaseReservationStateAvro()
                 else:
                     rs_state = ReservationStateAvro()
@@ -180,127 +181,29 @@ class ResultRecordList(AbcMessageAvro):
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
-        self.message_id = value['message_id']
-        self.status = ResultAvro()
-        self.status.from_dict(value['status'])
-        slices_list = value.get('slices', None)
-        self.from_dict_slices(slices_list)
-
-        reservations_list = value.get('reservations', None)
-        self.from_dict_reservations(reservations_list)
-
-        rs_list = value.get("reservation_states", None)
-        self.from_dict_reservation_states(rs_list)
-
-        temp_units = value.get('units', None)
-        self.from_dict_units(temp_units)
-
-        proxies_list = value.get('proxies', None)
-        self.from_dict_proxies(proxies_list)
-
-        model = value.get('model', None)
-        self.from_dict_model(model)
-
-        actors_list = value.get('actors', None)
-        self.from_dict_actors(actors_list)
-
-        delegations_list = value.get('delegations', None)
-        self.from_dict_delegations(delegations_list)
-
-    def to_dict_slices(self, result: dict):
-        if self.slices is not None:
-            temp = []
-            for s in self.slices:
-                temp.append(s.to_dict())
-            result["slices"] = temp
-
-        return result
-
-    def to_dict_reservations(self, result: dict):
-        if self.reservations is not None:
-            temp = []
-            for s in self.reservations:
-                temp.append(s.to_dict())
-            result["reservations"] = temp
-        return result
-
-    def to_dict_reservation_states(self, result: dict):
-        if self.reservation_states is not None:
-            rs_list = []
-            for state in self.reservation_states:
-                rs_list.append(state.to_dict())
-            result['reservation_states'] = rs_list
-
-        return result
-
-    def to_dict_units(self, result: dict):
-        if self.units is not None:
-            temp = []
-            for u in self.units:
-                temp.append(u.to_dict())
-            result["units"] = temp
-
-        return result
-
-    def to_dict_proxies(self, result: dict):
-        if self.proxies is not None:
-            temp = []
-            for s in self.proxies:
-                temp.append(s.to_dict())
-            result["proxies"] = temp
-        return result
-
-    def to_dict_model(self, result: dict):
-        if self.model is not None:
-            result["model"] = self.model.to_dict()
-
-        return result
-
-    def to_dict_actors(self, result: dict):
-        if self.actors is not None:
-            temp = []
-            for s in self.actors:
-                temp.append(s.to_dict())
-            result["actors"] = temp
-        return result
-
-    def to_dict_delegations(self, result: dict):
-        if self.delegations is not None:
-            temp = []
-            for s in self.delegations:
-                temp.append(s.to_dict())
-            result["delegations"] = temp
-        return result
-
-    def to_dict(self) -> dict:
-        """
-        The Avro Python library does not support code generation.
-        For this reason we must provide a dict representation of our class for serialization.
-        :return dict representing the class
-        """
-        if not self.validate():
-            raise MessageBusException("Invalid arguments")
-
-        result = {
-            "name": self.name,
-            "message_id": self.message_id,
-            "status": self.status.to_dict()
-        }
-        result = self.to_dict_slices(result)
-        result = self.to_dict_reservations(result)
-        result = self.to_dict_reservation_states(result)
-        result = self.to_dict_units(result)
-        result = self.to_dict_proxies(result)
-        result = self.to_dict_model(result)
-        result = self.to_dict_actors(result)
-        result = self.to_dict_delegations(result)
-        return result
-
-    def __str__(self):
-        return "name: {} message_id: {} status: {} slices: {} reservations: {} reservation_states: {} units: {} " \
-               "proxies: {} model: {} actors: {} delegations: {}".\
-            format(self.name, self.message_id, self.status, self.slices, self.reservations, self.reservation_states,
-                   self.units, self.proxies, self.model, self.actors, self.delegations)
+        for k, v in value.items():
+            if k in self.__dict__ and v is not None:
+                if k == Constants.STATUS:
+                    self.status = ResultAvro()
+                    self.status.from_dict(value=v)
+                elif k == Constants.SLICES:
+                    self.from_dict_slices(value=v)
+                elif k == Constants.RESERVATIONS:
+                    self.from_dict_reservations(value=v)
+                elif k == Constants.RESERVATION_STATES:
+                    self.from_dict_reservation_states(value=v)
+                elif k == Constants.UNITS:
+                    self.from_dict_units(value=v)
+                elif k == Constants.PROXIES:
+                    self.from_dict_proxies(value=v)
+                elif k == Constants.MODEL:
+                    self.from_dict_model(value=v)
+                elif k == Constants.ACTORS:
+                    self.from_dict_actors(value=v)
+                elif k == Constants.DELEGATIONS:
+                    self.from_dict_delegations(value=v)
+                else:
+                    self.__dict__[k] = v
 
     def set_status(self, status: ResultAvro):
         """
