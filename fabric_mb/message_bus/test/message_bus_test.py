@@ -28,7 +28,7 @@ Module to test various messages
 """
 
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fabric_mb.message_bus.admin import AdminApi
 from fabric_mb.message_bus.consumer import AvroConsumerApi
@@ -494,7 +494,7 @@ class MessageBusTest(unittest.TestCase):
         extend_res.new_resource_type = "abc"
         extend_res.request_properties = {'abcd':'eee'}
         extend_res.config_properties = {'abcd':'eee'}
-        extend_res.end_time = int(datetime.now().timestamp())
+        extend_res.end_time = int(datetime.now(timezone.utc).timestamp())
         print(extend_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", extend_res)

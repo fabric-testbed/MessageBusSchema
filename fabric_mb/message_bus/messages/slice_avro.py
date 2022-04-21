@@ -23,7 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
@@ -239,10 +239,10 @@ class SliceAvro(AbcObjectAvro):
 
     def get_lease_end(self) -> datetime or None:
         if self.lease_end is not None:
-            return datetime.fromtimestamp(self.lease_end)
+            return datetime.fromtimestamp(self.lease_end, tz=timezone.utc)
         return self.lease_end
 
     def get_lease_start(self) -> datetime or None:
         if self.lease_start is not None:
-            return datetime.fromtimestamp(self.lease_start)
+            return datetime.fromtimestamp(self.lease_start, tz=timezone.utc)
         return self.lease_start
