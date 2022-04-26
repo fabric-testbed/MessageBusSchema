@@ -19,6 +19,11 @@
 				"name": "email",
 				"type": ["null", "string"],
 				"default": null
+			},
+            {
+				"name": "token",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
