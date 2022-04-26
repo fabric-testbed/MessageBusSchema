@@ -35,6 +35,7 @@ class AuthAvro(AbcObjectAvro):
         self.guid = None
         self.oidc_sub_claim = None
         self.email = None
+        self.token = None
 
     def validate(self) -> bool:
         """
@@ -56,3 +57,6 @@ class AuthAvro(AbcObjectAvro):
 
     def get_email(self) -> str:
         return self.email
+
+    def get_token(self) -> str:
+        return self.token
