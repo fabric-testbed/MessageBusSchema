@@ -300,6 +300,11 @@
 				"name": "lease_start",
 				"type": ["null", "int"],
 				"default": null
+			},
+			{
+				"name": "project_id",
+				"type": ["null", "string"],
+				"default": null
 			}
         ]
     },
