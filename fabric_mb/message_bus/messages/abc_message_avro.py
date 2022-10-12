@@ -65,7 +65,7 @@ class AbcMessageAvro(ABC):
     update_slice = "UpdateSlice"
     remove_delegation = "RemoveDelegation"
     remove_reservation = "RemoveReservation"
-    close_delegation = "CloseDelegations"
+    close_delegations = "CloseDelegations"
     close_reservations = "CloseReservations"
     update_reservation = "UpdateReservation"
     add_reservation = "AddReservation"

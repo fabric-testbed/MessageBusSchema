@@ -33,7 +33,7 @@ class CloseDelegationsAvro(RequestByIdRecord):
     """
     def __init__(self):
         super(CloseDelegationsAvro, self).__init__()
-        self.name = AbcMessageAvro.close_reservations
+        self.name = AbcMessageAvro.close_delegations
 
     def validate(self) -> bool:
         """
