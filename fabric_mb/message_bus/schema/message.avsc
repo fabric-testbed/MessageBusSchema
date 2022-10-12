@@ -614,6 +614,11 @@
                 "type": "string"
             },
             {
+                "name": "delegation_name",
+                "type": ["null", "string"],
+				"default": null
+            },
+            {
                 "name": "sequence",
                 "type": ["null", "int"],
                 "default": null
