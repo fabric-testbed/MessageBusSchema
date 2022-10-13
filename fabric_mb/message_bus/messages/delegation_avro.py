@@ -38,6 +38,7 @@ class DelegationAvro(AbcObjectAvro):
         self.graph = None
         self.sequence = 0
         self.state = None
+        self.delegation_name = None
 
     def from_dict(self, value: dict):
         """
@@ -90,12 +91,17 @@ class DelegationAvro(AbcObjectAvro):
     def get_state(self) -> int:
         return self.state
 
+    def get_name(self) -> str:
+        return self.delegation_name
+
     def print(self):
         """
         Print on console
         """
         print("")
         print("Delegation ID: {} Slice ID: {}".format(self.delegation_id, self.slice.get_slice_id()))
+        if self.delegation_name is not None:
+            print("Delegation Name: {}".format(self.delegation_name))
         if self.sequence is not None:
             print("Sequence: {}".format(self.sequence))
         if self.state is not None:
