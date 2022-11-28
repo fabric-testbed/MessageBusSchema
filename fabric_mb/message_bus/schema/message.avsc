@@ -1208,6 +1208,20 @@
                     "values": "string"
                 }
             },
+            {
+                "name": "sites",
+                "type": {
+                    "type": "map",
+                    "values": "string"
+                }
+            },
+            {
+                "name": "projects",
+                "type": {
+                    "type": "map",
+                    "values": "string"
+                }
+            },
 			{
 				"name": "id_token",
 				"type": ["null", "string"],

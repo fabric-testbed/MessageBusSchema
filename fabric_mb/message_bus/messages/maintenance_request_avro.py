@@ -23,6 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+from typing import Dict
+
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
@@ -31,15 +33,29 @@ class MaintenanceRequestAvro(AbcMessageAvro):
     Implements Avro representation of an Maintenance Request Message
     """
 
-    def __init__(self, *, properties: dict = None, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
-                 message_id: str = None):
+    def __init__(self, *, properties: Dict[str, str] = None, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
+                 message_id: str = None, sites: Dict[str, str], projects: Dict[str, str]):
         super(MaintenanceRequestAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                                      name=AbcMessageAvro.maintenance_request, message_id=message_id)
         self.actor_guid = actor_guid
         self.properties = properties
+        self.sites = sites
+        self.projects = projects
 
-    def set_properties(self, properties: dict):
+    def set_properties(self, properties: Dict[str, str]):
         self.properties = properties
 
-    def get_properties(self) -> dict:
+    def get_properties(self) -> Dict[str, str]:
         return self.properties
+
+    def set_sites(self, sites: Dict[str, str]):
+        self.sites = sites
+
+    def get_sites(self) -> Dict[str, str]:
+        return self.sites
+
+    def set_projects(self, projects: Dict[str, str]):
+        self.projects = projects
+
+    def get_projects(self) -> Dict[str, str]:
+        return self.projects
