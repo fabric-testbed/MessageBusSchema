@@ -1210,17 +1210,19 @@
             },
             {
                 "name": "sites",
-                "type": {
+                "type": ["null", {
                     "type": "map",
                     "values": "string"
-                }
+                }],
+                "default": null
             },
             {
                 "name": "projects",
-                "type": {
+                "type": ["null", {
                     "type": "map",
                     "values": "string"
-                }
+                }],
+                "default": null
             },
 			{
 				"name": "id_token",

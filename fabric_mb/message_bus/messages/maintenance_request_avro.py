@@ -34,7 +34,7 @@ class MaintenanceRequestAvro(AbcMessageAvro):
     """
 
     def __init__(self, *, properties: Dict[str, str] = None, actor_guid: str = None, callback_topic: str = None, id_token: str = None,
-                 message_id: str = None, sites: Dict[str, str], projects: Dict[str, str]):
+                 message_id: str = None, sites: Dict[str, str] = None, projects: Dict[str, str] = None):
         super(MaintenanceRequestAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                                      name=AbcMessageAvro.maintenance_request, message_id=message_id)
         self.actor_guid = actor_guid
