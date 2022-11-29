@@ -1182,6 +1182,30 @@
 		]
 	},
 	{
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "SiteRecord",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+		    {
+				"name": "state",
+				"type": "int"
+			},
+			{
+				"name": "workers",
+				"type": ["null", "string"],
+				"default": null
+			},
+            {
+				"name": "deadline",
+				"type": ["null", "string"],
+				"default": null
+			}
+		]
+	},
+	{
 	    "namespace": "fabric.cf.model",
 		"name": "MaintenanceRequest",
 		"type": "record",
@@ -1209,21 +1233,13 @@
                 }
             },
             {
-                "name": "sites",
-                "type": ["null", {
-                    "type": "map",
-                    "values": "string"
-                }],
-                "default": null
-            },
-            {
-                "name": "projects",
-                "type": ["null", {
-                    "type": "map",
-                    "values": "string"
-                }],
-                "default": null
-            },
+				"name": "sites",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.SiteRecord"
+				}],
+				"default": null
+			},
 			{
 				"name": "id_token",
 				"type": ["null", "string"],

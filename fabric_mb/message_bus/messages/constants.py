@@ -89,6 +89,7 @@ class Constants:
     UPDATE_DATA = "update_data"
     DELEGATION = "delegation"
     STATUS = "status"
+    SITES = "sites"
 
     REDEEM_PREDECESSORS = "redeem_processors"
 
