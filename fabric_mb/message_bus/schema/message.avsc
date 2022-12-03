@@ -1031,6 +1031,11 @@
 				"name": "graph_format",
 				"type": ["null", "int"],
 				"default": null
+			},
+			{
+				"name": "site",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
@@ -1225,12 +1230,13 @@
 				"name": "actor_guid",
 				"type": "string"
 			},
-			{
+            {
                 "name": "properties",
-                "type": {
+                "type": ["null", {
                     "type": "map",
                     "values": "string"
-                }
+                }],
+                "default": null
             },
             {
 				"name": "sites",

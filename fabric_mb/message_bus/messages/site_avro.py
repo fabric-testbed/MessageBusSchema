@@ -56,7 +56,7 @@ class SiteAvro(AbcObjectAvro):
     def get_workers(self) -> List[str] or None:
         if self.workers is None:
             return self.workers
-        self.workers.split(',')
+        return self.workers.split(',')
 
     def get_deadline(self) -> datetime or None:
         if self.deadline is None:

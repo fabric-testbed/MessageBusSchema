@@ -48,6 +48,7 @@ class RequestByIdRecord(AbcMessageAvro):
         self.level = None
         self.email = None
         self.graph_format = None
+        self.site = None
 
     def get_slice_id(self) -> str:
         """
@@ -123,6 +124,12 @@ class RequestByIdRecord(AbcMessageAvro):
 
     def set_graph_format(self, graph_format):
         self.graph_format = graph_format
+
+    def set_site(self, site: str):
+        self.site = site
+
+    def get_site(self) -> str:
+        return self.site
 
     def validate(self) -> bool:
         """
