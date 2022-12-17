@@ -116,10 +116,7 @@ class UnitAvro(AbcObjectAvro):
         return ret_val
 
     def set_sliver(self, sliver):
-        if sliver is not None:
-            self.sliver = pickle.dumps(sliver)
+        self.sliver = sliver
 
     def get_sliver(self):
-        if self.sliver is not None:
-            return pickle.loads(self.sliver)
         return self.sliver

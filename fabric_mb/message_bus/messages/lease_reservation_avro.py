@@ -25,6 +25,7 @@
 # Author: Komal Thareja (kthare10@renci.org)
 from __future__ import annotations
 
+import pickle
 from typing import List
 
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
@@ -58,6 +59,8 @@ class LeaseReservationAvro(TicketReservationAvro):
                         predecessor = ReservationPredecessorAvro()
                         predecessor.from_dict(value=pred)
                         self.redeem_processors.append(predecessor)
+                elif k == Constants.SLIVER and v is not None:
+                    self.__dict__[k] = pickle.loads(v)
                 else:
                     self.__dict__[k] = v
 

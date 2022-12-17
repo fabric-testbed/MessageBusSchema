@@ -23,6 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+import pickle
 from abc import ABC, abstractmethod
 from fabric_mb.message_bus.message_bus_exception import MessageBusException
 from fabric_mb.message_bus.messages.constants import Constants
@@ -43,6 +44,10 @@ class AbcObjectAvro(ABC):
         for k in self.__dict__:
             if result[k] is None:
                 result.pop(k)
+            elif k == Constants.SLIVER:
+                v = result[k]
+                if v is not None:
+                    result[k] = pickle.dumps(v)
             elif isinstance(result[k], AbcObjectAvro):
                 result[k] = result[k].to_dict()
             elif isinstance(result[k], list):
@@ -61,7 +66,10 @@ class AbcObjectAvro(ABC):
         """
         for k, v in value.items():
             if k in self.__dict__:
-                self.__dict__[k] = v
+                if k == Constants.SLIVER and v is not None:
+                    self.__dict__[k] = pickle.loads(v)
+                else:
+                    self.__dict__[k] = v
 
     def __str__(self):
         d = self.__dict__.copy()
