@@ -47,6 +47,7 @@ class Constants:
     ACTOR_ID = "actor_id"
     PROPERTIES = "properties"
     SLIVER = "sliver"
+    MAINT_INFO = "maint_info"
     BROKER = "broker"
     TICKET = "ticket"
     RENEWABLE = "renewable"

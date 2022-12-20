@@ -33,13 +33,9 @@ class SiteAvro(AbcObjectAvro):
     """
     Implements Avro representation of an Site
     """
-    LEASE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S %z"
-
-    def __init__(self, *, name: str = None, workers: str = None, deadline: str = None, state: int = None):
+    def __init__(self, *, name: str = None, maint_info=None):
         self.name = name
-        self.workers = workers
-        self.deadline = deadline
-        self.state = state
+        self.maint_info = maint_info
 
     def validate(self) -> bool:
         """
@@ -53,16 +49,5 @@ class SiteAvro(AbcObjectAvro):
     def get_name(self) -> str:
         return self.name
 
-    def get_workers(self) -> List[str] or None:
-        if self.workers is None:
-            return self.workers
-        return self.workers.split(',')
-
-    def get_deadline(self) -> datetime or None:
-        if self.deadline is None:
-            return self.deadline
-
-        return datetime.strptime(self.deadline, self.LEASE_TIME_FORMAT)
-
-    def get_state(self) -> int or None:
-        return self.state
+    def get_maint_info(self):
+        return self.maint_info

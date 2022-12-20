@@ -44,7 +44,7 @@ class AbcObjectAvro(ABC):
         for k in self.__dict__:
             if result[k] is None:
                 result.pop(k)
-            elif k == Constants.SLIVER:
+            elif k == Constants.SLIVER or k == Constants.MAINT_INFO:
                 v = result[k]
                 if v is not None:
                     result[k] = pickle.dumps(v)
@@ -66,7 +66,7 @@ class AbcObjectAvro(ABC):
         """
         for k, v in value.items():
             if k in self.__dict__:
-                if k == Constants.SLIVER and v is not None:
+                if (k == Constants.SLIVER or k == Constants.MAINT_INFO) and v is not None:
                     self.__dict__[k] = pickle.loads(v)
                 else:
                     self.__dict__[k] = v

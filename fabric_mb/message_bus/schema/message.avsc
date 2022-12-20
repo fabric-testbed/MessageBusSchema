@@ -1194,20 +1194,11 @@
 				"name": "name",
 				"type": "string"
 			},
-		    {
-				"name": "state",
-				"type": "int"
-			},
 			{
-				"name": "workers",
-				"type": ["null", "string"],
-				"default": null
-			},
-            {
-				"name": "deadline",
-				"type": ["null", "string"],
-				"default": null
-			}
+                "name": "maint_info",
+                "type": ["null", "bytes"],
+                "default": null
+            }
 		]
 	},
 	{
