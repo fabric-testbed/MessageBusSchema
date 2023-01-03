@@ -107,6 +107,13 @@ class AbcMessageAvro(ABC):
         self.callback_topic = callback_topic
         self.kafka_error = kafka_error
         self.id_token = id_token
+        self.attempt = 1
+
+    def increment_attempt(self):
+        self.attempt += 1
+
+    def attempts(self) -> int:
+        return self.attempt
 
     def to_dict(self) -> dict:
         """
