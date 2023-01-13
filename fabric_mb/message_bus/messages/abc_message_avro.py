@@ -127,7 +127,7 @@ class AbcMessageAvro(ABC):
         result = self.__dict__.copy()
 
         for k in self.__dict__:
-            if result[k] is None or k == Constants.ID:
+            if result[k] is None or k == Constants.ID or k == Constants.ATTEMPT:
                 result.pop(k)
             elif isinstance(result[k], AbcObjectAvro):
                 result[k] = result[k].to_dict()

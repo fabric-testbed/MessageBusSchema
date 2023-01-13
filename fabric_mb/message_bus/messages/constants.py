@@ -76,6 +76,7 @@ class Constants:
     MANAGEMENT_CLASS = "management_class"
     MANAGEMENT_MODULE = "management_module"
     ID = "id"
+    ATTEMPT = "attempt"
     POLICY_GUID = "policy_guid"
 
     RESERVATION_LIST = "reservation_list"
