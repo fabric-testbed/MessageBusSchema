@@ -23,6 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+from typing import List
+
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
@@ -86,7 +88,7 @@ class RequestByIdRecord(AbcMessageAvro):
         """
         return self.broker_id
 
-    def get_reservation_state(self) -> int:
+    def get_reservation_state(self) -> List[int]:
         """
         Returns the reservation_state
         """
