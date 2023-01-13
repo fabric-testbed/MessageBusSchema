@@ -1004,10 +1004,10 @@
 			},
 			{
 				"name": "reservation_state",
-				"type": {
+				"type": ["null", {
 				    "type":"array",
 				    "items" : "int"
-				},
+				}],
 				"default": null
 			},
 			{
