@@ -51,6 +51,7 @@ class RequestByIdRecord(AbcMessageAvro):
         self.email = None
         self.graph_format = None
         self.site = None
+        self.states = None
 
     def get_slice_id(self) -> str:
         """
@@ -88,11 +89,14 @@ class RequestByIdRecord(AbcMessageAvro):
         """
         return self.broker_id
 
-    def get_reservation_state(self) -> List[int]:
+    def get_reservation_state(self) -> int:
         """
         Returns the reservation_state
         """
         return self.reservation_state
+
+    def get_states(self) -> List[int]:
+        return self.states
 
     def get_delegation_state(self) -> int:
         """
