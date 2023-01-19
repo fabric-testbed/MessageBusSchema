@@ -231,6 +231,21 @@
             }
         ]
     },
+  	{
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "SiteRecord",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+                "name": "maint_info",
+                "type": ["null", "bytes"],
+                "default": null
+            }
+		]
+	},
 	{
 	    "namespace": "fabric.cf.model",
         "name": "SliceRecord",
@@ -1206,21 +1221,6 @@
 				"name": "peer",
 				"type": "fabric.cf.model.ProxyRecord"
 			}
-		]
-	},
-	{
-		"namespace": "fabric.cf.model",
-		"type": "record",
-		"name": "SiteRecord",
-		"fields": [{
-				"name": "name",
-				"type": "string"
-			},
-			{
-                "name": "maint_info",
-                "type": ["null", "bytes"],
-                "default": null
-            }
 		]
 	},
 	{

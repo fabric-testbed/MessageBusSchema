@@ -27,13 +27,13 @@ from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecor
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
-class GetMaintInfoRequest(RequestByIdRecord):
+class GetSitesRequestAvro(RequestByIdRecord):
     """
-    Implements Avro representation of a Get Reservations Message
+    Implements Avro representation of a Get Sites Message
     """
     def __init__(self):
-        super(GetMaintInfoRequest, self).__init__()
-        self.name = AbcMessageAvro.get_maint_info_request
+        super(GetSitesRequestAvro, self).__init__()
+        self.name = AbcMessageAvro.get_sites_request
 
     def validate(self) -> bool:
         """
