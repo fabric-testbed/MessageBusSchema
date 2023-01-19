@@ -47,6 +47,7 @@ class Constants:
     ACTOR_ID = "actor_id"
     PROPERTIES = "properties"
     SLIVER = "sliver"
+    MAINT_INFO = "maint_info"
     BROKER = "broker"
     TICKET = "ticket"
     RENEWABLE = "renewable"
@@ -75,6 +76,7 @@ class Constants:
     MANAGEMENT_CLASS = "management_class"
     MANAGEMENT_MODULE = "management_module"
     ID = "id"
+    ATTEMPT = "attempt"
     POLICY_GUID = "policy_guid"
 
     RESERVATION_LIST = "reservation_list"
@@ -89,6 +91,7 @@ class Constants:
     UPDATE_DATA = "update_data"
     DELEGATION = "delegation"
     STATUS = "status"
+    SITES = "sites"
 
     REDEEM_PREDECESSORS = "redeem_processors"
 

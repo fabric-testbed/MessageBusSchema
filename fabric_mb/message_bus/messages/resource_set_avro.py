@@ -59,6 +59,11 @@ class ResourceSetAvro(AbcObjectAvro):
                         uu = UnitAvro()
                         uu.from_dict(value=u)
                         self.__dict__[k].append(uu)
+                elif k == Constants.SLIVER:
+                    if v is not None:
+                        self.__dict__[k] = pickle.loads(v)
+                    else:
+                        self.__dict__[k] = v
                 else:
                     self.__dict__[k] = v
 
@@ -73,10 +78,7 @@ class ResourceSetAvro(AbcObjectAvro):
         return ret_val
 
     def set_sliver(self, sliver):
-        if sliver is not None:
-            self.sliver = pickle.dumps(sliver)
+        self.sliver = sliver
 
     def get_sliver(self):
-        if self.sliver is not None:
-            return pickle.loads(self.sliver)
         return self.sliver

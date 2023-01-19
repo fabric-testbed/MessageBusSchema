@@ -231,6 +231,21 @@
             }
         ]
     },
+  	{
+		"namespace": "fabric.cf.model",
+		"type": "record",
+		"name": "SiteRecord",
+		"fields": [{
+				"name": "name",
+				"type": "string"
+			},
+			{
+                "name": "maint_info",
+                "type": ["null", "bytes"],
+                "default": null
+            }
+		]
+	},
 	{
 	    "namespace": "fabric.cf.model",
         "name": "SliceRecord",
@@ -303,6 +318,11 @@
 			},
 			{
 				"name": "project_id",
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "project_name",
 				"type": ["null", "string"],
 				"default": null
 			}
@@ -847,6 +867,15 @@
 				"default": null
 			},
 			{
+				"name": "sites",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.SiteRecord"
+				}],
+				"default": null
+			},
+
+			{
 				"name": "proxies",
 				"type": ["null", {
 				    "type":"array",
@@ -998,6 +1027,14 @@
 				"default": null
 			},
 			{
+				"name": "states",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "int"
+				}],
+				"default": null
+			},
+			{
 				"name": "reservation_state",
 				"type": ["null", "int"],
 				"default": null
@@ -1030,6 +1067,11 @@
             {
 				"name": "graph_format",
 				"type": ["null", "int"],
+				"default": null
+			},
+			{
+				"name": "site",
+				"type": ["null", "string"],
 				"default": null
 			}
 		]
@@ -1201,13 +1243,22 @@
 				"name": "actor_guid",
 				"type": "string"
 			},
-			{
+            {
                 "name": "properties",
-                "type": {
+                "type": ["null", {
                     "type": "map",
                     "values": "string"
-                }
+                }],
+                "default": null
             },
+            {
+				"name": "sites",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.SiteRecord"
+				}],
+				"default": null
+			},
 			{
 				"name": "id_token",
 				"type": ["null", "string"],

@@ -49,6 +49,7 @@ class SliceAvro(AbcObjectAvro):
         self.lease_start = None
         self.lease_end = None
         self.project_id = None
+        self.project_name = None
 
     def from_dict(self, value: dict):
         """
@@ -76,6 +77,8 @@ class SliceAvro(AbcObjectAvro):
         if all:
             if self.project_id is not None:
                 print("Project ID: {}".format(self.project_id))
+            if self.project_name is not None:
+                print("Project Name: {}".format(self.project_name))
             if self.owner is not None:
                 print(f"Slice owner: {self.owner}")
             if self.description is not None:
@@ -263,3 +266,17 @@ class SliceAvro(AbcObjectAvro):
         @param project_id project id
         """
         self.project_id = project_id
+
+    def get_project_name(self) -> str:
+        """
+        Return project name
+        @return project name
+        """
+        return self.project_name
+
+    def set_project_name(self, project_name: str):
+        """
+        Set project name
+        @param project_name project name
+        """
+        self.project_name = project_name

@@ -83,6 +83,7 @@ class AbcMessageAvro(ABC):
     get_unit_request = "GetUnitRequest"
     get_broker_query_model_request = "GetBrokerQueryModelRequest"
     get_actors_request = "GetActorsRequest"
+    get_sites_request = "GetSitesRequest"
 
     result_slice = "ResultSlice"
     result_reservation = "ResultReservation"
@@ -91,6 +92,7 @@ class AbcMessageAvro(ABC):
     result_strings = "ResultStrings"
     result_string = "ResultString"
     result_units = "ResultUnits"
+    result_sites = "ResultSites"
     result_proxy = "ResultProxy"
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
@@ -107,6 +109,13 @@ class AbcMessageAvro(ABC):
         self.callback_topic = callback_topic
         self.kafka_error = kafka_error
         self.id_token = id_token
+        self.attempt = 1
+
+    def increment_attempt(self):
+        self.attempt += 1
+
+    def attempts(self) -> int:
+        return self.attempt
 
     def to_dict(self) -> dict:
         """
@@ -120,7 +129,7 @@ class AbcMessageAvro(ABC):
         result = self.__dict__.copy()
 
         for k in self.__dict__:
-            if result[k] is None or k == Constants.ID:
+            if result[k] is None or k == Constants.ID or k == Constants.ATTEMPT:
                 result.pop(k)
             elif isinstance(result[k], AbcObjectAvro):
                 result[k] = result[k].to_dict()

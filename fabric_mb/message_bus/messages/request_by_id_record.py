@@ -23,6 +23,8 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+from typing import List
+
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
 
@@ -48,6 +50,8 @@ class RequestByIdRecord(AbcMessageAvro):
         self.level = None
         self.email = None
         self.graph_format = None
+        self.site = None
+        self.states = None
 
     def get_slice_id(self) -> str:
         """
@@ -91,6 +95,9 @@ class RequestByIdRecord(AbcMessageAvro):
         """
         return self.reservation_state
 
+    def get_states(self) -> List[int]:
+        return self.states
+
     def get_delegation_state(self) -> int:
         """
         Returns the delegation_state
@@ -123,6 +130,12 @@ class RequestByIdRecord(AbcMessageAvro):
 
     def set_graph_format(self, graph_format):
         self.graph_format = graph_format
+
+    def set_site(self, site: str):
+        self.site = site
+
+    def get_site(self) -> str:
+        return self.site
 
     def validate(self) -> bool:
         """

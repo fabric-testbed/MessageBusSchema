@@ -49,18 +49,6 @@ class ReservationMng(AbcObjectAvro):
         self.notices = None
         self.sliver = None
 
-    @staticmethod
-    def sliver_to_bytes(sliver):
-        if sliver is not None:
-            return pickle.dumps(sliver)
-        return None
-
-    @staticmethod
-    def bytes_to_sliver(sliver_bytes):
-        if sliver_bytes is not None:
-            return pickle.loads(sliver_bytes)
-        return sliver_bytes
-
     def print(self):
         """
         Prints ReservationMng
@@ -284,10 +272,10 @@ class ReservationMng(AbcObjectAvro):
         self.notices = value
 
     def get_sliver(self):
-        return self.bytes_to_sliver(self.sliver)
+        return self.sliver
 
     def set_sliver(self, sliver):
-        self.sliver = self.sliver_to_bytes(sliver)
+        self.sliver = sliver
 
     def validate(self) -> bool:
         """
