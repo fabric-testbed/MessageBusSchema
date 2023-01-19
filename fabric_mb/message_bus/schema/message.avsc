@@ -852,6 +852,15 @@
 				"default": null
 			},
 			{
+				"name": "sites",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.SiteRecord"
+				}],
+				"default": null
+			},
+
+			{
 				"name": "proxies",
 				"type": ["null", {
 				    "type":"array",

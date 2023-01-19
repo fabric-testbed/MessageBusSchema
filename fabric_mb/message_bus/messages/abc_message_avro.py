@@ -83,6 +83,7 @@ class AbcMessageAvro(ABC):
     get_unit_request = "GetUnitRequest"
     get_broker_query_model_request = "GetBrokerQueryModelRequest"
     get_actors_request = "GetActorsRequest"
+    get_maint_info_request = "GetMaintInfoRequest"
 
     result_slice = "ResultSlice"
     result_reservation = "ResultReservation"
@@ -91,6 +92,7 @@ class AbcMessageAvro(ABC):
     result_strings = "ResultStrings"
     result_string = "ResultString"
     result_units = "ResultUnits"
+    result_sites = "ResultSites"
     result_proxy = "ResultProxy"
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"

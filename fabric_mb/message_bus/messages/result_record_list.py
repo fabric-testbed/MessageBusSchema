@@ -38,6 +38,7 @@ from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
 from fabric_mb.message_bus.messages.result_avro import ResultAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
+from fabric_mb.message_bus.messages.site_avro import SiteAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
 from fabric_mb.message_bus.messages.ticket_reservation_avro import TicketReservationAvro
 from fabric_mb.message_bus.messages.unit_avro import UnitAvro
@@ -58,6 +59,7 @@ class ResultRecordList(AbcMessageAvro):
         self.model = None
         self.actors = None
         self.delegations = None
+        self.sites = None
 
     def from_dict_slices(self, value: list):
         """
@@ -175,6 +177,19 @@ class ResultRecordList(AbcMessageAvro):
                     self.delegations = []
                 self.delegations.append(del_obj)
 
+    def from_dict_sites(self, value: list):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            self.sites = []
+            for s in value:
+                site = SiteAvro()
+                site.from_dict(s)
+                self.sites.append(site)
+
     def from_dict(self, value: dict):
         """
         The Avro Python library does not support code generation.
@@ -202,6 +217,8 @@ class ResultRecordList(AbcMessageAvro):
                     self.from_dict_actors(value=v)
                 elif k == Constants.DELEGATIONS:
                     self.from_dict_delegations(value=v)
+                elif k == Constants.SITES:
+                    self.from_dict_sites(value=v)
                 else:
                     self.__dict__[k] = v
 
@@ -264,6 +281,12 @@ class ResultRecordList(AbcMessageAvro):
         Return delegations
         """
         return self.delegations
+
+    def get_sites(self) -> List[SiteAvro]:
+        """
+        Return sites
+        """
+        return self.sites
 
     def validate(self) -> bool:
         """
