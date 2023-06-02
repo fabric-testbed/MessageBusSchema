@@ -33,6 +33,7 @@ from fabric_mb.message_bus.messages.delegation_avro import DelegationAvro
 from fabric_mb.message_bus.messages.lease_reservation_avro import LeaseReservationAvro
 from fabric_mb.message_bus.messages.lease_reservation_state_avro import LeaseReservationStateAvro
 from fabric_mb.message_bus.messages.broker_query_model_avro import BrokerQueryModelAvro
+from fabric_mb.message_bus.messages.poa_info_avro import PoaInfoAvro
 from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.reservation_mng import ReservationMng
 from fabric_mb.message_bus.messages.reservation_state_avro import ReservationStateAvro
@@ -60,6 +61,7 @@ class ResultRecordList(AbcMessageAvro):
         self.actors = None
         self.delegations = None
         self.sites = None
+        self.poa_info = None
 
     def from_dict_slices(self, value: list):
         """
@@ -190,6 +192,16 @@ class ResultRecordList(AbcMessageAvro):
                 site.from_dict(s)
                 self.sites.append(site)
 
+    def from_dict_poa_info(self, value: dict):
+        """
+        The Avro Python library does not support code generation.
+        For this reason we must provide conversion from dict to our class for de-serialization
+        :param value: incoming message dictionary
+        """
+        if value is not None:
+            self.poa_info = PoaInfoAvro()
+            self.poa_info.from_dict(value=value)
+
     def from_dict(self, value: dict):
         """
         The Avro Python library does not support code generation.
@@ -219,6 +231,8 @@ class ResultRecordList(AbcMessageAvro):
                     self.from_dict_delegations(value=v)
                 elif k == Constants.SITES:
                     self.from_dict_sites(value=v)
+                elif k == Constants.POA_INFO:
+                    self.from_dict_poa_info(value=v)
                 else:
                     self.__dict__[k] = v
 
@@ -287,6 +301,12 @@ class ResultRecordList(AbcMessageAvro):
         Return sites
         """
         return self.sites
+
+    def get_poa_info(self) -> PoaInfoAvro:
+        """
+        Return Poa Info
+        """
+        return self.poa_info
 
     def validate(self) -> bool:
         """

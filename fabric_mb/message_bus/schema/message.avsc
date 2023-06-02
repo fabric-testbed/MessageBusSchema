@@ -818,6 +818,72 @@
 			}
         ]
     },
+    {
+        "namespace": "fabric.cf.model",
+        "name": "PoaRequest",
+        "type": "record",
+        "fields": [{
+                  "name": "name",
+                  "type": "string"
+              },
+              {
+                  "name": "callback_topic",
+                  "type": "string"
+              },
+              {
+                  "name": "message_id",
+                  "type": "string"
+              },
+              {
+                  "name": "operation",
+                  "type": "string"
+              },
+              {
+                  "name": "rid",
+                  "type": "string"
+              },
+              {
+                  "name": "auth",
+                  "type": "fabric.cf.model.AuthRecord"
+              },
+              {
+                  "name": "id_token",
+                  "type": ["null", "string"],
+                  "default": null
+              },
+               {
+                   "name": "vcpu_cpu_map",
+                   "type": ["null", {"type":"array", "items": {"type": "map", "values": "string"}}],
+                   "default": null
+               },
+               {
+                   "name": "node_set",
+                   "type": ["null", {"type":"array", "items" : "string"}],
+                   "default": null
+               }
+        ]
+    },
+    {
+        "namespace": "fabric.cf.model",
+        "type": "record",
+        "name": "PoaInInfoRecord",
+        "fields": [
+                    {
+                        "name": "operation",
+                        "type": "string"
+                    },
+                    {
+                        "name": "cpu_info",
+                        "type": ["null", "bytes"],
+                           "default": null
+                    },
+                    {
+                        "name": "numa_info",
+                        "type": ["null", "bytes"],
+                        "default": null
+                    }
+        ]
+    },
 	{
 	    "namespace": "fabric.cf.model",
 		"name": "ResultRecordList",
@@ -874,7 +940,6 @@
 				}],
 				"default": null
 			},
-
 			{
 				"name": "proxies",
 				"type": ["null", {
@@ -886,6 +951,11 @@
 			{
 				"name": "model",
                 "type": ["null", "fabric.cf.model.BrokerQueryModelRecord"],
+				"default": null
+			},
+            {
+				"name": "poa_info",
+                "type": ["null", "fabric.cf.model.PoaInInfoRecord"],
 				"default": null
 			},
 			{

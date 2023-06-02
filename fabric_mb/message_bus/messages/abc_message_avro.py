@@ -48,6 +48,7 @@ class AbcMessageAvro(ABC):
     extend_ticket = "ExtendTicket"
     failed_rpc = "FailedRpc"
     modify_lease = "ModifyLease"
+    poa = "Poa"
     query = "Query"
     query_result = "QueryResult"
     redeem = "Redeem"
@@ -96,6 +97,7 @@ class AbcMessageAvro(ABC):
     result_proxy = "ResultProxy"
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
+    result_poa = "ResultPoa"
 
     def __init__(self, *, message_id: str = None, name: str = None, callback_topic: str = None, kafka_error: str = None,
                  id_token: str = None):
