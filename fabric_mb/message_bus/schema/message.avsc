@@ -639,6 +639,11 @@
 				"default": null
             },
             {
+                "name": "site",
+                "type": ["null", "string"],
+				"default": null
+            },
+            {
                 "name": "sequence",
                 "type": ["null", "int"],
                 "default": null
@@ -835,12 +840,28 @@
                   "type": "string"
               },
               {
+                  "name": "poa_id",
+                  "type": "string"
+              },
+              {
+                  "name": "project_id",
+                  "type": "string"
+              },
+              {
                   "name": "operation",
                   "type": "string"
               },
               {
                   "name": "rid",
                   "type": "string"
+              },
+              {
+                  "name": "slice_id",
+                  "type": "string"
+              },
+              {
+                  "name": "sequence",
+                  "type": "int"
               },
               {
                   "name": "auth",
@@ -873,14 +894,29 @@
                         "type": "string"
                     },
                     {
-                        "name": "cpu_info",
-                        "type": ["null", "bytes"],
-                           "default": null
+                        "name": "poa_id",
+                        "type": "string"
                     },
                     {
-                        "name": "numa_info",
+                        "name": "rid",
+                        "type": "string"
+                    },
+                    {
+                        "name": "slice_id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "project_id",
+                        "type": "string"
+                    },
+                    {
+                        "name": "auth",
+                        "type": "fabric.cf.model.AuthRecord"
+                    },
+                    {
+                        "name": "info",
                         "type": ["null", "bytes"],
-                        "default": null
+                           "default": null
                     }
         ]
     },
@@ -954,8 +990,11 @@
 				"default": null
 			},
             {
-				"name": "poa_info",
-                "type": ["null", "fabric.cf.model.PoaInInfoRecord"],
+				"name": "poas",
+				"type": ["null", {
+				    "type":"array",
+				    "items" : "fabric.cf.model.PoaInInfoRecord"
+				}],
 				"default": null
 			},
 			{

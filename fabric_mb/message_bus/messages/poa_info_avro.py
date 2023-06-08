@@ -26,34 +26,49 @@
 import pickle
 
 from fabric_mb.message_bus.messages.abc_object_avro import AbcObjectAvro
+from fabric_mb.message_bus.messages.auth_avro import AuthAvro
 
 
 class PoaInfoAvro(AbcObjectAvro):
     """
     Implements Avro representation of a query Message
     """
-    def __init__(self, *, operation: str = None, cpu_info = None, numa_info = None):
+    def __init__(self, *, operation: str = None, info=None, rid: str = None, auth: AuthAvro = None,
+                 poa_id: str = None, project_id: str = None, slice_id: str = None):
         self.operation = operation
-        self.cpu_info = cpu_info
-        self.numa_info = numa_info
+        self.info = info
+        self.rid = rid
+        self.auth = auth
+        self.poa_id = poa_id
+        self.project_id = project_id
+        self.slice_id = slice_id
 
-    def get_cpu_info(self) -> dict:
+    def get_info(self) -> dict:
         """
         Return Cpu Info
         """
-        if self.cpu_info is not None:
-            if not isinstance(self.cpu_info, dict):
-                self.cpu_info = pickle.loads(self.cpu_info)
-        return self.cpu_info
+        if self.info is not None:
+            if not isinstance(self.info, dict):
+                self.info = pickle.loads(self.info)
+        return self.info
 
-    def get_numa_info(self) -> dict:
-        """
-        Return Numa Info
-        """
-        if self.numa_info is not None:
-            if not isinstance(self.numa_info, dict):
-                self.numa_info = pickle.loads(self.numa_info)
-        return self.numa_info
+    def get_operation(self) -> str:
+        return self.operation
+
+    def get_rid(self) -> str:
+        return self.rid
+
+    def get_project_id(self) -> str:
+        return self.project_id
+
+    def get_auth(self) -> AuthAvro:
+        return self.auth
+
+    def get_poa_id(self) -> str:
+        return self.poa_id
+
+    def get_slice_id(self) -> str:
+        return self.slice_id
 
     def validate(self) -> bool:
         """

@@ -61,7 +61,7 @@ class ResultRecordList(AbcMessageAvro):
         self.actors = None
         self.delegations = None
         self.sites = None
-        self.poa_info = None
+        self.poas = None
 
     def from_dict_slices(self, value: list):
         """
@@ -192,15 +192,18 @@ class ResultRecordList(AbcMessageAvro):
                 site.from_dict(s)
                 self.sites.append(site)
 
-    def from_dict_poa_info(self, value: dict):
+    def from_dict_poas(self, value: dict):
         """
         The Avro Python library does not support code generation.
         For this reason we must provide conversion from dict to our class for de-serialization
         :param value: incoming message dictionary
         """
         if value is not None:
-            self.poa_info = PoaInfoAvro()
-            self.poa_info.from_dict(value=value)
+            self.poas = []
+            for p in value:
+                poa = PoaInfoAvro()
+                poa.from_dict(p)
+                self.poas.append(poa)
 
     def from_dict(self, value: dict):
         """
@@ -231,8 +234,8 @@ class ResultRecordList(AbcMessageAvro):
                     self.from_dict_delegations(value=v)
                 elif k == Constants.SITES:
                     self.from_dict_sites(value=v)
-                elif k == Constants.POA_INFO:
-                    self.from_dict_poa_info(value=v)
+                elif k == Constants.POAS:
+                    self.from_dict_poas(value=v)
                 else:
                     self.__dict__[k] = v
 
@@ -302,11 +305,11 @@ class ResultRecordList(AbcMessageAvro):
         """
         return self.sites
 
-    def get_poa_info(self) -> PoaInfoAvro:
+    def get_poas(self) -> List[PoaInfoAvro]:
         """
         Return Poa Info
         """
-        return self.poa_info
+        return self.poas
 
     def validate(self) -> bool:
         """

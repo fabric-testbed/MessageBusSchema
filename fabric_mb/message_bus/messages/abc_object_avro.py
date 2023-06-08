@@ -44,7 +44,7 @@ class AbcObjectAvro(ABC):
         for k in self.__dict__:
             if result[k] is None:
                 result.pop(k)
-            elif k in [Constants.SLIVER, Constants.MAINT_INFO, Constants.CPU_INFO, Constants.NUMA_INFO]:
+            elif k in [Constants.SLIVER, Constants.MAINT_INFO, Constants.INFO]:
                 v = result[k]
                 if v is not None:
                     result[k] = pickle.dumps(v)
@@ -66,9 +66,12 @@ class AbcObjectAvro(ABC):
         """
         for k, v in value.items():
             if k in self.__dict__:
-                if (k in [Constants.SLIVER, Constants.MAINT_INFO, Constants.CPU_INFO, Constants.NUMA_INFO]) and \
-                        v is not None:
+                if (k in [Constants.SLIVER, Constants.MAINT_INFO, Constants.INFO]) and v is not None:
                     self.__dict__[k] = pickle.loads(v)
+                elif k == Constants.AUTH:
+                    from fabric_mb.message_bus.messages.auth_avro import AuthAvro
+                    self.__dict__[k] = AuthAvro()
+                    self.__dict__[k].from_dict(value=v)
                 else:
                     self.__dict__[k] = v
 

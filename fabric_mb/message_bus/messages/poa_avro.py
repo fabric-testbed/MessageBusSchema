@@ -24,6 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 from typing import List, Dict
+from uuid import uuid4
 
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 from fabric_mb.message_bus.messages.auth_avro import AuthAvro
@@ -34,8 +35,9 @@ class PoaAvro(AbcMessageAvro):
     Implements Avro representation of a query Message
     """
     def __init__(self, *, operation: str = None, vcpu_cpu_map: List[Dict[str, str]] = None,
-                 node_set: List[str] = None, callback_topic: str = None, rid: str = None,
-                 id_token: str = None, message_id: str = None, auth: AuthAvro = None):
+                 node_set: List[str] = None, callback_topic: str = None, rid: str = None, project_id: str = None,
+                 id_token: str = None, message_id: str = None, auth: AuthAvro = None, poa_id: str = None,
+                 sequence: int = None, slice_id: str = None):
         super(PoaAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                       name=AbcMessageAvro.poa, message_id=message_id)
         self.operation = operation
@@ -43,6 +45,12 @@ class PoaAvro(AbcMessageAvro):
         self.rid = rid
         self.vcpu_cpu_map = vcpu_cpu_map
         self.node_set = node_set
+        self.poa_id = poa_id
+        self.project_id = project_id
+        self.sequence = sequence
+        self.slice_id = slice_id
+        if self.poa_id is None:
+            self.poa_id = uuid4().__str__()
 
     def get_node_set(self) -> List[str]:
         return self.node_set
@@ -52,6 +60,21 @@ class PoaAvro(AbcMessageAvro):
 
     def get_operation(self) -> str:
         return self.operation
+
+    def get_poa_id(self) -> str:
+        return self.poa_id
+
+    def get_rid(self) -> str:
+        return self.rid
+
+    def get_project_id(self) -> str:
+        return self.project_id
+
+    def get_sequence(self) -> int:
+        return self.sequence
+
+    def get_slice_id(self) -> str:
+        return self.slice_id
 
     def validate(self) -> bool:
         """

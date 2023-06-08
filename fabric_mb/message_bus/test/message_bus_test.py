@@ -337,7 +337,7 @@ class MessageBusTest(unittest.TestCase):
         poa_res = ResultPoaAvro()
         poa_res.message_id = "msg12"
         poa_res.status = result
-        poa_res.poa_info = PoaInfoAvro(operation="reboot")
+        poa_res.poas = PoaInfoAvro(operation="reboot")
 
         producer.produce("fabric_mb-mb-public-test2", poa_res)
 
@@ -955,7 +955,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.model, outgoing.model)
         self.assertEqual(incoming.actors, outgoing.actors)
         self.assertEqual(incoming.delegations, outgoing.delegations)
-        self.assertEqual(incoming.poa_info, outgoing.poa_info)
+        self.assertEqual(incoming.poas, outgoing.poas)
 
     def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro,
                                                 outgoing: GetReservationsStateRequestAvro):
