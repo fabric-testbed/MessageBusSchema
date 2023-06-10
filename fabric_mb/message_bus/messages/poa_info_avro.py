@@ -42,6 +42,7 @@ class PoaInfoAvro(AbcObjectAvro):
         self.poa_id = poa_id
         self.project_id = project_id
         self.slice_id = slice_id
+        self.state = state
 
     def get_info(self) -> dict:
         """
@@ -69,6 +70,9 @@ class PoaInfoAvro(AbcObjectAvro):
 
     def get_slice_id(self) -> str:
         return self.slice_id
+
+    def get_state(self) -> str:
+        return self.state
 
     def validate(self) -> bool:
         """
