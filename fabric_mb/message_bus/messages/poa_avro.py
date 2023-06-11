@@ -23,6 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+import pickle
 from typing import List, Dict
 from uuid import uuid4
 
@@ -34,10 +35,9 @@ class PoaAvro(AbcMessageAvro):
     """
     Implements Avro representation of a query Message
     """
-    def __init__(self, *, operation: str = None, vcpu_cpu_map: List[Dict[str, str]] = None,
-                 node_set: List[str] = None, callback_topic: str = None, rid: str = None, project_id: str = None,
-                 id_token: str = None, message_id: str = None, auth: AuthAvro = None, poa_id: str = None,
-                 sequence: int = None, slice_id: str = None):
+    def __init__(self, *, operation: str = None, vcpu_cpu_map = None, node_set = None, callback_topic: str = None,
+                 rid: str = None, project_id: str = None, id_token: str = None, message_id: str = None,
+                 auth: AuthAvro = None, poa_id: str = None, sequence: int = None, slice_id: str = None):
         super(PoaAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                       name=AbcMessageAvro.poa, message_id=message_id)
         self.operation = operation
@@ -53,9 +53,15 @@ class PoaAvro(AbcMessageAvro):
             self.poa_id = uuid4().__str__()
 
     def get_node_set(self) -> List[str]:
+        if self.node_set is not None:
+            if not isinstance(self.node_set, List):
+                self.node_set = pickle.loads(self.node_set)
         return self.node_set
 
     def get_vcpu_cpu_map(self) -> List[Dict[str, str]]:
+        if self.vcpu_cpu_map is not None:
+            if not isinstance(self.vcpu_cpu_map, List):
+                self.vcpu_cpu_map = pickle.loads(self.vcpu_cpu_map)
         return self.vcpu_cpu_map
 
     def get_operation(self) -> str:

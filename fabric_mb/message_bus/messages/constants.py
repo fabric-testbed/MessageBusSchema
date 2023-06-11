@@ -50,6 +50,8 @@ class Constants:
     MAINT_INFO = "maint_info"
     POAS = "poas"
     INFO = "info"
+    VCPU_CPU_MAP = "vcpu_cpu_map"
+    NODE_SET = "node_set"
     BROKER = "broker"
     TICKET = "ticket"
     RENEWABLE = "renewable"

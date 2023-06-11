@@ -874,12 +874,12 @@
               },
                {
                    "name": "vcpu_cpu_map",
-                   "type": ["null", {"type":"array", "items": {"type": "map", "values": "string"}}],
+                   "type": ["null", "bytes"],
                    "default": null
                },
                {
                    "name": "node_set",
-                   "type": ["null", {"type":"array", "items" : "string"}],
+                   "type": ["null", "bytes"],
                    "default": null
                }
         ]
