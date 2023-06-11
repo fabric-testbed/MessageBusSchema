@@ -34,7 +34,8 @@ class PoaInfoAvro(AbcObjectAvro):
     Implements Avro representation of a query Message
     """
     def __init__(self, *, operation: str = None, info=None, rid: str = None, auth: AuthAvro = None,
-                 poa_id: str = None, project_id: str = None, slice_id: str = None, state: str = None):
+                 poa_id: str = None, project_id: str = None, slice_id: str = None, state: str = None,
+                 error: str = None):
         self.operation = operation
         self.info = info
         self.rid = rid
@@ -43,6 +44,7 @@ class PoaInfoAvro(AbcObjectAvro):
         self.project_id = project_id
         self.slice_id = slice_id
         self.state = state
+        self.error = error
 
     def get_info(self) -> dict:
         """
@@ -73,6 +75,9 @@ class PoaInfoAvro(AbcObjectAvro):
 
     def get_state(self) -> str:
         return self.state
+
+    def get_error(self) -> str:
+        return self.error
 
     def validate(self) -> bool:
         """

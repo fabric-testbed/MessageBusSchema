@@ -914,13 +914,18 @@
                         "type": "string"
                     },
                     {
+                        "name": "error",
+                        "type": ["null", "string"],
+                        "default": null
+                    },
+                    {
                         "name": "auth",
                         "type": "fabric.cf.model.AuthRecord"
                     },
                     {
                         "name": "info",
                         "type": ["null", "bytes"],
-                           "default": null
+                        "default": null
                     }
         ]
     },
