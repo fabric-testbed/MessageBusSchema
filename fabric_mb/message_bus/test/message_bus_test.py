@@ -60,6 +60,8 @@ from fabric_mb.message_bus.messages.get_unit_request_avro import GetUnitRequestA
 from fabric_mb.message_bus.messages.maintenance_request_avro import MaintenanceRequestAvro
 from fabric_mb.message_bus.messages.modify_lease_avro import ModifyLeaseAvro
 from fabric_mb.message_bus.messages.broker_query_model_avro import BrokerQueryModelAvro
+from fabric_mb.message_bus.messages.poa_avro import PoaAvro
+from fabric_mb.message_bus.messages.poa_info_avro import PoaInfoAvro
 from fabric_mb.message_bus.messages.proxy_avro import ProxyAvro
 from fabric_mb.message_bus.messages.request_by_id_record import RequestByIdRecord
 from fabric_mb.message_bus.messages.reservation_or_delegation_record import ReservationOrDelegationRecord
@@ -67,6 +69,7 @@ from fabric_mb.message_bus.messages.reservation_state_avro import ReservationSta
 from fabric_mb.message_bus.messages.resource_ticket_avro import ResourceTicketAvro
 from fabric_mb.message_bus.messages.result_actor_avro import ResultActorAvro
 from fabric_mb.message_bus.messages.result_broker_query_model_avro import ResultBrokerQueryModelAvro
+from fabric_mb.message_bus.messages.result_poa_avro import ResultPoaAvro
 from fabric_mb.message_bus.messages.result_proxy_avro import ResultProxyAvro
 from fabric_mb.message_bus.messages.result_record_list import ResultRecordList
 from fabric_mb.message_bus.messages.result_reservation_avro import ResultReservationAvro
@@ -85,6 +88,7 @@ from fabric_mb.message_bus.messages.result_avro import ResultAvro
 from fabric_mb.message_bus.messages.result_string_avro import ResultStringAvro
 from fabric_mb.message_bus.messages.result_strings_avro import ResultStringsAvro
 from fabric_mb.message_bus.messages.result_units_avro import ResultUnitsAvro
+from fabric_mb.message_bus.messages.site_avro import SiteAvro
 from fabric_mb.message_bus.messages.slice_avro import SliceAvro
 from fabric_mb.message_bus.messages.term_avro import TermAvro
 from fabric_mb.message_bus.messages.ticket import Ticket
@@ -108,13 +112,15 @@ class MessageBusTest(unittest.TestCase):
     def test_consumer_producer(self):
         from threading import Thread
         import time
-
+        '''
         conf = {'metadata.broker.list': 'localhost:19092',
                 'security.protocol': 'SSL',
                 'ssl.ca.location': '../../../secrets/snakeoil-ca-1.crt',
                 'ssl.key.location': '../../../secrets/kafkacat.client.key',
                 'ssl.key.password': 'confluent',
                 'ssl.certificate.location': '../../../secrets/kafkacat-ca1-signed.pem'}
+        '''
+        conf = {'metadata.broker.list': 'localhost:9092'}
         # Create Admin API object
         api = AdminApi(conf=conf)
 
@@ -327,6 +333,13 @@ class MessageBusTest(unittest.TestCase):
         #print(slice_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", slice_res)
+
+        poa_res = ResultPoaAvro()
+        poa_res.message_id = "msg12"
+        poa_res.status = result
+        poa_res.poas = PoaInfoAvro(operation="reboot")
+
+        producer.produce("fabric_mb-mb-public-test2", poa_res)
 
         res_req = GetReservationsRequestAvro()
         res_req.message_id = "abc123"
@@ -677,12 +690,19 @@ class MessageBusTest(unittest.TestCase):
         producer.produce("fabric_mb-mb-public-test2", result_actor)
 
         props = {"mode": "True"}
+        site = SiteAvro(name="renc")
         maint_req = MaintenanceRequestAvro(properties=props, actor_guid="am", callback_topic="test", id_token="id_token",
-                                           message_id="mesg-id-1")
+                                           message_id="mesg-id-1", sites=[site])
+
         producer.produce("fabric_mb-mb-public-test2", maint_req)
 
         #add_peer_req = AddPeerAvro(peer=proxy, callback_topic="test", id_token="token", message_id="mg-1")
         #producer.produce("fabric_mb-mb-public-test2", add_peer_req)
+
+        vcpu_cpu_map = [{"vcpu": "1", "cpu": "11"}, {"vcpu": "0", "cpu": "10"}]
+        poa = PoaAvro(operation="cpupin", vcpu_cpu_map=vcpu_cpu_map, callback_topic="test",
+                      id_token="id_token", auth=auth, rid="rid", message_id="mesg-id-1")
+        producer.produce("fabric_mb-mb-public-test2", poa)
 
         # Fallback to earliest to ensure all messages are consumed
         conf['auto.offset.reset'] = "earliest"
@@ -725,6 +745,9 @@ class MessageBusTest(unittest.TestCase):
 
                 elif message.get_message_name() == AbcMessageAvro.result_slice:
                     self.parent.validate_result_record(message, slice_res)
+
+                elif message.get_message_name() == AbcMessageAvro.result_poa:
+                    self.parent.validate_result_record(message, poa_res)
 
                 elif message.get_message_name() == AbcMessageAvro.get_reservations_request:
                     self.parent.validate_request_by_id(message, res_req)
@@ -825,6 +848,9 @@ class MessageBusTest(unittest.TestCase):
                 elif message.get_message_name() == AbcMessageAvro.maintenance_request:
                     self.parent.assertEqual(message, maint_req)
 
+                elif message.get_message_name() == AbcMessageAvro.poa:
+                    self.parent.validate_poa(message, poa)
+
                 #elif message.get_message_name() == AbcMessageAvro.add_peer:
                 #    self.parent.assertEqual(message, add_peer_req)
 
@@ -903,6 +929,20 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
 
+    def validate_poa(self, incoming: PoaAvro, outgoing: PoaAvro):
+        self.assertEqual(incoming.name, outgoing.name)
+        self.assertEqual(incoming.message_id, outgoing.message_id)
+        self.assertEqual(incoming.callback_topic, outgoing.callback_topic)
+        self.assertEqual(incoming.operation, outgoing.operation)
+        self.assertEqual(len(incoming.vcpu_cpu_map), len(outgoing.vcpu_cpu_map))
+        idx = 0
+        for v_c_pair in incoming.vcpu_cpu_map:
+            self.assertEqual(v_c_pair.get("vcpu"), outgoing.vcpu_cpu_map[idx].get("vcpu"))
+            self.assertEqual(v_c_pair.get("cpu"), outgoing.vcpu_cpu_map[idx].get("cpu"))
+            idx += 1
+        self.assertEqual(incoming.node_set, outgoing.node_set)
+        self.assertEqual(incoming.id_token, outgoing.id_token)
+
     def validate_result_record(self, incoming: ResultRecordList, outgoing: ResultRecordList):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
@@ -915,6 +955,7 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.model, outgoing.model)
         self.assertEqual(incoming.actors, outgoing.actors)
         self.assertEqual(incoming.delegations, outgoing.delegations)
+        self.assertEqual(incoming.poas, outgoing.poas)
 
     def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro,
                                                 outgoing: GetReservationsStateRequestAvro):

@@ -1,5 +1,3 @@
-[![Requirements Status](https://requires.io/github/fabric-testbed/MessageBusSchema/requirements.svg?branch=master)](https://requires.io/github/fabric-testbed/MessageBusSchema/requirements/?branch=master)
-
 [![PyPI](https://img.shields.io/pypi/v/fabric-message-bus?style=plastic)](https://pypi.org/project/fabric-message-bus/)
 
 # Message Bus Schema and Message Definition

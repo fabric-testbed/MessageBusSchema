@@ -23,6 +23,7 @@
 #
 #
 # Author: Komal Thareja (kthare10@renci.org)
+import pickle
 from abc import ABC
 from uuid import uuid4
 
@@ -48,6 +49,7 @@ class AbcMessageAvro(ABC):
     extend_ticket = "ExtendTicket"
     failed_rpc = "FailedRpc"
     modify_lease = "ModifyLease"
+    poa = "Poa"
     query = "Query"
     query_result = "QueryResult"
     redeem = "Redeem"
@@ -96,6 +98,7 @@ class AbcMessageAvro(ABC):
     result_proxy = "ResultProxy"
     result_broker_query_model = "ResultBrokerQueryModel"
     result_actor = "ResultActor"
+    result_poa = "ResultPoa"
 
     def __init__(self, *, message_id: str = None, name: str = None, callback_topic: str = None, kafka_error: str = None,
                  id_token: str = None):
@@ -133,6 +136,10 @@ class AbcMessageAvro(ABC):
                 result.pop(k)
             elif isinstance(result[k], AbcObjectAvro):
                 result[k] = result[k].to_dict()
+            elif k in [Constants.VCPU_CPU_MAP, Constants.NODE_SET]:
+                v = result[k]
+                if v is not None:
+                    result[k] = pickle.dumps(v)
             elif isinstance(result[k], list):
                 temp = []
                 for elem in result[k]:

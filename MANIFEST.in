@@ -1,3 +1,0 @@
-include fabric_mb/message_bus/schema/*.avsc
-include LICENSE
-include README.md
