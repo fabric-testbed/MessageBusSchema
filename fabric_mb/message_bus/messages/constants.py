@@ -52,6 +52,7 @@ class Constants:
     INFO = "info"
     VCPU_CPU_MAP = "vcpu_cpu_map"
     NODE_SET = "node_set"
+    KEYS = "keys"
     BROKER = "broker"
     TICKET = "ticket"
     RENEWABLE = "renewable"

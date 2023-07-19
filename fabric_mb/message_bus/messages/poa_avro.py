@@ -37,7 +37,8 @@ class PoaAvro(AbcMessageAvro):
     """
     def __init__(self, *, operation: str = None, vcpu_cpu_map = None, node_set = None, callback_topic: str = None,
                  rid: str = None, project_id: str = None, id_token: str = None, message_id: str = None,
-                 auth: AuthAvro = None, poa_id: str = None, sequence: int = None, slice_id: str = None):
+                 auth: AuthAvro = None, poa_id: str = None, sequence: int = None, slice_id: str = None,
+                 keys=None):
         super(PoaAvro, self).__init__(callback_topic=callback_topic, id_token=id_token,
                                       name=AbcMessageAvro.poa, message_id=message_id)
         self.operation = operation
@@ -45,12 +46,19 @@ class PoaAvro(AbcMessageAvro):
         self.rid = rid
         self.vcpu_cpu_map = vcpu_cpu_map
         self.node_set = node_set
+        self.keys = keys
         self.poa_id = poa_id
         self.project_id = project_id
         self.sequence = sequence
         self.slice_id = slice_id
         if self.poa_id is None:
             self.poa_id = uuid4().__str__()
+
+    def get_keys(self) -> List[str]:
+        if self.keys is not None:
+            if not isinstance(self.keys, List):
+                self.keys = pickle.loads(self.keys)
+        return self.keys
 
     def get_node_set(self) -> List[str]:
         if self.node_set is not None:
