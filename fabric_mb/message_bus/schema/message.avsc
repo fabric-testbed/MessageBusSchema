@@ -881,6 +881,11 @@
                    "name": "node_set",
                    "type": ["null", "bytes"],
                    "default": null
+               },
+               {
+                   "name": "keys",
+                   "type": ["null", "bytes"],
+                   "default": null
                }
         ]
     },

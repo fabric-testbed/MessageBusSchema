@@ -30,6 +30,7 @@ Defines AvroConsumer API class which exposes interface for various consumer func
 import importlib
 import logging
 import re
+import traceback
 from typing import List
 
 from confluent_kafka.avro import AvroConsumer, SerializerError
@@ -143,6 +144,8 @@ class AvroConsumerApi(ABCMbApi):
                 continue
             except KeyboardInterrupt:
                 break
+            except Exception as e:
+                self.logger.error(f"KAFKA: consumer error: {e}", stack_info=True)
 
         self.logger.debug("KAFKA: Shutting down consumer..")
         self.consumer.close()

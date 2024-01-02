@@ -136,7 +136,7 @@ class AbcMessageAvro(ABC):
                 result.pop(k)
             elif isinstance(result[k], AbcObjectAvro):
                 result[k] = result[k].to_dict()
-            elif k in [Constants.VCPU_CPU_MAP, Constants.NODE_SET]:
+            elif k in [Constants.VCPU_CPU_MAP, Constants.NODE_SET, Constants.KEYS]:
                 v = result[k]
                 if v is not None:
                     result[k] = pickle.dumps(v)
