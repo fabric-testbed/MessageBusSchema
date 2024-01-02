@@ -54,7 +54,7 @@ class PoaAvro(AbcMessageAvro):
         if self.poa_id is None:
             self.poa_id = uuid4().__str__()
 
-    def get_keys(self) -> List[str]:
+    def get_keys(self) -> List[Dict[str, str]]:
         if self.keys is not None:
             if not isinstance(self.keys, List):
                 self.keys = pickle.loads(self.keys)
