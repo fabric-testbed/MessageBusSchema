@@ -48,7 +48,7 @@ class AvroConsumerApi(ABCMbApi):
     """
     def __init__(self, *, consumer_conf: dict, key_schema_location, value_schema_location: str,
                  topics: List[str], batch_size: int = 5, logger: logging.Logger = None,
-                 poll_timeout: float = 0.25):
+                 poll_timeout: int = 250):
         super(AvroConsumerApi, self).__init__(logger=logger)
 
         self.key_schema = self.load_schema(schema_file=key_schema_location)
@@ -59,7 +59,7 @@ class AvroConsumerApi(ABCMbApi):
         self.running = True
         self.topics = topics
         self.batch_size = batch_size
-        self.poll_timeout = poll_timeout
+        self.poll_timeout = float(poll_timeout/1000)
         self.enable_auto_commit = consumer_conf.get("enable.auto.commit", True)
 
     def shutdown(self):
@@ -120,7 +120,7 @@ class AvroConsumerApi(ABCMbApi):
         offsets = []
         while self.running:
             try:
-                msg = self.consumer.poll(self.poll_timeout)
+                msg = self.consumer.poll(timeout=self.poll_timeout)
 
                 # There were no messages on the queue, continue polling
                 if msg is None:
@@ -162,11 +162,13 @@ class AvroConsumerApi(ABCMbApi):
             except SerializerError as e:
                 # Report malformed record, discard results, continue polling
                 self.logger.error(f"KAFKA: Message deserialization failed {e}")
+                self.logger.error(traceback.format_exc())
                 continue
             except KeyboardInterrupt:
                 break
             except Exception as e:
-                self.logger.error(f"KAFKA: consumer error: {e}", stack_info=True)
+                self.logger.error(f"KAFKA: consumer error: {e}")
+                self.logger.error(traceback.format_exc())
 
         self.logger.debug("KAFKA: Shutting down consumer..")
         self.consumer.close()
