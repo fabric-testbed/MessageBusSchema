@@ -30,11 +30,12 @@ Defines AvroConsumer API class which exposes interface for various consumer func
 import importlib
 import logging
 import re
+import time
 import traceback
 from typing import List
 
 from confluent_kafka.avro import AvroConsumer, SerializerError
-from confluent_kafka.cimpl import KafkaError
+from confluent_kafka.cimpl import KafkaError, TopicPartition
 
 from fabric_mb.message_bus.abc_mb_api import ABCMbApi
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
@@ -46,7 +47,8 @@ class AvroConsumerApi(ABCMbApi):
     It is expected that the users would extend this class and override handle_message function.
     """
     def __init__(self, *, consumer_conf: dict, key_schema_location, value_schema_location: str,
-                 topics: List[str], batch_size: int = 5, logger: logging.Logger = None, sync: bool = False):
+                 topics: List[str], batch_size: int = 5, logger: logging.Logger = None,
+                 poll_timeout: float = 0.25):
         super(AvroConsumerApi, self).__init__(logger=logger)
 
         self.key_schema = self.load_schema(schema_file=key_schema_location)
@@ -57,7 +59,8 @@ class AvroConsumerApi(ABCMbApi):
         self.running = True
         self.topics = topics
         self.batch_size = batch_size
-        self.sync = sync
+        self.poll_timeout = poll_timeout
+        self.enable_auto_commit = consumer_conf.get("enable.auto.commit", True)
 
     def shutdown(self):
         """
@@ -114,9 +117,10 @@ class AvroConsumerApi(ABCMbApi):
         self.consumer.subscribe(self.topics)
 
         msg_count = 0
+        offsets = []
         while self.running:
             try:
-                msg = self.consumer.poll(1)
+                msg = self.consumer.poll(self.poll_timeout)
 
                 # There were no messages on the queue, continue polling
                 if msg is None:
@@ -131,12 +135,29 @@ class AvroConsumerApi(ABCMbApi):
                         self.logger.error(f"KAFKA: Consumer error: {msg.error()}")
                         continue
 
-                self.process_message(msg.topic(), msg.key(), msg.value())
+                # Retrieve current offset and high-water mark
+                partition = msg.partition()
+                topic = msg.topic()
+                current_offset = msg.offset()
+                offsets.append(current_offset)
+                low_mark, highwater_mark = self.consumer.get_watermark_offsets(TopicPartition(topic=topic,
+                                                                                              partition=partition))
 
-                if self.sync:
+                # Calculate lag
+                lag = highwater_mark - current_offset
+
+                self.logger.info(
+                    f"Partition {partition}: Current Offset={current_offset}, Highwater Mark={highwater_mark}, "
+                    f"Lag={lag}, Current Message: {msg.value().get('name')}")
+                begin = time.time()
+                self.process_message(msg.topic(), msg.key(), msg.value())
+                self.logger.info(f"KAFKA PROCESS TIME: {time.time() - begin:.0f}")
+
+                if not self.enable_auto_commit:
                     msg_count += 1
                     if msg_count % self.batch_size == 0:
-                        self.consumer.commit(asynchronous=False)
+                        self.consumer.commit(offsets=offsets)
+                        offsets.clear()
 
             except SerializerError as e:
                 # Report malformed record, discard results, continue polling
