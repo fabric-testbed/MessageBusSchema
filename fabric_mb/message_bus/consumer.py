@@ -139,7 +139,7 @@ class AvroConsumerApi(ABCMbApi):
                 partition = msg.partition()
                 topic = msg.topic()
                 current_offset = msg.offset()
-                offsets.append(current_offset)
+                offsets.append(TopicPartition(topic=topic, partition=partition, offset=current_offset))
                 low_mark, highwater_mark = self.consumer.get_watermark_offsets(TopicPartition(topic=topic,
                                                                                               partition=partition))
 
