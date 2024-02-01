@@ -43,7 +43,7 @@ class ABCMbApi(ABC):
             file = open(schema_file, "r")
             schema_bytes = file.read()
             file.close()
-            return avro.loads(schema_bytes)
+            return schema_bytes
         except Exception as e:
             self.logger.error(f"Exception occurred while loading the schema: {schema_file}: {e}")
             self.logger.error(traceback.format_exc())

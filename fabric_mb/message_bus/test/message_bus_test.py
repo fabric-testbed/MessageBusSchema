@@ -31,9 +31,8 @@ import unittest
 from datetime import datetime, timezone
 
 from fabric_mb.message_bus.admin import AdminApi
-from fabric_mb.message_bus.consumer import AvroConsumerApi
+from fabric_mb.message_bus.consumer_new import AvroConsumerApi
 from fabric_mb.message_bus.messages.actor_avro import ActorAvro
-from fabric_mb.message_bus.messages.add_peer_avro import AddPeerAvro
 from fabric_mb.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric_mb.message_bus.messages.add_reservations_avro import AddReservationsAvro
 from fabric_mb.message_bus.messages.add_slice_avro import AddSliceAvro
@@ -102,13 +101,14 @@ from fabric_mb.message_bus.messages.update_reservation_avro import UpdateReserva
 from fabric_mb.message_bus.messages.update_slice_avro import UpdateSliceAvro
 from fabric_mb.message_bus.messages.update_ticket_avro import UpdateTicketAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
-from fabric_mb.message_bus.producer import AvroProducerApi
+from fabric_mb.message_bus.producer_new import AvroProducerApi
 
 
 class MessageBusTest(unittest.TestCase):
     """
     Implements test functions
     """
+
     def test_consumer_producer(self):
         from threading import Thread
         import time
@@ -134,13 +134,12 @@ class MessageBusTest(unittest.TestCase):
         api.create_topics(topics, num_partitions=1, replication_factor=1)
 
         # load AVRO schema
-        key_schema = "../schema/key.avsc"
         value_schema = "../schema/message.avsc"
 
-        conf['schema.registry.url'] = "http://localhost:8081"
+        schema_registry_conf = {'url': "http://localhost:8081"}
 
         # create a producer
-        producer = AvroProducerApi(producer_conf=conf, key_schema_location=key_schema,
+        producer = AvroProducerApi(producer_conf=conf, schema_registry_conf=schema_registry_conf,
                                    value_schema_location=value_schema)
 
         # push messages to topics
@@ -163,7 +162,7 @@ class MessageBusTest(unittest.TestCase):
         query.properties = {"abc": "def"}
         query.auth = auth
         query.id_token = id_token
-        #print(query.to_dict())
+        # print(query.to_dict())
         producer.produce("fabric_mb-mb-public-test1", query)
 
         # query_result
@@ -172,7 +171,7 @@ class MessageBusTest(unittest.TestCase):
         query_result.request_id = "req2"
         query_result.properties = {"abc": "def"}
         query_result.auth = auth
-        #print(query_result.to_dict())
+        # print(query_result.to_dict())
         producer.produce("fabric_mb-mb-public-test2", query_result)
 
         # FailedRPC
@@ -183,7 +182,7 @@ class MessageBusTest(unittest.TestCase):
         failed_rpc.request_type = 1
         failed_rpc.error_details = "test error message"
         failed_rpc.auth = auth
-        #print(failed_rpc.to_dict())
+        # print(failed_rpc.to_dict())
         producer.produce("fabric_mb-mb-public-test2", failed_rpc)
 
         claim_req = ClaimResourcesAvro()
@@ -197,9 +196,8 @@ class MessageBusTest(unittest.TestCase):
         claim_req.slice_id = "slice_1"
         claim_req.id_token = id_token
 
-        #print(claim_req.to_dict())
+        # print(claim_req.to_dict())
         producer.produce("fabric_mb-mb-public-test2", claim_req)
-
 
         reservation = ReservationAvro()
         reservation.reservation_id = "res123"
@@ -261,7 +259,7 @@ class MessageBusTest(unittest.TestCase):
         claimd.callback_topic = "test"
         claimd.delegation = delegation
         claimd.id_token = id_token
-        #print(claim.to_dict())
+        # print(claim.to_dict())
         producer.produce("fabric_mb-mb-public-test2", claimd)
 
         # redeem
@@ -270,7 +268,7 @@ class MessageBusTest(unittest.TestCase):
         redeem.callback_topic = "test"
         redeem.reservation = reservation
         redeem.auth = auth
-        #print(redeem.to_dict())
+        # print(redeem.to_dict())
         producer.produce("fabric_mb-mb-public-test2", redeem)
 
         update_ticket = UpdateTicketAvro()
@@ -282,7 +280,7 @@ class MessageBusTest(unittest.TestCase):
         update_ticket.update_data.failed = False
         update_ticket.update_data.message = ""
 
-        #print(update_ticket.to_dict())
+        # print(update_ticket.to_dict())
         producer.produce("fabric_mb-mb-public-test2", update_ticket)
 
         update_d = UpdateDelegationAvro()
@@ -295,7 +293,7 @@ class MessageBusTest(unittest.TestCase):
         update_d.update_data.message = ""
         update_d.id_token = id_token
 
-        #print(update_ticket.to_dict())
+        # print(update_ticket.to_dict())
         producer.produce("fabric_mb-mb-public-test2", update_d)
 
         get_slice = GetSlicesRequestAvro()
@@ -305,7 +303,7 @@ class MessageBusTest(unittest.TestCase):
         get_slice.guid = "guid"
         get_slice.id_token = id_token
 
-        #print(get_slice.to_dict())
+        # print(get_slice.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", get_slice)
 
@@ -330,14 +328,14 @@ class MessageBusTest(unittest.TestCase):
         slice_res.slices = []
         slice_res.slices.append(s1)
 
-        #print(slice_res.to_dict())
+        # print(slice_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", slice_res)
 
         poa_res = ResultPoaAvro()
         poa_res.message_id = "msg12"
         poa_res.status = result
-        poa_res.poas = PoaInfoAvro(operation="reboot")
+        poa_res.poas = [PoaInfoAvro(operation="reboot")]
 
         producer.produce("fabric_mb-mb-public-test2", poa_res)
 
@@ -350,7 +348,7 @@ class MessageBusTest(unittest.TestCase):
         res_req.auth = auth
         res_req.id_token = id_token
 
-        print(res_req.to_dict())
+        # print(res_req.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", res_req)
 
@@ -362,7 +360,7 @@ class MessageBusTest(unittest.TestCase):
         del_req.auth = auth
         del_req.id_token = id_token
 
-        print(del_req.to_dict())
+        # print(del_req.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", del_req)
 
@@ -384,7 +382,7 @@ class MessageBusTest(unittest.TestCase):
         res_res.status = result
         res_res.reservations = res_list
 
-        #print(res_res.to_dict())
+        # print(res_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", res_res)
         remove_slice = RemoveSliceAvro()
@@ -393,7 +391,7 @@ class MessageBusTest(unittest.TestCase):
         remove_slice.slice_id = 'slice1'
         remove_slice.callback_topic = 'test_topic'
         remove_slice.auth = auth
-        #print(remove_slice.to_dict())
+        # print(remove_slice.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", remove_slice)
 
@@ -450,7 +448,7 @@ class MessageBusTest(unittest.TestCase):
         update_res.reservation_obj = res
         update_res.callback_topic = 'test_topic'
         update_res.auth = auth
-        print(update_res.to_dict())
+        # print(update_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", update_res)
 
@@ -472,7 +470,7 @@ class MessageBusTest(unittest.TestCase):
         add_res.reservation_obj = ticket
         add_res.callback_topic = 'test_topic'
         add_res.auth = auth
-        print(add_res.to_dict())
+        # print(add_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", add_res)
 
@@ -483,7 +481,7 @@ class MessageBusTest(unittest.TestCase):
         add_ress.reservation_list.append(ticket)
         add_ress.callback_topic = 'test_topic'
         add_ress.auth = auth
-        print(add_ress.to_dict())
+        # print(add_ress.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", add_ress)
 
@@ -493,7 +491,7 @@ class MessageBusTest(unittest.TestCase):
         demand_res.reservation_obj = res
         demand_res.callback_topic = 'test_topic'
         demand_res.auth = auth
-        print(demand_res.to_dict())
+        # print(demand_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", demand_res)
 
@@ -505,10 +503,10 @@ class MessageBusTest(unittest.TestCase):
         extend_res.reservation_id = "rid1"
         extend_res.new_units = -1
         extend_res.new_resource_type = "abc"
-        extend_res.request_properties = {'abcd':'eee'}
-        extend_res.config_properties = {'abcd':'eee'}
+        extend_res.request_properties = {'abcd': 'eee'}
+        extend_res.config_properties = {'abcd': 'eee'}
         extend_res.end_time = int(datetime.now(timezone.utc).timestamp())
-        print(extend_res.to_dict())
+        # print(extend_res.to_dict())
 
         producer.produce("fabric_mb-mb-public-test2", extend_res)
 
@@ -627,7 +625,6 @@ class MessageBusTest(unittest.TestCase):
 
         producer.produce("fabric_mb-mb-public-test2", bqm_query)
 
-
         actors_req = GetActorsRequestAvro()
         actors_req.message_id = "msg1"
         actors_req.guid = "gud1"
@@ -691,13 +688,14 @@ class MessageBusTest(unittest.TestCase):
 
         props = {"mode": "True"}
         site = SiteAvro(name="renc")
-        maint_req = MaintenanceRequestAvro(properties=props, actor_guid="am", callback_topic="test", id_token="id_token",
+        maint_req = MaintenanceRequestAvro(properties=props, actor_guid="am", callback_topic="test",
+                                           id_token="id_token",
                                            message_id="mesg-id-1", sites=[site])
 
         producer.produce("fabric_mb-mb-public-test2", maint_req)
 
-        #add_peer_req = AddPeerAvro(peer=proxy, callback_topic="test", id_token="token", message_id="mg-1")
-        #producer.produce("fabric_mb-mb-public-test2", add_peer_req)
+        # add_peer_req = AddPeerAvro(peer=proxy, callback_topic="test", id_token="token", message_id="mg-1")
+        # producer.produce("fabric_mb-mb-public-test2", add_peer_req)
 
         vcpu_cpu_map = [{"vcpu": "1", "cpu": "11"}, {"vcpu": "0", "cpu": "10"}]
         poa = PoaAvro(operation="cpupin", vcpu_cpu_map=vcpu_cpu_map, callback_topic="test",
@@ -730,7 +728,7 @@ class MessageBusTest(unittest.TestCase):
 
                 elif message.get_message_name() == AbcMessageAvro.claim_delegation:
                     self.parent.validate_reservation_or_delegation_record(message, claimd)
-                
+
                 elif message.get_message_name() == AbcMessageAvro.redeem:
                     self.parent.validate_reservation_or_delegation_record(message, redeem)
 
@@ -828,7 +826,7 @@ class MessageBusTest(unittest.TestCase):
                     self.parent.validate_request_by_id(message, bqm_query)
 
                 elif message.get_message_name() == AbcMessageAvro.get_actors_request:
-                    self.parent.validate_request_by_id(message, actors_req)                
+                    self.parent.validate_request_by_id(message, actors_req)
 
                 elif message.get_message_name() == AbcMessageAvro.result_reservation:
                     self.parent.validate_result_record(message, res_res)
@@ -851,12 +849,12 @@ class MessageBusTest(unittest.TestCase):
                 elif message.get_message_name() == AbcMessageAvro.poa:
                     self.parent.validate_poa(message, poa)
 
-                #elif message.get_message_name() == AbcMessageAvro.add_peer:
+                # elif message.get_message_name() == AbcMessageAvro.add_peer:
                 #    self.parent.assertEqual(message, add_peer_req)
 
         # create a consumer
         conf['group.id'] = 'ssl-host'
-        consumer = TestConsumer(consumer_conf=conf, key_schema_location=key_schema,
+        consumer = TestConsumer(consumer_conf=conf, schema_registry_conf=schema_registry_conf,
                                 value_schema_location=value_schema, topics=topics)
         consumer.set_parent(self)
 
@@ -955,6 +953,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.model, outgoing.model)
         self.assertEqual(incoming.actors, outgoing.actors)
         self.assertEqual(incoming.delegations, outgoing.delegations)
+        print(f"KOMAL -in--- {incoming.poas}")
+        print(f"KOMAL -out--- {outgoing.poas}")
         self.assertEqual(incoming.poas, outgoing.poas)
 
     def validate_get_reservations_state_request(self, incoming: GetReservationsStateRequestAvro,
@@ -987,7 +987,8 @@ class MessageBusTest(unittest.TestCase):
         self.assertEqual(incoming.auth, outgoing.auth)
         self.assertEqual(incoming.id_token, outgoing.id_token)
 
-    def validate_add_update_reservation_record(self, incoming: AddUpdateReservationRecord, outgoing: AddUpdateReservationRecord):
+    def validate_add_update_reservation_record(self, incoming: AddUpdateReservationRecord,
+                                               outgoing: AddUpdateReservationRecord):
         self.assertEqual(incoming.name, outgoing.name)
         self.assertEqual(incoming.message_id, outgoing.message_id)
         self.assertEqual(incoming.guid, outgoing.guid)
