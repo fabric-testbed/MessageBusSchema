@@ -170,5 +170,9 @@ class AvroConsumerApi(ABCMbApi):
                 self.logger.error(f"KAFKA: consumer error: {e}")
                 self.logger.error(traceback.format_exc())
 
-        self.logger.debug("KAFKA: Shutting down consumer..")
+        self.logger.info("KAFKA: Shutting down consumer..")
+        # Commit all the messages processed if any pending
+        if len(offsets):
+            self.consumer.commit(offsets=offsets, asynchronous=False)
         self.consumer.close()
+        self.logger.info("KAFKA: Consumer Shutting down complete..")
