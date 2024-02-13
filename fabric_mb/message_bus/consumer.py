@@ -54,6 +54,7 @@ class AvroConsumerApi(ABCMbApi):
         self.key_schema = self.load_schema(schema_file=key_schema_location)
         self.value_schema = self.load_schema(schema_file=value_schema_location)
 
+        consumer_conf['on_commit'] = self.commit_completed
         self.consumer = AvroConsumer(consumer_conf, reader_key_schema=self.key_schema,
                                      reader_value_schema=self.value_schema)
         self.running = True
@@ -139,7 +140,7 @@ class AvroConsumerApi(ABCMbApi):
                 partition = msg.partition()
                 topic = msg.topic()
                 current_offset = msg.offset()
-                offsets.append(TopicPartition(topic=topic, partition=partition, offset=current_offset))
+                offsets.append(TopicPartition(topic=topic, partition=partition, offset=current_offset + 1))
                 low_mark, highwater_mark = self.consumer.get_watermark_offsets(TopicPartition(topic=topic,
                                                                                               partition=partition))
 
@@ -176,3 +177,9 @@ class AvroConsumerApi(ABCMbApi):
             self.consumer.commit(offsets=offsets, asynchronous=False)
         self.consumer.close()
         self.logger.info("KAFKA: Consumer Shutting down complete..")
+
+    def commit_completed(self, err, partitions):
+        if err:
+            self.logger.error(f"KAFKA: commit failure: {err}")
+        else:
+            self.logger.debug(f"KAFKA: Committed partition offsets: {partitions}")
