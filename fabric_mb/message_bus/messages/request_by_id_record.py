@@ -52,6 +52,8 @@ class RequestByIdRecord(AbcMessageAvro):
         self.graph_format = None
         self.site = None
         self.states = None
+        self.start = None
+        self.end = None
 
     def get_slice_id(self) -> str:
         """
