@@ -26,7 +26,6 @@
 from __future__ import annotations
 
 import pickle
-from datetime import datetime, timezone
 from typing import List
 
 from fabric_mb.message_bus.messages.constants import Constants
@@ -163,19 +162,3 @@ class LeaseReservationAvro(TicketReservationAvro):
         @return redeem processors
         """
         return self.redeem_processors
-
-    def set_end(self, end: datetime):
-        if end is not None:
-            self.end = int(end.timestamp())
-
-    def set_start(self, start: datetime):
-        if start is not None:
-            self.start = int(start.timestamp())
-
-    def get_end(self) -> datetime:
-        if self.end is not None:
-            return datetime.fromtimestamp(self.end, tz=timezone.utc)
-
-    def get_start(self) -> datetime:
-        if self.start is not None:
-            return datetime.fromtimestamp(self.start, tz=timezone.utc)
