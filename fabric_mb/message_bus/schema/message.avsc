@@ -1196,6 +1196,16 @@
 				"name": "site",
 				"type": ["null", "string"],
 				"default": null
+			},
+			{
+				"name": "start",
+				"type": ["null", "string"],
+				"default": null
+			},
+			{
+				"name": "end",
+				"type": ["null", "string"],
+				"default": null
 			}
 		]
 	},
