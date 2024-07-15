@@ -30,10 +30,12 @@ Defines AvroConsumer API class which exposes interface for various consumer func
 import importlib
 import logging
 import re
+import time
 import traceback
 from typing import List
 
 from confluent_kafka.avro import AvroConsumer, SerializerError
+
 from confluent_kafka.cimpl import KafkaError, Consumer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
@@ -64,11 +66,13 @@ class AvroConsumerApi(ABCMbApi):
                                                    schema_registry_client=self.schema_registry_client,
                                                    from_dict=self.from_dict)
 
+        consumer_conf['on_commit'] = self.commit_completed
         self.consumer = Consumer(consumer_conf)
         self.running = True
         self.topics = topics
         self.batch_size = batch_size
-        self.sync = sync
+        self.poll_timeout = float(poll_timeout/1000)
+        self.enable_auto_commit = consumer_conf.get("enable.auto.commit", True)
 
     def shutdown(self):
         """
@@ -104,9 +108,10 @@ class AvroConsumerApi(ABCMbApi):
         self.consumer.subscribe(self.topics)
 
         msg_count = 0
+        offsets = []
         while self.running:
             try:
-                msg = self.consumer.poll(timeout)
+                msg = self.consumer.poll(timeout=self.poll_timeout)
 
                 # There were no messages on the queue, continue polling
                 if msg is None:
@@ -121,12 +126,15 @@ class AvroConsumerApi(ABCMbApi):
                         self.logger.error(f"KAFKA: Consumer error: {msg.error()}")
                         continue
 
+
                 deserialized_message = self.value_deserializer(msg.value(),
                                                               SerializationContext(msg.topic(), MessageField.VALUE))
                 # Retrieve current offset and high-water mark
                 partition = msg.partition()
                 topic = msg.topic()
                 current_offset = msg.offset()
+
+                offsets.append(TopicPartition(topic=topic, partition=partition, offset=current_offset + 1))
                 low_mark, highwater_mark = self.consumer.get_watermark_offsets(TopicPartition(topic=topic,
                                                                                               partition=partition))
 
@@ -136,14 +144,16 @@ class AvroConsumerApi(ABCMbApi):
                 self.logger.info(
                     f"Partition {partition}: Current Offset={current_offset}, Highwater Mark={highwater_mark}, "
                     f"Lag={lag}, Current Message: {deserialized_message.get_message_name()}")
+                
                 begin = time.time()
                 self.handle_message(message=deserialized_message)
                 self.logger.info(f"KAFKA PROCESS TIME: {time.time() - begin:.0f}")
 
-                if self.sync:
+                if not self.enable_auto_commit:
                     msg_count += 1
                     if msg_count % self.batch_size == 0:
-                        self.consumer.commit(asynchronous=False)
+                        self.consumer.commit(offsets=offsets)
+                        offsets.clear()
 
             except SerializerError as e:
                 # Report malformed record, discard results, continue polling
@@ -155,9 +165,11 @@ class AvroConsumerApi(ABCMbApi):
             except Exception as e:
                 self.logger.error(f"KAFKA: consumer error: {e}")
                 self.logger.error(traceback.format_exc())
-                continue
 
-        self.logger.debug("KAFKA: Shutting down consumer..")
+        self.logger.info("KAFKA: Shutting down consumer..")
+        # Commit all the messages processed if any pending
+        if len(offsets):
+            self.consumer.commit(offsets=offsets, asynchronous=False)
         self.consumer.close()
 
     @staticmethod
@@ -172,3 +184,9 @@ class AvroConsumerApi(ABCMbApi):
         message = AvroConsumerApi._create_instance(module_name=module_name, class_name=class_name)
         message.from_dict(value)
         return message
+
+    def commit_completed(self, err, partitions):
+        if err:
+            self.logger.error(f"KAFKA: commit failure: {err}")
+        else:
+            self.logger.debug(f"KAFKA: Committed partition offsets: {partitions}")
