@@ -55,6 +55,8 @@ class RequestByIdRecord(AbcMessageAvro):
         self.states = None
         self.start = None
         self.end = None
+        self.ip_subnet = None
+        self.host = None
 
     def get_slice_id(self) -> str:
         """
@@ -167,3 +169,16 @@ class RequestByIdRecord(AbcMessageAvro):
     def get_start(self) -> datetime:
         if self.start is not None:
             return datetime.fromtimestamp(self.start, tz=timezone.utc)
+
+    def set_ip_subnet(self, ip_subnet: str):
+        self.ip_subnet = ip_subnet
+
+    def get_ip_subnet(self) -> str:
+        return self.ip_subnet
+
+    def set_host(self, host: str):
+        self.host = host
+
+    def get_host(self) -> str:
+        return self.host
+
