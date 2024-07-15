@@ -53,7 +53,8 @@ class AvroConsumerApi(ABCMbApi):
     It is expected that the users would extend this class and override handle_message function.
     """
     def __init__(self, *, consumer_conf: dict, schema_registry_conf: dict, value_schema_location: str,
-                 topics: List[str], batch_size: int = 5, logger: logging.Logger = None, sync: bool = False):
+                 topics: List[str], batch_size: int = 5, logger: logging.Logger = None,
+                 poll_timeout: int = 250):
         super(AvroConsumerApi, self).__init__(logger=logger)
 
         self.schema_registry_client = SchemaRegistryClient(schema_registry_conf)
@@ -126,7 +127,6 @@ class AvroConsumerApi(ABCMbApi):
                         self.logger.error(f"KAFKA: Consumer error: {msg.error()}")
                         continue
 
-
                 deserialized_message = self.value_deserializer(msg.value(),
                                                               SerializationContext(msg.topic(), MessageField.VALUE))
                 # Retrieve current offset and high-water mark
@@ -134,6 +134,7 @@ class AvroConsumerApi(ABCMbApi):
                 topic = msg.topic()
                 current_offset = msg.offset()
 
+                self.logger.debug(f"Topic: {topic} Partition: {partition}")
                 offsets.append(TopicPartition(topic=topic, partition=partition, offset=current_offset + 1))
                 low_mark, highwater_mark = self.consumer.get_watermark_offsets(TopicPartition(topic=topic,
                                                                                               partition=partition))

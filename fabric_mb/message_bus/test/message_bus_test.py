@@ -31,7 +31,7 @@ import unittest
 from datetime import datetime, timezone
 
 from fabric_mb.message_bus.admin import AdminApi
-from fabric_mb.message_bus.consumer_new import AvroConsumerApi
+from fabric_mb.message_bus.consumer import AvroConsumerApi
 from fabric_mb.message_bus.messages.actor_avro import ActorAvro
 from fabric_mb.message_bus.messages.add_reservation_avro import AddReservationAvro
 from fabric_mb.message_bus.messages.add_reservations_avro import AddReservationsAvro
@@ -101,7 +101,7 @@ from fabric_mb.message_bus.messages.update_reservation_avro import UpdateReserva
 from fabric_mb.message_bus.messages.update_slice_avro import UpdateSliceAvro
 from fabric_mb.message_bus.messages.update_ticket_avro import UpdateTicketAvro
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
-from fabric_mb.message_bus.producer_new import AvroProducerApi
+from fabric_mb.message_bus.producer import AvroProducerApi
 
 
 class MessageBusTest(unittest.TestCase):
