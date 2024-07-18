@@ -24,6 +24,7 @@
 #
 # Author: Komal Thareja (kthare10@renci.org)
 from typing import List
+from datetime import datetime, timezone
 
 from fabric_mb.message_bus.messages.abc_message_avro import AbcMessageAvro
 
@@ -52,6 +53,10 @@ class RequestByIdRecord(AbcMessageAvro):
         self.graph_format = None
         self.site = None
         self.states = None
+        self.start = None
+        self.end = None
+        self.ip_subnet = None
+        self.host = None
 
     def get_slice_id(self) -> str:
         """
@@ -148,3 +153,32 @@ class RequestByIdRecord(AbcMessageAvro):
             ret_val = False
 
         return ret_val
+
+    def set_end(self, end: datetime):
+        if end is not None:
+            self.end = int(end.timestamp())
+
+    def set_start(self, start: datetime):
+        if start is not None:
+            self.start = int(start.timestamp())
+
+    def get_end(self) -> datetime:
+        if self.end is not None:
+            return datetime.fromtimestamp(self.end, tz=timezone.utc)
+
+    def get_start(self) -> datetime:
+        if self.start is not None:
+            return datetime.fromtimestamp(self.start, tz=timezone.utc)
+
+    def set_ip_subnet(self, ip_subnet: str):
+        self.ip_subnet = ip_subnet
+
+    def get_ip_subnet(self) -> str:
+        return self.ip_subnet
+
+    def set_host(self, host: str):
+        self.host = host
+
+    def get_host(self) -> str:
+        return self.host
+
